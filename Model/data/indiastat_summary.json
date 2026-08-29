@@ -1,0 +1,39 @@
+{
+  "digital": {
+    "n": 37,
+    "mean": 94.4,
+    "sd": 3.951371070063317,
+    "lo": 83.2,
+    "hi": 100.0
+  },
+  "gender": {
+    "n": 37,
+    "mean": 1.3162162162162174,
+    "median": 0.4000000000000057
+  },
+  "cv": {
+    "Campus concentration": 55.218845288469566,
+    "Hostel residents": 78.87104054920451,
+    "Urban MPCE": 18.977553396115027,
+    "Daily internet use, 15-24 urban": 4.185774438626395
+  },
+  "rho_concentration": 0.8999999999999999,
+  "p_concentration": 2.7927579624638857e-08,
+  "rho_axis_swap": 0.8948051948051948,
+  "top5_overlap": 4,
+  "top5_mpce": [
+    "Delhi",
+    "Tamil Nadu",
+    "Karnataka",
+    "Telangana",
+    "Bihar"
+  ],
+  "top5_nsdp": [
+    "Delhi",
+    "Tamil Nadu",
+    "Karnataka",
+    "Bihar",
+    "Maharashtra"
+  ],
+  "source_note": "Aggregate statistics derived from licensed IndiaStat/NSS tables; no raw tables or row-level extracts included."
+}

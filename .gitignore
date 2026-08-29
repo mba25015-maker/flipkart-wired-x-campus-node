@@ -1,0 +1,26 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+*.pyo
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+.env
+.env.*
+~$*
+.~lock.*#
+*.tmp
+
+# Private/licensed source material and local presentation artifacts
+Research Pulls/
+papers/
+*.pdf
+*.pptx
+*.ppt
+*.xlsx
+*.xls
+*.docx
+*.doc

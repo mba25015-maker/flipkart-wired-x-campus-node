@@ -1,0 +1,11 @@
+{
+  "as_of": "2026-08-28",
+  "n_colleges": 54014,
+  "n_universities": 1428,
+  "n_standalone": 16910,
+  "n_districts": 760,
+  "urban_colleges": 21000,
+  "rural_colleges": 32336,
+  "urban_high_propensity_standalone": 1897,
+  "source_note": "Derived district aggregates from the AISHE live institution register; no institution-level records included."
+}
