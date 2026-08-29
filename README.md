@@ -15,6 +15,14 @@ Public-safe, reproducible analytical model supporting the Flipkart WiRED X semi-
 | [L5 — Fulfilment model](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L5_Fulfilment_Model.ipynb) | `sla.py`, `fleet_mix.py` | SLA, batching, runner threshold, volume weighting |
 | [L6 — Basket regression](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L6_Basket_Regression.ipynb) | `basket.py` | Four-quarter basket fit and limitation |
 
+## Appendix assets
+
+Judge-ready output captures, QR codes, and the page-by-page placement map are in [`assets/`](assets/):
+
+- [`assets/screenshots/`](assets/screenshots/) — S1–S6, cropped at 2× resolution;
+- [`assets/qr/`](assets/qr/) — one scan-ready QR image for each L1–L6 notebook;
+- [`assets/manifests/deck_asset_manifest.csv`](assets/manifests/deck_asset_manifest.csv) — notebook, appendix page, proof line, QR, and screenshot mapping.
+
 ## Verify the submission
 
 Run from the repository root:
