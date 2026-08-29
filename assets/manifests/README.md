@@ -12,5 +12,6 @@ The six public notebooks, their appendix destinations, their QR images, and the 
 | L4 district screen | A7 | `L4_District_Screen_QR.png` | S5 |
 | L5 fulfilment model | A5 | `L5_Fulfilment_Model_QR.png` | — |
 | L6 basket regression | A6 | `L6_Basket_Regression_QR.png` | S6 |
+| A2 source register | A2 | `A2_Source_Register_QR.png` | — |
 
-The Google Sheet source-register link belongs on A2. Add its QR after the native Sheet has been created and sharing has been verified.
+The source-register Sheet is shared read-only with anyone holding the link. Its QR belongs on A2.
