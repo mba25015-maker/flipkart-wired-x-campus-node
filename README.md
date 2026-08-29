@@ -4,6 +4,17 @@ Public-safe, reproducible analytical model supporting the Flipkart WiRED X semi-
 
 [![Open the audit in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L1_Audit_Verification.ipynb)
 
+## Run the public notebooks
+
+| Link | Notebook | What it reproduces |
+|---|---|---|
+| [L1 — Audit](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L1_Audit_Verification.ipynb) | `audit.py` | Submission-wide 311-assertion audit |
+| [L2 — Dead-zone solver](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L2_Dead_Zone_Solver.ipynb) | `solver.py` | Five-strategy decision rule |
+| [L3 — Return model](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L3_Return_Model.ipynb) | `roce.py` | ROCE, DuPont, payback, IRR, hurdle AOV |
+| [L4 — District screen](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L4_District_Screen.ipynb) | `aishe_district.py` | District shortlist and contestedness |
+| [L5 — Fulfilment model](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L5_Fulfilment_Model.ipynb) | `sla.py`, `fleet_mix.py` | SLA, batching, runner threshold, volume weighting |
+| [L6 — Basket regression](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L6_Basket_Regression.ipynb) | `basket.py` | Four-quarter basket fit and limitation |
+
 ## Verify the submission
 
 Run from the repository root:
