@@ -2,6 +2,8 @@
 
 Public-safe, reproducible analytical model supporting the Flipkart WiRED X semi-final submission. Paid analyst documents and licensed raw workbooks are intentionally excluded.
 
+[![Open the audit in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L1_Audit_Verification.ipynb)
+
 ## Verify the submission
 
 Run from the repository root:
@@ -81,4 +83,3 @@ Passing a local document or PowerPoint path to a verification script checks that
 ## Important limitation
 
 The checks establish computational reproducibility and internal consistency. They do not independently certify the accuracy, currency, or licensing of every third-party source. District-level enrolment remains an imputation because the AISHE register supplies institution counts, not district enrolment.
-
