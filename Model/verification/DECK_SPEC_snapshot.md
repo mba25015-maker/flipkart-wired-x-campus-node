@@ -38,7 +38,7 @@ table stakes — which is exactly why doing it in a form that costs no space is 
 | 7 | AISHE 2023-24 report — enrolment, hostel occupancy. **Different instrument from [6]. Never mix a count from one with an enrolment from the other.** |
 | 8 | Eternal / Blinkit FY26 disclosures — take rate 19.41%, contribution ₹29.4/order, shrinkage 1.8% of NOV, NWC days |
 | 9 | Zepto, MCA-filed audited consolidated accounts — 13 days inventory, ~60 days payables |
-| 10 | Swiggy Instamart quarterly disclosures — non-grocery share of GOV vs AOV; management's stated 30–40% ceiling |
+| 10 | Swiggy Instamart quarterly disclosures — non-grocery share of GOV vs AOV; disclosed 30–40% reference range |
 | 11 | J.P. Morgan quick-commerce channel work — 4.0 orders/active hour, sub-2km leg, rider cost; Physicswallah note 9 Jul 2026 |
 | 12 | UBS Evidence Lab rider survey, n=100, Nov–Dec 2025 — batching incidence, food-delivery productivity |
 | 13 | Walmart Q1 FY27 earnings call, 21 May 2026 — >800 MFCs, <13 minutes, >30 cities |
@@ -123,7 +123,7 @@ GATE         go/no-go at month 3 on 4 instrumented metrics (A4)
 | Districts clearing the operational screen | **111 of 760**⁶ |
 | Asset turn, campus vs city, one basis | **6.93× / 7.34× = 0.944** |
 | Across Blinkit's whole observed range² | **0.90 – 1.00** |
-| Basket to ₹580 | **24.9% non-grocery** vs 30–40% ceiling¹⁰ |
+| Basket to ₹580 | **24.9% non-grocery** vs Swiggy's 30–40% disclosed range¹⁰ |
 | Holding through the break vs relocating | **24% of one relocation** |
 
 **Limit strip (full width, ruled, not shaded)**
@@ -388,7 +388,7 @@ Read-line: **the ratio is linear in throughput, so we quote the range rather tha
 
 **Limit strip**
 > `ASSUMPTION EXPOSED` "Other fixed" of **₹2,59,660 (28.8% of the base)** is a residual we allocated out of JM's blended ₹100/sqft utilities-and-other line, not an itemised figure¹. It is the least defensible line in the stack and the one that persists through the break.
-> `OUTSIDE EVIDENCE` Physicswallah's pre-Ind-AS EBITDA margin swings ~850bps Q4FY26→Q1FY27E on the academic calendar (with NEET postponement delaying offline batches)¹¹. Kambli 2020: worker reallocation alone cuts campus-dining wait 29% at $200 capex and $0/yr — labour beats capital, in a campus context¹⁸. CRISIL: occupier contracts run 1–3 years, terminable by the client on short notice — the flexibility is on our side of the table¹⁷.
+> `OUTSIDE EVIDENCE` Physicswallah's pre-Ind-AS EBITDA margin swings ~850bps Q4FY26→Q1FY27E on the academic calendar (with NEET postponement delaying offline batches)¹¹. Kambli 2020: worker reallocation alone cuts campus-dining wait 29% at $200 capex and $0/yr — labour beats capital, in a campus context¹⁸. CRISIL: occupier contracts run 1–3 years, terminable by the occupier on short notice — the flexibility is on our side of the table¹⁷.
 
 **So-what band**
 > Cost cannot close the calendar. Density can. So the break becomes a site-selection criterion. Slide 6.
@@ -465,7 +465,7 @@ then screened for incumbent presence:   uncontested 9  |  contested 22  |  stack
 ## SLIDE 7 — THE BASKET AND THE BREAK PLAYBOOK
 
 **Action title**
-> ₹580 is reachable at 24.9% non-grocery, inside the operator's own stated ceiling — and holding the node through the break costs 24% of relocating it.
+> ₹580 is modeled at 24.9% non-grocery, within Swiggy's disclosed reference range — and holding the node through the break costs 24% of relocating it.
 
 **Kicker**
 > No assumed lifting rate. The one disclosed quarterly series where an Indian operator actually lifted AOV, fitted and applied.
@@ -483,7 +483,8 @@ then screened for incumbent presence:   uncontested 9  |  contested 22  |  stack
             +  ₹55   non-grocery mix 20% -> 24.9% of GOV
             =  ₹580  required
    mix lever alone would need 31.5%. Occasions do the rest.
-   Management's stated ceiling 30-40% [10]  ->  headroom +15.1 pp
+   Swiggy disclosed range 30-40% [10]  ->  headroom +15.1 pp
+   Cross-operator reference only; not a Flipkart commitment.
 ```
 Second lever: Minutes' free-delivery threshold is **₹149**, the market's lowest (Instamart ₹199, Blinkit ₹499 — and Blinkit already varies it by location and demand). A campus threshold is an existing platform lever, not a new ask.
 
@@ -539,7 +540,7 @@ Urban demand is spatially mobile and temporally continuous — relocation is rig
 **Footnote line** — `Sources 4,8,9,10,20,21,22 · basket fit A6 · playbook A4 · WC derivation A5`
 
 **Napkin prompt**
-> A waterfall of three ascending bars left to right: ₹450 labelled "network basket today", a small connector bar "+₹75 term-start durables", reaching ₹525, then a second connector "+₹55 non-grocery mix to 24.9%", reaching a final gold bar ₹580 labelled "breakeven". Above the final bar draw a light horizontal band spanning 30–40% labelled "management's stated ceiling — headroom 15.1 pp". Flat vector, navy #0D1F5C bars, gold #FFC220 final bar, grey connectors, transparent background, no gradients or shadows, wider than tall.
+> A waterfall of three ascending bars left to right: ₹450 labelled "network basket today", a small connector bar "+₹75 term-start durables", reaching ₹525, then a second connector "+₹55 non-grocery mix to 24.9%", reaching a final gold bar ₹580 labelled "breakeven". Above the final bar draw a light horizontal band spanning 30–40% labelled "Swiggy disclosed range — headroom 15.1 pp". Flat vector, navy #0D1F5C bars, gold #FFC220 final bar, grey connectors, transparent background, no gradients or shadows, wider than tall.
 
 **Kill list** — no shopping-basket icon, no student persona, no "habit loop" diagram.
 
@@ -548,7 +549,7 @@ Urban demand is spatially mobile and temporally continuous — relocation is rig
 ## SLIDE 8 — TRADE-OFFS AND WHERE THIS BREAKS
 
 **Action title**
-> Four things can break this node. Three are priced, all four stay inside the basket lever's stated ceiling, and one binds alone.
+> Four things can break this node. Three are priced; all four fall within the AOV band implied by Swiggy's disclosed range, and one binds alone.
 
 **Kicker**
 > Shocks are quoted against the adopted ₹580 breakeven. The volume shock is the single binding dependency; the other three are absorbed.
@@ -565,7 +566,7 @@ Urban demand is spatially mobile and temporally continuous — relocation is rig
 ```
 CAN THE BASKET STILL COVER IT?
    AOV reachable at 30% non-grocery   ₹637      3 of 4 shocks covered inside the conservative floor
-   AOV reachable at 40% non-grocery   ₹750      4 of 4 covered inside the stated ceiling
+   AOV reachable at 40% non-grocery   ₹750      4 of 4 covered within Swiggy's range
    The volume shock needs the basket to work harder than the 30% case. One binding dependency, not four.
 ```
 
@@ -663,7 +664,7 @@ Ranked by what it adds per hour of work.
    number into a sign, and the sign changes the recommendation from financial to contractual.
 7. **DuPont framing on the asset turn**, if you want one more layer: T = NOV/K is the turnover leg of
    ROCE, and Eternal has publicly targeted ROCE "north of 40%"⁸. Saying *the campus node clears the
-   turnover leg at 94% of a city store* connects our headline to the client's own stated hurdle.
+   turnover leg at 94% of a city store* connects the asset-turn result to Eternal's public benchmark.
 8. **Concepts to name explicitly** where they already apply, so the vocabulary is visible:
    *cost-to-serve decomposition* (slide 3), *risk pooling / consolidation* (slide 4), *capacity cushion*
    (slide 4 runners), *postponement* (scheduled-slot tier), *fixed-cost absorption and operating

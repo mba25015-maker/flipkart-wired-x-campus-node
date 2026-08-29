@@ -191,10 +191,10 @@ def slide1():
              f"Campus asset turn {M.CAMPUS_TURN:.2f}x against a city store's {M.CITY_TURN:.2f}x = "
              f"{M.TURN_RATIO:.3f} — and {M.turn_ratio_at(M.CEIL_LO):.2f}–{M.turn_ratio_at(M.CEIL_HI):.2f} across "
              f"the whole range a mature operator has actually recorded."),
-            ("And the basket gets there inside a stated ceiling.",
+            ("The basket benchmark is source-bounded.",
              f"Rs{be:,.0f} needs {BK.SHARE_NEEDED_AFTER_OCCASION:.1f}% non-grocery, from "
-             f"{BK.MINUTES_NONGROCERY:.0f}% today, against management's own "
-             f"{BK.NONGROCERY_CEILING_LO:.0f}–{BK.NONGROCERY_CEILING:.0f}% ceiling.")]
+             f"{BK.MINUTES_NONGROCERY:.0f}% today, compared with Swiggy's disclosed "
+             f"{BK.NONGROCERY_CEILING_LO:.0f}–{BK.NONGROCERY_CEILING:.0f}% range. This is a cross-operator reference, not a Flipkart commitment.")]
 
     for col,(x,items,accent) in enumerate([(0.55,left,NEG),(5.10,right,POS)]):
         yy = (yl if col==0 else yr)+0.10

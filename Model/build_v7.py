@@ -366,7 +366,7 @@ rows=[
  ("Blinkit contribution profit / order","Rs29.4",tg("T1"),""),
  ("Orders/day/store, 9-quarter range","1,334-1,487",tg("T1"),""),
  ("Net working capital","18 days",tg("T1"),""),
- ("ROCE target, management","> 40%",tg("T1"),""),
+ ("ROCE benchmark, Eternal","> 40%",tg("T1"),""),
  ("Higher-ed enrolment / hostel residents","4.46 cr / 49.4 L",tg("T1"),""),
  ("Urban MPCE by state","HCES 2023-24",tg("T1"),""),
  ("Active academic months","8.5",tg("T1"),""),

@@ -10,7 +10,7 @@ Public-safe, reproducible analytical model supporting the Flipkart WiRED X semi-
 |---|---|---|
 | [L1 — Audit](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L1_Audit_Verification.ipynb) | `audit.py` | Submission-wide 311-assertion audit |
 | [L2 — Dead-zone solver](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L2_Dead_Zone_Solver.ipynb) | `solver.py` | Five-strategy decision rule |
-| [L3 — Return model](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L3_Return_Model.ipynb) | `roce.py` | ROCE, DuPont, payback, IRR, hurdle AOV |
+| [L3 — Return model](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L3_Return_Model.ipynb) | `roce.py` | ROCE, DuPont, payback, IRR, external-benchmark AOV |
 | [L4 — District screen](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L4_District_Screen.ipynb) | `aishe_district.py` | District shortlist and contestedness |
 | [L5 — Fulfilment model](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L5_Fulfilment_Model.ipynb) | `sla.py`, `fleet_mix.py` | SLA, batching, runner threshold, volume weighting |
 | [L6 — Basket regression](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L6_Basket_Regression.ipynb) | `basket.py` | Four-quarter basket fit and limitation |
@@ -66,7 +66,7 @@ On Windows, activate with `.venv\Scripts\Activate.ps1`.
 |---|---|
 | `Model/audit.py` | Runs the submission-wide assertion framework |
 | `Model/solver.py` | Compares five dead-zone strategies |
-| `Model/roce.py` | Reproduces ROCE, DuPont, payback, IRR, and hurdle-AOV calculations |
+| `Model/roce.py` | Reproduces ROCE, DuPont, payback, IRR, and external-benchmark AOV calculations |
 | `Model/aishe_district.py` | Runs the district screening and contestedness model |
 | `Model/sla.py` | Reproduces fulfilment and SLA calculations |
 | `Model/fleet_mix.py` | Calculates volume-weighted fulfilment cost |
@@ -102,3 +102,7 @@ Passing a local document or PowerPoint path to a verification script checks that
 ## Important limitation
 
 The checks establish computational reproducibility and internal consistency. They do not independently certify the accuracy, currency, or licensing of every third-party source. District-level enrolment remains an imputation because the AISHE register supplies institution counts, not district enrolment.
+
+## Benchmark attribution
+
+The return model uses Eternal's publicly stated ROCE of “north of 40%” as an external comparator; it is not presented as a Flipkart target. The basket model compares its implied mix with Swiggy's disclosed 30–40% non-grocery range; that range is likewise a cross-operator reference, not a Flipkart commitment or proof of feasibility. Runnable outputs label both boundaries explicitly.

@@ -43,7 +43,7 @@ INV_PER_STORE_RESOLVED = False
 ETERNAL_NWC_DAYS_NOW    = 14.0   # T1  Eternal Q1FY27 call, 22 Jul 2026 ("down from 18")
 ETERNAL_NWC_DAYS_TARGET = 12.0   # T1  same call, steady-state target
 ETERNAL_NWC_DAYS_OLD    = 18.0   # T1  Jan 2026 call - the figure the model was carrying
-NWC_PCT_NOV = {12.0: 0.033, 18.0: 0.050}   # T1  management's own conversion, both points given
+NWC_PCT_NOV = {12.0: 0.033, 18.0: 0.050}   # T1  Eternal's disclosed conversion, both points given
 
 ZEPTO_INV_DAYS, ZEPTO_PAY_DAYS = 13.0, 60.0     # T1  EMIS/Zepto: 13 days inventory vs ~60 payables
 ZEPTO_CCC = ZEPTO_INV_DAYS - ZEPTO_PAY_DAYS      # -47 days. Supplier-funded, cash-positive cycle.

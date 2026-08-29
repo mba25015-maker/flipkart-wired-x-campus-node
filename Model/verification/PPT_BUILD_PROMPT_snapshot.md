@@ -183,7 +183,7 @@ BREAK — repurpose the catchment; the node never closes ·
 GATE — go/no-go at day 90 on four instrumented metrics
 
 **EXHIBIT 2 — four stat tiles (accent bars: blue, green, green, green):**
-| CAPITAL EMPLOYED **₹325 L** capex ₹235 L + working capital ₹90 L | ROCE, 30% BASKET **32.7%** and 40% at AOV ₹763, inside the stated ceiling |
+| CAPITAL EMPLOYED **₹325 L** capex ₹235 L + working capital ₹90 L | ROCE, 30% BASKET **32.7%** and 40% at AOV ₹763 against Eternal's public benchmark |
 | PAYBACK **27 months** against a 56-month franchised-store benchmark¹¹ | IRR, 5-YEAR **34.4%** 31–35% across a 2–6 month ramp |
 
 **EXHIBIT 3 — comparison table.** Header row two cells: left **"TREATED AS A COST PROBLEM"** on
@@ -192,7 +192,7 @@ GATE — go/no-go at day 90 on four instrumented metrics
 |---|---|
 | Lever ladder moves the requirement 70.8% → 48.6% of term volume, then stops | 111 of 760 districts clear a four-part operational screen |
 | 48.6 points still unfunded through a break that delivers nothing | Density buys the calendar back: 6.93× against a city store's 7.34× |
-| Holding costs ₹31.6 L; relocating costs ₹89 L and forfeits a catchment that returns on a published date | The same node returns 32.7% on a basket mix already called reachable |
+| Holding costs ₹31.6 L; relocating costs ₹89 L and forfeits a catchment that returns on a published date | The same node returns 32.7% at the modeled 30% basket mix |
 | Network basket ₹450 against a required ₹580 | Repurposing the break is worth ₹26 of AOV — cheaper than lifting the basket |
 
 **Limit strip (red callout, one line):** LIMIT, COMPUTED — at a 30% basket with volume 30% below plan, ROCE falls to 12.9% and payback runs to 67 months, longer than the node's 60-month life. Volume is what day 90 measures first.
@@ -298,11 +298,11 @@ blended ₹100/sqft line, not an itemised figure — the least defensible number
  ┌ 0.45→5.35 @2.06 · EXH 11 four sensitivity cells, 1.20 wide each ───────┐
  ┌ 0.45→5.35 @3.06 · EXH 12 DuPont mono card, height 0.92 ────────────────┐
  ┌ 5.45→9.55 @1.44 · EXH 13 roce_ladder.png 4.10 × 1.42 ─────────────────┐
- ┌ 5.45→9.55 @3.00 · five-row fact list (breakeven → hurdle → premium)  ──┐
+ ┌ 5.45→9.55 @3.00 · five-row fact list (breakeven → benchmark → premium)  ──┐
  red callout 0.45→5.35 @4.06 (two asset turns) · band @4.76 · footnote
 ```
 
-**Action title:** Campus density buys back the academic calendar almost exactly — and on the client's own hurdle metric the node clears 40% ROCE at ₹763
+**Action title:** Campus density buys back the academic calendar almost exactly — and reaches Eternal's public 40% ROCE benchmark at ₹763
 
 **Kicker:** Asset turn is the turnover leg of ROCE. The node clears that leg at 94% of a city store. The margin leg is what the basket has to buy.
 
@@ -323,12 +323,12 @@ AOV* = (ROCE·CE + F·12)/(τ·N) + c/τ        closed form, no search
 ```
 
 **EXHIBIT 13** — `roce_ladder.png`, then a five-row fact list beneath it:
-AOV for ROCE = 0 **₹578** · AOV for the 40% hurdle **₹763** · premium over breakeven **₹185** ·
-non-grocery mix it implies **33.0% of GOV** · management's stated ceiling **30–40%**
+AOV for ROCE = 0 **₹578** · AOV for the 40% benchmark **₹763** · premium over breakeven **₹185** ·
+non-grocery mix it implies **33.0% of GOV** · Swiggy disclosed reference range **30–40%**
 
 **Red callout:** TWO ASSET TURNS, BOTH CORRECT — QUOTE THE BASIS. The 6.93× is a like-for-like comparison at a common AOV of ₹450, which is what isolates density × calendar. The DuPont leg (8.50×) is the node's own turnover at its achieved AOV on capital employed including working capital.
 
-**Band:** Breakeven was never the hurdle. **₹578 earns zero on ₹325 lakh; ₹763 earns 40%** — and the site is what supplies the throughput either one needs.
+**Band:** Breakeven is not the return benchmark. **₹578 earns zero on ₹325 lakh; ₹763 earns 40%** — and the site is what supplies the throughput either one needs.
 
 **Footnote:** Sources 1, 2, 4, 8, 10, 11 · ROCE model, DuPont reconciliation and the day-count note A6b
 
@@ -443,7 +443,7 @@ orders, up from 42%¹²
  red callout 0.45→9.55 @4.30 (the limit) · band @4.76 · footnote
 ```
 
-**Action title:** One node earns ₹130 lakh of EBIT and 32.7% on capital at a 30% non-grocery basket, and clears the 40% hurdle at ₹763
+**Action title:** One node earns ₹130 lakh of EBIT and 32.7% on capital at a 30% non-grocery basket, and reaches Eternal's public 40% benchmark at ₹763
 
 **Kicker:** The basket is fitted, not assumed — the one disclosed quarterly series where an Indian operator actually lifted AOV. Every point of non-grocery mix is worth ₹11.28.
 
@@ -453,10 +453,10 @@ orders, up from 42%¹²
 **capital employed ₹325 L** · cash conversion cycle **−47 days — the node is supplier-funded**⁹
 
 **EXHIBIT 24** — `basket_ladder.png`. Caption: ₹450 → ₹525 on term-start durables → ₹580 at 24.9%
-non-grocery, from 20% today. The 40% hurdle needs 33.0% — still inside the stated 30–40% ceiling,
-with 7.0 points of headroom.
+non-grocery, from 20% today. The 40% benchmark needs 33.0% — within Swiggy's disclosed 30–40% range,
+with 7.0 points of headroom. This is a cross-operator reference, not a Flipkart commitment.
 
-**EXHIBIT 25 — returns:** breakeven AOV ₹578 · hurdle AOV, pre-tax **₹763** · post-tax at 25.17% ₹825 ·
+**EXHIBIT 25 — returns:** breakeven AOV ₹578 · benchmark AOV, pre-tax **₹763** · post-tax at 25.17% ₹825 ·
 IRR, 5-year, 3-month ramp **34.4%** · ramp 2–6 months 35%–31% · node life anchor 56-month payback¹¹
 
 **EXHIBIT 26 — scenarios (data table):**
@@ -469,7 +469,7 @@ IRR, 5-year, 3-month ramp **34.4%** · ramp 2–6 months 35%–31% · node life 
 
 **Red callout:** THE LIMIT, COMPUTED NOT ASSERTED — at a 30% basket with volume 30% below plan the node returns 12.9% and pays back in 67 months, longer than the 60 months its life is anchored on. Under that combination it does not pay back within its life. That is why day 90 measures volume before anything else, and why node two is not funded until it clears.
 
-**Band:** The node clears the hurdle on a basket mix management has already called reachable. **One dependency binds: term volume.**
+**Band:** The modeled basket mix falls within Swiggy's disclosed range; this does not establish Flipkart feasibility. **One dependency binds: term volume.**
 
 **Footnote:** Sources 2, 4, 8, 9, 10, 11 · P&L, capital and ROCE derivation A6b · basket fit R²=0.918 on four disclosed quarters A6 · NPV at 12%/15% assumes a discount rate; no WACC is disclosed
 

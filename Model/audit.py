@@ -249,7 +249,7 @@ chk("S19    breakeven D2-consistent = Rs580 (ADOPTED)", 580.2,
 chk("S21    Instamart mix->AOV slope = Rs11.3/pt",   11.28, BK.SLOPE, 0.01)
 chk("S21    fit R2 = 0.918",                          0.918, BK.R2, 0.01)
 chk("S21    non-grocery needed after occasions = 24.9%", 24.9, BK.SHARE_NEEDED_AFTER_OCCASION, 0.01)
-chk("S21    fits under mgmt 30-40% ceiling",          1, 1 if BK.FITS_AFTER_OCCASION else 0, 0.001)
+chk("S21    mix falls within Swiggy 30-40% range",    1, 1 if BK.FITS_AFTER_OCCASION else 0, 0.001)
 chk("S21    Minutes non-grocery today = 20%",         20.0, BK.MINUTES_NONGROCERY, 0.001)
 chk("S21    term-start occasion lifts AOV to Rs525",  525, BK.OCCASION_AOV, 0.01)
 chk("S21    hold-through-break cost = Rs21.3L",       21.3, B.relocate_vs_flex()["flex_total"]/1e5, 0.02)
@@ -368,7 +368,7 @@ chk("S8      shrinkage double-count flag is set",    1,
 chk("S8      basket reaches Rs637 at the 30% floor",  637.5, RS.AOV_CEILING_LO, 0.005)
 chk("S8      basket reaches Rs750 at the 40% ceiling", 750.3, RS.AOV_CEILING_HI, 0.005)
 chk("S8      3 of 4 shocks covered inside the 30% floor", 3, len(RS.COVERED_AT_LO), 0.001)
-chk("S8      4 of 4 shocks covered inside the 40% ceiling", 1,
+chk("S8      4 of 4 shocks covered at Swiggy range maximum", 1,
     1 if RS.ALL_COVERED_AT_HI else 0, 0.001)
 
 # ---- CC-6: labour-class parameter table (labour_class.py) ---------------------
@@ -425,21 +425,21 @@ chk("S30     ROCE breakeven AOV reproduces the spine", 1,
     1 if RC.BREAKEVEN_TIES_TO_SPINE else 0, 0.001)
 chk("S30     day-count gap to the spine = Rs2.14",   2.14, RC.DAYCOUNT_GAP, 0.02)
 chk("S30     AOV for ROCE = 0 is Rs578",            578, RC.AOV_BREAKEVEN, 0.005)
-chk("S30     AOV for the 40% hurdle is Rs763",      763, RC.AOV_HURDLE, 0.005)
-chk("S30     post-tax hurdle AOV is Rs825",         825, RC.AOV_HURDLE_POSTTAX, 0.005)
-chk("S30     hurdle premium over breakeven = Rs185", 185, RC.HURDLE_PREMIUM, 0.02)
-chk("S30     non-grocery share implied by the hurdle = 33.0%", 33.0, RC.HURDLE_NONGROCERY_SHARE, 0.02)
-chk("S30     hurdle sits inside the stated ceiling", 1, 1 if RC.HURDLE_INSIDE_CEILING else 0, 0.001)
+chk("S30     AOV for the 40% benchmark is Rs763",   763, RC.AOV_HURDLE, 0.005)
+chk("S30     post-tax benchmark AOV is Rs825",      825, RC.AOV_HURDLE_POSTTAX, 0.005)
+chk("S30     benchmark premium over breakeven = Rs185", 185, RC.HURDLE_PREMIUM, 0.02)
+chk("S30     non-grocery share implied by benchmark = 33.0%", 33.0, RC.HURDLE_NONGROCERY_SHARE, 0.02)
+chk("S30     benchmark-implied mix is within Swiggy range", 1, 1 if RC.HURDLE_INSIDE_CEILING else 0, 0.001)
 chk("S30     DuPont identity closes: margin x turn = ROCE", 0,
     RC.dupont(RC.AOV_HURDLE)["ebit_margin"]*RC.dupont(RC.AOV_HURDLE)["capital_turn"]
     - RC.roce(RC.AOV_HURDLE), 0.001)
-chk("S30     ROCE at the hurdle AOV = 40%",         0.40, RC.roce(RC.AOV_HURDLE), 0.005)
+chk("S30     ROCE at the benchmark AOV = 40%",      0.40, RC.roce(RC.AOV_HURDLE), 0.005)
 chk("S30     ROCE at a 30% non-grocery basket = 32.7%", 32.7, RC.roce(RC.AOV_UP)*100, 0.02)
 chk("S30     ROCE under the -30% volume shock = 12.9%", 12.9,
     RC.roce(RC.AOV_UP, v=M.CEILING*RC.VOL_SHOCK)*100, 0.02)
 chk("S30     downside payback exceeds the node's anchored life", 1,
     1 if RC.CAPEX_MID/RC.monthly_ebitda(RC.AOV_UP, v=M.CEILING*RC.VOL_SHOCK) > RC.NODE_LIFE_MO else 0, 0.001)
-chk("S30     IRR at the hurdle AOV = 34.4%",        34.4, RC.irr(RC.AOV_HURDLE)*100, 0.02)
+chk("S30     IRR at the benchmark AOV = 34.4%",     34.4, RC.irr(RC.AOV_HURDLE)*100, 0.02)
 chk("S30     repurpose is worth Rs26 of AOV",       26, RC.REPURPOSE_WORTH_AOV, 0.05)
 chk("S30     slide-4 turn is the like-for-like quantity", 6.93, RC.TURN_SLIDE4, 0.005)
 chk("S30     tax rate = 25.17%",                    25.17, RC.TAX_RATE*100, 0.001)

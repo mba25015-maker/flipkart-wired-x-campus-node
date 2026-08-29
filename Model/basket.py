@@ -43,7 +43,7 @@ MINUTES_NONGROCERY = 20.0     # T2  Netscribes, from Flipkart disclosure: mobile
 MINUTES_AOV_NOW    = M.MINUTES_AOV            # Rs450, T1, journalist-confirmed
 TARGET_AOV         = 580.0                    # S19/S20 D2-consistent minimum viable campus AOV
 
-# Management's own ceiling, and it is a real constraint, not a modelling choice:
+# Cross-operator reference range, not a Flipkart commitment:
 NONGROCERY_CEILING = 40.0     # T1  Swiggy management: non-grocery capped at 30-40% of GOV
                               #     "to retain the benefits of being on a high frequency platform"
 NONGROCERY_CEILING_LO = 30.0
@@ -133,7 +133,7 @@ def ladder():
     # remaining gap closed by category mix
     need = share_needed(TARGET_AOV, aov2, MINUTES_NONGROCERY)
     rows.append((f"+ non-grocery mix to {need:.0f}% of GOV", TARGET_AOV,
-                 f"vs {MINUTES_NONGROCERY:.0f}% today; management ceiling {NONGROCERY_CEILING_LO:.0f}-{NONGROCERY_CEILING:.0f}%"))
+                 f"vs {MINUTES_NONGROCERY:.0f}% today; Swiggy disclosed range {NONGROCERY_CEILING_LO:.0f}-{NONGROCERY_CEILING:.0f}%"))
     return rows, need
 
 LADDER_ROWS, SHARE_NEEDED_AFTER_OCCASION = ladder()
@@ -160,9 +160,10 @@ def report():
     print(f"  Non-grocery share required, mix lever alone      {SHARE_NEEDED:.1f}% of GOV")
     print(f"  Non-grocery share required, after occasions      {SHARE_NEEDED_AFTER_OCCASION:.1f}% of GOV")
     print(f"  Minutes today                                    {MINUTES_NONGROCERY:.1f}% of GOV")
-    print(f"  Management ceiling (Swiggy, stated)              {NONGROCERY_CEILING_LO:.0f}-{NONGROCERY_CEILING:.0f}% of GOV")
-    print(f"  VERDICT  {'REACHABLE inside the stated ceiling' if FITS_AFTER_OCCASION else 'NOT reachable inside the ceiling'}"
+    print(f"  Swiggy disclosed reference range                 {NONGROCERY_CEILING_LO:.0f}-{NONGROCERY_CEILING:.0f}% of GOV")
+    print(f"  VERDICT  {'WITHIN the Swiggy range' if FITS_AFTER_OCCASION else 'OUTSIDE the Swiggy range'}"
           f"  (headroom {NONGROCERY_CEILING-SHARE_NEEDED_AFTER_OCCASION:+.1f} pts)")
+    print("           Cross-operator comparator only; not a Flipkart target or commitment.")
     print()
     print("  SECOND LEVER -- free-delivery threshold, and Minutes is the market outlier")
     for k,v in FREE_DELIVERY_THRESHOLD.items(): print(f"    {k:<20} Rs{v:.0f}")

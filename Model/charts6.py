@@ -1,7 +1,7 @@
 """
 Figures for the restructured deck: slide 4 (the return) and slide 7 (the financials).
 
-  17. roce_ladder  (S4/S7)  ROCE by scenario against the client's own 40% hurdle line.
+  17. roce_ladder  (S4/S7)  ROCE by scenario against Eternal's public 40% benchmark.
   18. pnl_bridge   (S7)     one node, one year: NOV -> revenue -> contribution -> EBIT.
 
 Nothing typed. Values come from roce.py, which imports the rest of the model.
@@ -13,14 +13,14 @@ import roce as RC, campus_model as M, cost_stack as CS
 plt.rcParams["font.family"] = "DejaVu Sans"
 
 
-# ============ 17. ROCE AGAINST THE HURDLE ============
+# ============ 17. ROCE AGAINST THE EXTERNAL BENCHMARK ============
 def roce_ladder(T):
     c = THEMES[T]
     rows = RC.scenario_rows()
     labels = ["underwritten\n(breakeven)", "basket 30%\nnon-grocery", "basket 40%\nnon-grocery",
               "basket 30%\nvolume -30%"]
     vals = [r["roce"]*100 for r in rows]
-    order = [0, 3, 1, 2]                      # worst to best reads better against a hurdle line
+    order = [0, 3, 1, 2]                      # worst to best against the benchmark line
     vals   = [vals[i] for i in order]
     labels = [labels[i] for i in order]
 
@@ -34,7 +34,7 @@ def roce_ladder(T):
         ax.text(i, v+1.6, f"{v:.1f}%", ha="center", va="bottom", fontsize=8.2,
                 color=c["fg"], fontweight="bold", zorder=5)
     ax.axhline(hurdle, color=c["hi"], lw=1.4, ls="--", zorder=4)
-    ax.text(len(vals)-.42, hurdle+1.8, f"hurdle {hurdle:.0f}%", ha="right", va="bottom",
+    ax.text(len(vals)-.42, hurdle+1.8, f"Eternal benchmark {hurdle:.0f}%", ha="right", va="bottom",
             fontsize=6.4, color=c["hi"], fontweight="bold", zorder=5)
     ax.set_xticks(range(len(vals)))
     ax.set_xticklabels(labels, fontsize=6.0, color=c["mute"], linespacing=1.2)
@@ -49,7 +49,7 @@ def roce_ladder(T):
 
 # ============ 18. THE P&L BRIDGE, ONE NODE, ONE YEAR ============
 def pnl_bridge(T):
-    """At the hurdle AOV, because that is the case being underwritten on slide 7."""
+    """At the AOV implied by Eternal's public return benchmark."""
     c = THEMES[T]
     aov = RC.AOV_HURDLE
     n   = RC.orders_year()

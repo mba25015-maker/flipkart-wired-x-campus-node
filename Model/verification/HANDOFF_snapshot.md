@@ -105,14 +105,16 @@ own CEO said **">800 MFCs, <13 minutes, >30 cities"** on 21 May 2026. Run rate ~
 **Concede the 11-minute figure.** Walmart says <13; Euromonitor 15-20; our own JM 35-store survey
 median 15, only 9% at <=10 min.
 
-### Return on capital — S30. THE HURDLE, NOT THE BREAKEVEN
+### Return on capital — S30. BREAKEVEN VS AN EXTERNAL BENCHMARK
 **Capital employed Rs325.0 lakh** = capex Rs235.0 L + NWC Rs90.0 L. **AOV for ROCE = 0 is Rs578**
-(ties to the Rs580 spine within Rs2.14 — a 365-day vs 12x30-day count, asserted). **AOV for the 40%
-hurdle is Rs763**, a **Rs185 premium**, implying **33.0% non-grocery** against a stated 30-40% ceiling.
+(ties to the Rs580 spine within Rs2.14 — a 365-day vs 12x30-day count, asserted). **AOV implied by
+Eternal's 40% external benchmark is Rs763**, a **Rs185 premium**, implying **33.0% non-grocery** against Swiggy's disclosed
+30-40% range. Eternal's return benchmark and Swiggy's mix range are cross-operator references,
+not Flipkart targets or commitments.
 **ROCE 32.7% at a 30% basket (payback 27 mo), 57.1% at 40% (15 mo). IRR 34.4%.**
 **THE LIMIT: at a 30% basket with volume -30%, ROCE is 12.9% and payback is 67 months — longer than
 the node's 60-month anchored life.** That is why the day-90 gate measures volume first.
-**ROCE = margin x turnover, so the 0.944 moneyshot IS the turnover leg of the client's own metric.**
+**ROCE = margin x turnover, so the 0.944 asset-turn comparison supplies the turnover leg of the identity.**
 **TWO ASSET TURNS, BOTH CORRECT — ALWAYS QUOTE THE BASIS:** 6.93x is like-for-like at a COMMON AOV
 Rs450 (isolates density x calendar); 8.50x is the node's own turnover at its achieved AOV on capital
 employed. **Repurpose is worth Rs26 of AOV** — the site filter and the basket lever are substitutes.
@@ -171,7 +173,8 @@ is close most units / skeleton crew / cut hours — our lever ladder in differen
 Method: no assumed lifting rate. Take the one disclosed quarterly series where an Indian operator
 actually lifted AOV. **Instamart: AOV = 11.28 x (non-grocery % of GOV) + 391, R2 = 0.918.**
 **Ladder: Rs450 -> Rs525 (term-start durables over 14% of active weeks) -> Rs580 at 24.9%
-non-grocery**, from 20% today, against Swiggy management's stated **30-40% ceiling. 15.1 pts headroom.**
+non-grocery**, from 20% today, against Swiggy's disclosed **30-40% range. 15.1 pts headroom.**
+This is a cross-operator comparator, not a Flipkart commitment or proof of feasibility.
 Second lever: **Minutes' free-delivery threshold is Rs149, the market's lowest** (Instamart Rs199,
 Blinkit Rs499 — and Blinkit already varies it **by location and demand**, so a campus threshold is an
 existing platform lever, not a novel ask).
@@ -254,7 +257,7 @@ The live risk is the inverse: a campus cohort may monetise ads **below** network
 - Fixed base Rs9.02L, **confirmed as Tier-1/2 from JM Exhibit 5** [S17]
 - **Model basis is GROSS order value throughout** [S18]
 - Rent is the LEAST flexible line [S11] — **amended:** CRISIL says warehousing occupier contracts run
-  **1-3 years, terminable by the client on short notice without compensation**, so the flexibility
+  **1-3 years, terminable by the occupier on short notice without compensation**, so the flexibility
   sits on our side of the table. No calendar-indexed *retail* lease exists in India.
 - Footprint lever = format choice (2,000 sqft), NOT an SKU elasticity — falsified [S15]
 

@@ -202,7 +202,7 @@ def slide1():
     ay=3.50
     text(s,0.45,ay,9.10,0.13,"THE ASK, AND WHAT IT RETURNS  ·  ONE NODE, FIVE-YEAR LIFE, ALL FOUR NUMBERS SOLVED NOT ASSUMED",5.9,FG,bold=True)
     cells=[("CAPITAL EMPLOYED", f"₹{RC.CE_BASE/1e5:,.0f} L", f"capex ₹{RC.CAPEX_MID/1e5:,.0f} L + working capital ₹{WC.WC_ADOPTED/1e5:,.0f} L", FG),
-           ("ROCE, 30% BASKET", f"{SCN[1]['roce']:.1%}", f"and {RC.ROCE_HURDLE:.0%} at AOV ₹{RC.AOV_HURDLE:,.0f}, inside the stated ceiling", POS),
+           ("ROCE, 30% BASKET", f"{SCN[1]['roce']:.1%}", f"and {RC.ROCE_HURDLE:.0%} at AOV ₹{RC.AOV_HURDLE:,.0f}, against Eternal's public benchmark", POS),
            ("PAYBACK", f"{SCN[1]['payback']:.0f} mo", f"against a {M.FRANCHISE_PAYBACK}-month franchised-store benchmark¹¹", POS),
            ("IRR", f"{RC.irr(RC.AOV_HURDLE):.1%}", f"{RC.irr(RC.AOV_HURDLE,ramp=6):.0%}–{RC.irr(RC.AOV_HURDLE,ramp=2):.0%} across a 2–6 month ramp", POS)]
     cw=9.10/4
@@ -357,9 +357,9 @@ def slide4():
     s=prs.slides.add_slide(L[CONTENT_LAYOUT]); strip_ph(s)
     rail(s,4,"THE RETURN","→ so which sites supply the density?")
     head(s, f"Density buys back the calendar: {M.CAMPUS_TURN:.2f}× against a city store's {M.CITY_TURN:.2f}× — "
-            f"and the node clears the {RC.ROCE_HURDLE:.0%} ROCE the client manages to",
+            f"and reaches Eternal's public {RC.ROCE_HURDLE:.0%} ROCE benchmark at ₹{RC.AOV_HURDLE:,.0f}",
          f"Asset turn is the turnover leg of ROCE. The campus node clears that leg at {M.TURN_RATIO:.0%} of a city "
-         f"store; the margin leg is what the basket lever has to buy. Two legs, one identity, in the client's own metric.")
+         f"store; the margin leg is what the basket lever has to buy. The threshold is an external comparator, not a Flipkart target.")
 
     ib=box(s,0.45,1.44,5.40,0.56,CHIP,radius=0.08)
     f=ib.text_frame; f.vertical_anchor=MSO_ANCHOR.MIDDLE
@@ -395,16 +395,16 @@ def slide4():
         ("                  margin leg   turnover leg",False),
         (f"     = {RC.dupont(RC.AOV_HURDLE)['ebit_margin']:.2%} × {RC.dupont(RC.AOV_HURDLE)['capital_turn']:.2f}× = "
          f"{RC.roce(RC.AOV_HURDLE):.0%}  at AOV ₹{RC.AOV_HURDLE:,.0f}",True),
-        ("AOV* = (ROCE·CE + F·12)/(τ·N) + c/τ    closed form, no search",False)],"THE IDENTITY THE CLIENT MANAGES TO")
+        ("AOV* = (ROCE·CE + F·12)/(τ·N) + c/τ    closed form, no search",False)],"DUPONT IDENTITY · EXTERNAL 40% BENCHMARK")
 
-    yr=banner(s,6.05,1.44,3.50,"ROCE BY SCENARIO   ·   AGAINST ETERNAL'S OWN HURDLE")
+    yr=banner(s,6.05,1.44,3.50,"ROCE BY SCENARIO   ·   ETERNAL PUBLIC BENCHMARK")
     pic(s,"roce_ladder",6.05,yr+0.05,3.50,1.42)
     kv(s,6.05,yr+1.52,3.50,[
         ("AOV for ROCE = 0 (breakeven)", f"₹{RC.AOV_BREAKEVEN:,.0f}", FG),
-        ("AOV for the 40% hurdle", f"₹{RC.AOV_HURDLE:,.0f}", HI),
+        ("AOV for the 40% benchmark", f"₹{RC.AOV_HURDLE:,.0f}", HI),
         ("premium over breakeven", f"₹{RC.HURDLE_PREMIUM:,.0f}", NEG),
         ("non-grocery mix it implies", f"{RC.HURDLE_NONGROCERY_SHARE:.1f}% of GOV", FG),
-        ("vs management's stated ceiling", f"{BK.NONGROCERY_CEILING_LO:.0f}–{BK.NONGROCERY_CEILING:.0f}%", POS)],gap=0.20)
+        ("vs Swiggy disclosed range", f"{BK.NONGROCERY_CEILING_LO:.0f}–{BK.NONGROCERY_CEILING:.0f}%", POS)],gap=0.20)
 
     b=box(s,0.45,4.06,5.40,0.58,None,radius=0.09,line=NEG,lw=1.0)
     f=b.text_frame; f.margin_left=In(0.12); f.vertical_anchor=MSO_ANCHOR.MIDDLE
@@ -415,7 +415,7 @@ def slide4():
           f"own turnover at its achieved AOV on capital employed including working capital. Quoting either without its "
           f"basis is how a panel finds a contradiction that is not there.",5.9,FG)
 
-    band(s,4.76,[("Breakeven was never the hurdle. ",True),
+    band(s,4.76,[("Breakeven is not the return benchmark. ",True),
                  (f"₹{RC.AOV_BREAKEVEN:,.0f} earns zero on ₹{RC.CE_BASE/1e5:,.0f} lakh; ₹{RC.AOV_HURDLE:,.0f} earns "
                   f"{RC.ROCE_HURDLE:.0%} — and the site is what supplies the throughput either needs.",False)])
     foot(s,"Sources 1,2,4,8,10,11  ·  ROCE model and DuPont reconciliation A6b  ·  throughput sensitivity A6  ·  capital build A5")
@@ -585,9 +585,9 @@ def slide7():
     s=prs.slides.add_slide(L[CONTENT_LAYOUT]); strip_ph(s)
     rail(s,7,"THE FINANCIALS","→ what breaks it, and when do we know?")
     head(s, f"One node returns {SCN[1]['roce']:.0%} on ₹{RC.CE_BASE/1e5:,.0f} lakh at a 30% non-grocery basket, "
-            f"and {RC.ROCE_HURDLE:.0%} at ₹{RC.AOV_HURDLE:,.0f} — inside management's own stated ceiling",
+            f"and reaches Eternal's public {RC.ROCE_HURDLE:.0%} benchmark at ₹{RC.AOV_HURDLE:,.0f}",
          f"The basket is fitted, not assumed: the one disclosed quarterly series where an Indian operator actually "
-         f"lifted AOV. AOV = {BK.SLOPE:.2f}·x + {BK.INTERCEPT:.0f}, R² = {BK.R2:.3f}, n = 4 quarters¹⁰.")
+         f"lifted AOV. AOV = {BK.SLOPE:.2f}·x + {BK.INTERCEPT:.0f}, R² = {BK.R2:.3f}, n = 4 quarters¹⁰. Cross-operator reference only.")
 
     yl=banner(s,0.45,1.44,4.35,"ONE NODE, ONE YEAR   ·   ₹ LAKH")
     pic(s,"pnl_bridge",0.45,yl+0.05,4.35,1.50)
@@ -602,21 +602,21 @@ def slide7():
     text(s,5.00,ym+1.26,2.20,0.62,
          f"₹{M.MINUTES_AOV:,.0f} → ₹525 on term-start durables → ₹{BE:,.0f} at "
          f"{BK.SHARE_NEEDED_AFTER_OCCASION:.1f}% non-grocery, from {BK.MINUTES_NONGROCERY:.0f}% today. The "
-         f"{RC.ROCE_HURDLE:.0%} hurdle needs {RC.HURDLE_NONGROCERY_SHARE:.1f}% — still inside the stated "
-         f"{BK.NONGROCERY_CEILING_LO:.0f}–{BK.NONGROCERY_CEILING:.0f}% ceiling, with "
-         f"{RC.HURDLE_HEADROOM_PTS:+.1f} pts of headroom.",5.8,MUTE,lsp=0.98)
+         f"{RC.ROCE_HURDLE:.0%} benchmark needs {RC.HURDLE_NONGROCERY_SHARE:.1f}% — within Swiggy's disclosed "
+         f"{BK.NONGROCERY_CEILING_LO:.0f}–{BK.NONGROCERY_CEILING:.0f}% range, with "
+         f"{RC.HURDLE_HEADROOM_PTS:+.1f} pts of headroom. This is not a Flipkart commitment.",5.8,MUTE,lsp=0.98)
 
     yr=banner(s,7.40,1.44,2.15,"RETURNS")
     kv(s,7.40,yr+0.08,2.15,[
         ("breakeven AOV", f"₹{RC.AOV_BREAKEVEN:,.0f}", FG),
-        ("hurdle AOV, pre-tax", f"₹{RC.AOV_HURDLE:,.0f}", HI),
+        ("benchmark AOV, pre-tax", f"₹{RC.AOV_HURDLE:,.0f}", HI),
         ("post-tax at 25.17%", f"₹{RC.AOV_HURDLE_POSTTAX:,.0f}", MUTE),
         ("IRR, 5-yr, 3-mo ramp", f"{RC.irr(RC.AOV_HURDLE):.1%}", POS),
         ("ramp 2 – 6 months", f"{RC.irr(RC.AOV_HURDLE,ramp=2):.0%} – {RC.irr(RC.AOV_HURDLE,ramp=6):.0%}", MUTE),
         ("node life anchor¹¹", f"{M.FRANCHISE_PAYBACK} mo payback", MUTE)],gap=0.195)
 
     sy=3.56
-    text(s,5.00,sy,4.55,0.13,"SCENARIOS  ·  ALL ON INPUTS ALREADY PRICED ELSEWHERE IN THE DECK",5.8,FG,bold=True)
+    text(s,5.00,sy,4.55,0.13,"SCENARIOS  ·  ALL ON INPUTS ALREADY PRICED ELSEWHERE IN THE MODEL",5.8,FG,bold=True)
     rows=[]
     for r_ in SCN:
         col = POS if r_["roce"]>=RC.ROCE_HURDLE else (NEG if r_["roce"]<0.15 else FG)
@@ -644,7 +644,7 @@ def slide7():
          f"already varies it by location and demand) — an existing platform lever, not a new ask.   ·   NPV at 12% / 15% "
          f"[assumed; no WACC is disclosed]: ₹{RC.npv(RC.AOV_HURDLE,0.12)/1e5:,.0f} L / ₹{RC.npv(RC.AOV_HURDLE,0.15)/1e5:,.0f} L.",5.6,MUTE,lsp=0.96)
 
-    band(s,4.76,[("The node clears the hurdle on a basket mix management has already said is reachable. ",True),
+    band(s,4.76,[("The modeled basket mix falls within Swiggy's disclosed range; this does not establish Flipkart feasibility. ",True),
                  ("One dependency binds: term volume. That is what the first 90 days are for.",False)])
     foot(s,"Sources 2,4,8,9,10,11  ·  P&L, capital and ROCE derivation A6b  ·  basket fit A6  ·  working-capital constructs A5  ·  scenarios A3")
 
@@ -701,8 +701,8 @@ def slide8():
     table(s,6.05,ty+0.17,3.50,[("SHOCK",0.62,PP_ALIGN.LEFT),("BREAKEVEN",0.22,PP_ALIGN.RIGHT),
           ("Δ",0.16,PP_ALIGN.RIGHT)],rows,size=5.8,gap=0.165)
     text(s,6.05,4.10,3.50,0.42,
-         f"Three of four are covered inside a 30% non-grocery basket (₹{BK.SLOPE*BK.NONGROCERY_CEILING_LO+BK.INTERCEPT:,.0f}); "
-         f"all four inside 40% (₹{BK.SLOPE*BK.NONGROCERY_CEILING+BK.INTERCEPT:,.0f}). Shrinkage is an UPPER BOUND — the stack "
+         f"Three of four are covered at the 30% floor of Swiggy's range (₹{BK.SLOPE*BK.NONGROCERY_CEILING_LO+BK.INTERCEPT:,.0f}); "
+         f"all four at its 40% maximum (₹{BK.SLOPE*BK.NONGROCERY_CEILING+BK.INTERCEPT:,.0f}). Cross-operator reference only. Shrinkage is an UPPER BOUND — the stack "
          f"was calibrated on a reported contribution figure that is already net of it, so charging it again double-counts.",
          5.7,MUTE,lsp=0.98)
 
