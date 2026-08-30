@@ -23,10 +23,10 @@ import json, os
 HERE = os.path.dirname(os.path.abspath(__file__))
 RESULTS = os.path.join(HERE, "_verification.json")
 
-AUDIT_COUNT = 366   # audit.py       - checks DEFINED, not passed
+AUDIT_COUNT = 378   # audit.py       - checks DEFINED, not passed
 DOCS_COUNT  = 31    # verify_docs.py
 SPEC_COUNT  = 79    # verify_spec.py
-ARTF_COUNT  = 23    # verify_artifacts.py - workbook, notebooks, manifest, public data
+ARTF_COUNT  = 28    # verify_artifacts.py - workbook, notebooks, manifest, public data
 
 from deck_checks import DECK_CHECK_COUNT   # verify_deck.py
 

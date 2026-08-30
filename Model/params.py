@@ -120,6 +120,26 @@ def cluster_residents(cluster_volume=None):
 def state_gate_residents():
     return cluster_residents() * MIN_CLUSTERS_PER_STATE
 
+# ---------------------------------------------------------------- PG ADJACENCY
+# PG fulfilment is already priced in cost_stack.py. Demand is deliberately kept behind an
+# evidence gate because AISHE counts institutional-hostel residents, not paying-guest beds.
+# These are the ONLY site-level PG demand inputs. Zero means "not evidenced" rather than
+# "there are no PG residents". pg_demand.py will not admit PG volume into the underwritten
+# case unless PG_DEMAND_ENABLED is True and every required input is positive.
+PG_DEMAND_ENABLED = False
+PG_VERIFIED_OCCUPIED_STUDENT_BEDS = 0
+PG_ACTIVE_USER_PENETRATION = 0.0
+PG_AOV = 0.0
+PG_COMMON_DROP_SHARE = 0.0
+PG_BREAK_RETENTION = 0.0
+PG_HOSTEL_TERM_OPD = CLUSTER_VOLUME
+
+# Sensitivities are explicitly ASSUMED ranges, not findings. They are used only for the
+# normalised "per 1,000 verified occupied student beds" table in pg_demand.py and the
+# workbook. The operating case continues to read the five gated inputs above.
+PG_NORMALISED_BEDS = 1000
+PG_PENETRATION_SENSITIVITY = (0.10, 0.25, 0.40)
+
 # ---------------------------------------------------------------- BUILD TARGETS
 FINAL_DECK = "Flipkart_Minutes_WiRED_SemiFinal_FULL_light.pptx"
 # verify_deck.py defaulted to Flipkart_Minutes_WiRED_SemiFinal_light.pptx - the

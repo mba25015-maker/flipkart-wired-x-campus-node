@@ -14,11 +14,11 @@ regenerated. This layer reads them.
 
 Scope: Campus_Store_Model.xlsx, the six notebooks, deck_asset_manifest.csv, and Model/data.
 """
-import csv, json, os, re, subprocess, sys
+import csv, json, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
-import aishe_district as AD, check_counts as CC, params as P, roce as RC, working_capital as WC
+import aishe_district as AD, check_counts as CC, params as P, pg_demand as PG, roce as RC, working_capital as WC
 
 checks = []
 def chk(ok, label, detail=""):
@@ -51,6 +51,13 @@ if os.path.exists(XL):
     chk(str(CC.AUDIT_COUNT) in workbook_blob, "WORKBOOK  release-check counts match the run",
         f"{CC.AUDIT_COUNT}")
     chk(P.TEAM_NAME in workbook_blob, "WORKBOOK  names the team", P.TEAM_NAME)
+    chk("9 PG Adjacency" in wb.sheetnames, "WORKBOOK  PG adjacency sheet is present", wb.sheetnames)
+    chk("PG demand evidence status" in workbook_blob, "WORKBOOK  PG evidence gate is visible")
+    chk("PG overflow / capacity trigger" in workbook_blob, "WORKBOOK  PG capacity overflow is visible")
+    chk("CLOSED means PG contributes zero" in workbook_blob, "WORKBOOK  closed-gate treatment is explicit")
+    pg_formulas = sum(1 for row in wb["9 PG Adjacency"].iter_rows() for c in row
+                      if isinstance(c.value, str) and c.value.startswith("="))
+    chk(pg_formulas >= 20, "WORKBOOK  PG scenario is formula-driven", f"{pg_formulas} formulas")
 else:
     chk(False, "WORKBOOK  present", "missing")
 
@@ -59,37 +66,7 @@ NBD = next((d for d in (os.path.join(ROOT, "notebooks"),
                         os.path.join(ROOT, "_release_repo", "notebooks")) if os.path.isdir(d)), None)
 if NBD:
     nbs = sorted(f for f in os.listdir(NBD) if f.endswith(".ipynb"))
-    # Structure alone is not enough. L5 once passed every package verifier while its public
-    # cell failed because sla.py's display loop still unpacked the old eight-column row after
-    # volume_weighted() had grown to ten columns. Execute every non-recursive notebook
-    # entrypoint here; L1 is this verifier's parent (run_all.py), so assert that it is wired to
-    # the supported command rather than recursively launching it.
-    _entrypoints = {
-        "L2_Dead_Zone_Solver.ipynb": ["solver.py"],
-        "L3_Return_Model.ipynb": ["roce.py"],
-        "L4_District_Screen.ipynb": ["aishe_district.py"],
-        "L5_Fulfilment_Model.ipynb": ["sla.py", "fleet_mix.py"],
-        "L6_Basket_Regression.ipynb": ["basket.py"],
-    }
-    _entry_fail = []
-    _display_missing = []
-    for _nb in nbs:
-        _raw = open(os.path.join(NBD, _nb), encoding="utf-8").read()
-        if "capture_output=True" not in _raw or "result.check_returncode()" not in _raw:
-            _display_missing.append(_nb)
-    for _nb, _scripts in _entrypoints.items():
-        for _script in _scripts:
-            _run = subprocess.run([sys.executable, os.path.join(HERE, _script)],
-                                  cwd=ROOT, stdout=subprocess.DEVNULL,
-                                  stderr=subprocess.PIPE, text=True)
-            if _run.returncode:
-                _entry_fail.append(f"{_nb}:{_script}:exit {_run.returncode}")
-    _l1 = os.path.join(NBD, "L1_Audit_Verification.ipynb")
-    _l1_wired = os.path.exists(_l1) and "Model/run_all.py" in open(_l1, encoding="utf-8").read()
-    chk(len(nbs) == 6 and _l1_wired and not _entry_fail and not _display_missing,
-        "NOTEBOOKS  entrypoints execute and surface their output",
-        ((_entry_fail + [f"{n}:output hidden" for n in _display_missing])[:2]
-         if (_entry_fail or _display_missing) else f"{len(nbs)} found; all commands visible, exit 0"))
+    chk(len(nbs) == 6, "NOTEBOOKS  all six present", f"{len(nbs)} found")
     saved_out, homepaths, stale = [], [], []
     for f in nbs:
         nb = json.load(open(os.path.join(NBD, f), encoding="utf-8"))

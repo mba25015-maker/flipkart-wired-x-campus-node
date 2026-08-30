@@ -287,6 +287,7 @@ if HAS_APX:
     must("A5c  PG demand is excluded from the base case", "EXCLUDED from")
     must("A5c  the PG position is Phase 2",       "Phase-2 adjacency")
     must("A5c  the promotion test is stated",     "common-drop feasibility")
+    must("A5c  the PG scenario is evidence-gated", "pg_demand.py")
     must("A5c  the brief's three segments are named", "paying-guest")
     must("S6   the runner row is the block-shelf unit cost", f"{FM.shelf_handoff_value()[2]:.2f}")
     must_not_on("S6   door-drop cost is not on the plan slide", f"{FM.shelf_handoff_value()[1]:.2f}")

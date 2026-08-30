@@ -22,7 +22,7 @@ from openpyxl.utils import get_column_letter
 
 import params as P, campus_model as M, cost_stack as CS, sla as SL, fleet_mix as FM
 import roce as RC, working_capital as WC, break_mode as B, risk_shocks as RS
-import basket as BK, aishe_district as AD, check_counts as CC
+import basket as BK, aishe_district as AD, check_counts as CC, pg_demand as PG
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
 OUT  = os.path.join(ROOT, "Campus_Store_Model.xlsx")
@@ -35,6 +35,7 @@ BODY=Font(name="Calibri",size=10,color=INK)
 MUTE=Font(name="Calibri",size=9,italic=True,color="FF5A6785")
 BAND=PatternFill("solid",fgColor=INK); SRC=PatternFill("solid",fgColor=BLUE)
 CALC=PatternFill("solid",fgColor=GREEN); CHIP=PatternFill("solid",fgColor=GREY)
+PILOT=PatternFill("solid",fgColor=GOLD)
 THIN=Border(bottom=Side(style="thin",color="FFDFE6F2"))
 
 def sheet(wb,name,title,note):
@@ -94,7 +95,8 @@ def build():
         "A value redeclared outside params.py fails the audit.")
     r=4; header(ws,r,[("Parameter",34),("Value",14),("Unit",14),("Tier",7),("Source / derivation",42)]); r+=1
     legs=SL.cost_legs()
-    for row in [
+    _input_rows = {}
+    _inputs = [
         ("Cluster volume", M.CEILING, "orders/day","T1","JM Ex.29 observed 1,334–1,487 band"),
         ("Campus gates per node", P.CAMPUSES_PER_NODE, "gates","D","params.CAMPUSES_PER_NODE"),
         ("Active academic months", M.ACTIVE_MONTHS, "months/yr","T1","institutional calendars"),
@@ -109,8 +111,27 @@ def build():
         ("Capex midpoint", RC.CAPEX_MID, "Rs","T2","band midpoint"),
         ("Tax rate", RC.TAX_RATE, "%","T1","22% + surcharge + cess"),
         ("Node life", RC.NODE_LIFE_MO, "months","D","must outlive its own payback"),
-    ]:
-        r=put(ws,r,list(row),fill=SRC)
+        ("PG demand evidence gate", P.PG_DEMAND_ENABLED, "TRUE/FALSE","P","opens only after site evidence is approved"),
+        ("PG verified occupied student beds", P.PG_VERIFIED_OCCUPIED_STUDENT_BEDS, "beds","P","occupied STUDENT beds inside the served radius"),
+        ("PG active-user penetration", P.PG_ACTIVE_USER_PENETRATION, "%","P","pilot-observed active users / occupied student beds"),
+        ("PG gross AOV", P.PG_AOV, "Rs/order","P","pilot-observed; zero means not evidenced"),
+        ("PG common-drop share", P.PG_COMMON_DROP_SHARE, "%","P","share served at reception, warden desk or locker"),
+        ("PG break retention", P.PG_BREAK_RETENTION, "% of term","P","PG demand persisting through the academic break"),
+        ("Hostel term volume in PG scenario", P.PG_HOSTEL_TERM_OPD, "orders/day","P","capacity already consumed by the hostel base"),
+        ("PG orders per active user per day", PG.PG_ORDERS_PER_ACTIVE_USER_DAY, "orders/day","T1","Blinkit 3.6/month / 30; no captive-campus uplift"),
+        ("PG doorstep last mile", PG.PG_DOORSTEP_CPO, "Rs/order","D","cost_stack Type B urban PG geometry"),
+        ("PG common-drop last mile", PG.PG_COMMON_DROP_CPO, "Rs/order","D","cost_stack Type B common-drop geometry"),
+        ("NOV / GOV", WC.NOV_OVER_GOV, "x","T1","Blinkit FY26E"),
+        ("Term days", RC.DAYS_TERM, "days/year","D","365 x active academic months / 12"),
+        ("Break days", RC.DAYS_BREAK, "days/year","D","365 - term days"),
+        ("Hostel comparison AOV", RC.AOV_UP, "Rs/order","D","basket at the 30% non-grocery floor"),
+    ]
+    for row in _inputs:
+        _input_rows[row[0]] = r
+        r=put(ws,r,list(row),fill=PILOT if row[3]=="P" else SRC)
+
+    def _iref(label):
+        return f"'1 Inputs'!$B${_input_rows[label]}"
 
     # ---------------------------------------------------------------- 2 Fulfilment
     ws=sheet(wb,"2 Fulfilment","Fulfilment — two legs, two cost structures",
@@ -241,6 +262,77 @@ def build():
                 ("document scan","a superseded figure in HANDOFF, spec, build prompt or README"),
                 ("release.py","build - verify - capture - stamp - re-verify the exact stamped file")):
         r=put(ws,r,[g,w])
+
+    # ---------------------------------------------------------------- 9 PG adjacency
+    ws=sheet(wb,"9 PG Adjacency","PG adjacency — evidence-gated demand and capacity",
+        "The hostel-only base case is unchanged. PG demand enters only after the evidence gate opens, "
+        "and only into spare term capacity or available break-period capacity. Edit the gold pilot "
+        "inputs on 1 Inputs; every output below is a live formula.")
+    r=4; ws.cell(row=r,column=1,value="CONFIGURED SCENARIO — ZERO UNTIL THE PILOT INPUTS ARE EVIDENCED").font=BOLD; r+=1
+    header(ws,r,[("Metric",40),("Value",18),("Unit",16),("Decision reading",58)]); r+=1
+    _admit=(f"AND({_iref('PG demand evidence gate')}=TRUE,"
+            f"{_iref('PG verified occupied student beds')}>0,"
+            f"{_iref('PG active-user penetration')}>0,"
+            f"{_iref('PG gross AOV')}>0)")
+    _gross=r; r=put(ws,r,["PG demand evidence status",f'=IF({_admit},"OPEN","CLOSED")',"",
+                          "CLOSED means PG contributes zero to every published return"],fill=PILOT,bold=True)
+    _gross=r; r=put(ws,r,["Gross PG demand",f'=IF({_admit},{_iref("PG verified occupied student beds")}*{_iref("PG active-user penetration")}*{_iref("PG orders per active user per day")},0)',"orders/day",
+                          "verified beds × active-user penetration × frequency"],fill=CALC)
+    _spare=r; r=put(ws,r,["Spare term capacity",f'=MAX(0,{_iref("Cluster volume")}-{_iref("Hostel term volume in PG scenario")})',"orders/day",
+                          "PG is not added above the store working ceiling"],fill=CALC)
+    _served=r; r=put(ws,r,["PG admitted in term",f'=MIN(B{_gross},B{_spare})',"orders/day",
+                           "the lower of evidenced demand and spare capacity"],fill=CALC)
+    _overflow=r; r=put(ws,r,["PG overflow / capacity trigger",f'=MAX(0,B{_gross}-B{_served})',"orders/day",
+                             "requires capacity expansion or remains unserved"],fill=CALC)
+    _break=r; r=put(ws,r,["PG admitted in academic break",f'=MIN({_iref("Cluster volume")},B{_gross}*{_iref("PG break retention")})',"orders/day",
+                          "zero until break retention is measured"],fill=CALC)
+    _lm=r; r=put(ws,r,["Weighted PG last mile",f'=(1-{_iref("PG common-drop share")})*{_iref("PG doorstep last mile")}+{_iref("PG common-drop share")}*{_iref("PG common-drop last mile")}',"Rs/order",
+                       "doorstep/common-drop mix"],fill=CALC)
+    _cm=r; r=put(ws,r,["PG contribution per order",f'=IF({_iref("PG gross AOV")}>0,{_iref("Revenue take rate")}*{_iref("PG gross AOV")}-B{_lm}-{_iref("Store ops per order")}-{_iref("Packaging per order")}-{_iref("Unallocated residual")},0)',"Rs/order",
+                       "same take rate and store-cost basis as the core model"],fill=CALC)
+    _annual=r; r=put(ws,r,["Annual incremental PG orders",f'=B{_served}*{_iref("Term days")}+B{_break}*{_iref("Break days")}',"orders/year",
+                           "term spare capacity plus measured break retention"],fill=CALC)
+    _ebit=r; r=put(ws,r,["Incremental PG EBIT",f'=B{_annual}*B{_cm}',"Rs/year",
+                         "before any capacity-expansion capex"],fill=CALC)
+    _nwc=r; r=put(ws,r,["Incremental PG working capital",f'=MAX(B{_served},B{_break})*{_iref("PG gross AOV")}*{_iref("NOV / GOV")}*{_iref("NWC days")}',"Rs",
+                        "14 NWC days on incremental NOV"],fill=CALC)
+    _base_ebit=r; r=put(ws,r,["Base EBIT at configured hostel volume",
+        f'=({_iref("Revenue take rate")}*{_iref("Hostel comparison AOV")}-{_iref("City gig leg")}-{_iref("In-gate roster leg")}-{_iref("Store ops per order")}-{_iref("Packaging per order")}-{_iref("Unallocated residual")})*{_iref("Hostel term volume in PG scenario")}*{_iref("Term days")}-{_iref("Store fixed cost")}*12',
+        "Rs/year","30% non-grocery AOV comparison basis"],fill=CALC)
+    r=put(ws,r,["Pro-forma node ROCE",f'=(B{_base_ebit}+B{_ebit})/({_iref("Capex midpoint")}+{_iref("NWC days")}*{_iref("Cluster volume")}*{_iref("Hostel comparison AOV")}*{_iref("NOV / GOV")}+B{_nwc})',"%",
+                "PG changes the return only after the evidence gate opens"],fill=CALC,fmt="0.0%")
+    for rr in range(_gross, _break+1): ws.cell(rr,2).number_format="0.0"
+    for rr in (_lm, _cm): ws.cell(rr,2).number_format="0.00"
+    for rr in (_annual, _ebit, _nwc, _base_ebit): ws.cell(rr,2).number_format="#,##0"
+
+    r+=2; ws.cell(row=r,column=1,value=f"NORMALISED CAPACITY SENSITIVITY — PER {P.PG_NORMALISED_BEDS:,} VERIFIED OCCUPIED STUDENT BEDS").font=BOLD; r+=1
+    header(ws,r,[("Active-user penetration",22),("Hostel orders/day",18),("Gross PG orders/day",20),
+                 ("Spare capacity",17),("PG served",14),("PG overflow",15)]); r+=1
+    for pen in P.PG_PENETRATION_SENSITIVITY:
+        for hopd in (1000,1200,1400):
+            rr=r
+            r=put(ws,r,[pen,hopd,
+                f'={P.PG_NORMALISED_BEDS}*A{rr}*{_iref("PG orders per active user per day")}',
+                f'=MAX(0,{_iref("Cluster volume")}-B{rr})',
+                f'=MIN(C{rr},D{rr})',f'=MAX(0,C{rr}-E{rr})'],fill=CALC)
+            for cc in range(2,7): ws.cell(rr,cc).number_format="0.0"
+        ws.cell(row=r-3,column=1).number_format="0%"; ws.cell(row=r-2,column=1).number_format="0%"; ws.cell(row=r-1,column=1).number_format="0%"
+
+    r+=2; ws.cell(row=r,column=1,value="PG UNIT ECONOMICS — EXISTING MODEL AOV REFERENCES, NOT A FORECAST").font=BOLD; r+=1
+    header(ws,r,[("AOV reference",26),("AOV",13),("Common-drop share",20),("Last mile",14),("Contribution/order",20),("Reading",42)]); r+=1
+    for label,aov in (("Minutes current midpoint",M.MINUTES_AOV),
+                      ("Campus spine breakeven",RC.SPINE_BREAKEVEN),
+                      ("30% non-grocery basket",RC.AOV_UP)):
+        for share in (0.0,0.5,1.0):
+            rr=r
+            r=put(ws,r,[label,aov,share,
+                f'=(1-C{rr})*{_iref("PG doorstep last mile")}+C{rr}*{_iref("PG common-drop last mile")}',
+                f'={_iref("Revenue take rate")}*B{rr}-D{rr}-{_iref("Store ops per order")}-{_iref("Packaging per order")}-{_iref("Unallocated residual")}',
+                f'=IF(E{rr}>0,"positive before fixed cost","does not cover variable cost")'],fill=CALC)
+            ws.cell(row=rr,column=3).number_format="0%"
+            ws.cell(row=rr,column=2).number_format="0.00"
+            ws.cell(row=rr,column=4).number_format="0.00"
+            ws.cell(row=rr,column=5).number_format="0.00"
     wb.save(OUT); return OUT
 
 if __name__=="__main__":

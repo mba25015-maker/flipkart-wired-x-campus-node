@@ -1853,7 +1853,8 @@ def a5c():
          "PGs sit tighter to campus than a standard zone, so they are geometrically CHEAPER to reach than the "
          "benchmark. What is missing is demand evidence: the AISHE register carries no PG count, so density is "
          "unmeasured, and whether a given block supports a common drop is a site question. PGs are therefore a "
-         "Phase-2 adjacency, subject to pilot validation of density and common-drop feasibility.",
+         "Phase-2 adjacency, subject to common-drop feasibility. The evidence-gated scenario in pg_demand.py and workbook tab 9 admits them only "
+         "into spare term capacity or measured break-period capacity.",
          6.3,DFG,lsp=0.98)
     box(s,6.05,3.42,3.50,0.66,None,radius=0.09,line=DHI,lw=1.0)
     text(s,6.17,3.49,3.26,0.56,
@@ -1862,7 +1863,7 @@ def a5c():
          "locker bank. Until both read through, PG volume stays out of the plan and out of every number on it.",
          6.1,DHI,lsp=0.97)
     text(s,6.05,4.18,3.50,0.30,
-         "Every figure on this page is computed by cost_stack.segment_cpo() and sla.cost_legs(), and asserted "
+         "Every figure on this page is computed by cost_stack.segment_cpo(), sla.cost_legs() and pg_demand.py, and asserted "
          "in audit.py. None of it is typed.",6.0,DMUTE,ital=True,lsp=0.98)
     runit(s,"L5",t=4.86)
 

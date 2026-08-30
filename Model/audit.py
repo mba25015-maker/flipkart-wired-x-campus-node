@@ -8,6 +8,7 @@ import solver as SV
 import lever_rank as LR
 import risk_shocks as RS, labour_class as LC
 import roce as RC
+import pg_demand as PG
 import params as PM
 import check_counts as CC
 import source_scan as SS
@@ -217,6 +218,42 @@ checks.append((SL.cost_legs()["total"] < _SEGC["Type A campus, gate-drop"],
                f'{SL.cost_legs()["total"]:.2f} vs {_SEGC["Type A campus, gate-drop"]:.2f}'))
 recon("segment_cpo prices every geometry at ONE batch",
       float(len(_SEGC)), float(len(C.GEOM)))
+
+# PG DEMAND IS A GATED ADJACENCY, NOT A FREE UPLIFT. These checks protect the two ways this
+# module could become misleading: admitting unverified volume, or adding PG orders beyond the
+# store's 1,400/day working ceiling. The normalised sensitivity is an explicit scenario per
+# 1,000 VERIFIED occupied student beds; it is not a claim about any site.
+_PGCFG = PG.configured_scenario()
+_PGS = PG.scenario(PM.PG_NORMALISED_BEDS, 0.25, hostel_term_opd=1000,
+                   common_drop_share=0.50, break_retention=0.20,
+                   pg_aov=M.MINUTES_AOV)
+_PGFULL = PG.scenario(PM.PG_NORMALISED_BEDS, 0.25, hostel_term_opd=M.CEILING)
+recon("PG frequency anchor == Blinkit 3.6/month without campus uplift",
+      PG.PG_ORDERS_PER_ACTIVE_USER_DAY, M.BLINKIT_FREQ/30.0)
+recon("PG doorstep cost == cost_stack geometry",
+      PG.PG_DOORSTEP_CPO, _SEGC["Type B urban PG cluster"])
+recon("PG common-drop cost == cost_stack geometry",
+      PG.PG_COMMON_DROP_CPO, _SEGC["Type B PG cluster, common-drop"])
+checks.append((not PG.inputs_are_admissible(),
+               "PG  evidence gate stays closed while site inputs are zero", "closed",
+               "closed" if not PG.inputs_are_admissible() else "OPEN"))
+chk("PG      configured base-case orders = zero", 0, _PGCFG["gross_pg_opd"], 0.001)
+chk("PG      1,000 beds x 25% active x 0.12/day = 30/day", 30, _PGS["gross_pg_opd"], 0.001)
+recon("PG served + overflow == gross demand",
+      _PGS["term_pg_served_opd"] + _PGS["term_pg_overflow_opd"], _PGS["gross_pg_opd"])
+checks.append((_PGS["hostel_term_opd"] + _PGS["term_pg_served_opd"] <= PM.CLUSTER_VOLUME,
+               "PG  admitted term volume never exceeds the node ceiling", "<= ceiling",
+               _PGS["hostel_term_opd"] + _PGS["term_pg_served_opd"]))
+chk("PG      no spare term capacity at the 1,400/day base", 0,
+    _PGFULL["term_pg_served_opd"], 0.001)
+recon("PG overflow at the ceiling == gross PG demand",
+      _PGFULL["term_pg_overflow_opd"], _PGFULL["gross_pg_opd"])
+checks.append((_PGS["incremental_nwc"] >= 0,
+               "PG  incremental working capital cannot be negative", ">= 0",
+               round(_PGS["incremental_nwc"], 2)))
+checks.append((PG.PG_COMMON_DROP_CPO < PG.PG_DOORSTEP_CPO,
+               "PG  common-drop remains cheaper than doorstep", "common < doorstep",
+               f"{PG.PG_COMMON_DROP_CPO:.2f} < {PG.PG_DOORSTEP_CPO:.2f}"))
 
 # ONE DEMAND CONSTANT. campus_model carried a SECOND orders/resident/day (0.25) with a
 # 5,600-resident cluster and a 28,000 state gate derived from it. Nothing imported them and
