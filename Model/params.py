@@ -93,6 +93,15 @@ def gate_volume(cluster=None, topology=None):
     topology = GATE_TOPOLOGY if topology is None else topology
     return cluster if topology == "pooled" else cluster / CAMPUSES_PER_NODE
 
+# ---------------------------------------------------------------- TEAM IDENTITY
+TEAM_NAME = "ANAVRIN"
+TEAM_ID   = ""
+# The cover fields are MODEL PARAMETERS, not environment variables. They used to be read only
+# from os.environ, which meant `python3 Model/run_all.py` failed on a clean clone for anyone who
+# did not know to set TEAM_NAME first - the verification command the README advertises did not
+# work as advertised. The environment still overrides, for a one-off build under another name.
+# TEAM_ID is empty because WiRED X does not issue one; empty means the line is not drawn at all.
+
 # ---------------------------------------------------------------- BUILD TARGETS
 FINAL_DECK = "Flipkart_Minutes_WiRED_SemiFinal_FULL_light.pptx"
 # verify_deck.py defaulted to Flipkart_Minutes_WiRED_SemiFinal_light.pptx - the

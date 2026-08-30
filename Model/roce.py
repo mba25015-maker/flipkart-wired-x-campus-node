@@ -1,12 +1,11 @@
 """
-S30  RETURN ON CAPITAL EMPLOYED — breakeven and an external return benchmark.
+S30  RETURN ON CAPITAL EMPLOYED — the leg of the argument the deck was missing.
 
 WHY THIS MODULE EXISTS. Everything upstream solves for BREAKEVEN: the AOV at which the node
-stops losing money (Rs573 on the 30-day spine; Rs571 on the 365-day convention). Eternal has
-publicly stated a ROCE benchmark "north of 40%"
-[T1, earnings call Jan 2026]. This is an external comparator, not a disclosed Flipkart target.
-A node that clears the breakeven earns exactly zero, so this module separately reports the basket needed
-for breakeven and the basket implied by the external return benchmark.
+stops losing money (Rs580). But Eternal has publicly given the hurdle it actually manages to --
+ROCE "north of 40%" [T1, earnings call Jan 2026] -- and breakeven is not that hurdle. A node that
+clears Rs580 earns exactly zero. So the honest question is not "can the basket reach breakeven",
+it is "can the basket reach the RETURN", and until now the deck never asked it.
 
 THE DECOMPOSITION THAT CONNECTS THIS TO THE MONEYSHOT (DuPont):
 
@@ -14,12 +13,13 @@ THE DECOMPOSITION THAT CONNECTS THIS TO THE MONEYSHOT (DuPont):
                             ---------        --------
                             margin leg       turnover leg
 
-The turnover leg contains the 0.944 comparison: campus asset turn against a city store's. The
-margin leg is where AOV enters. The DuPont identity therefore connects throughput, basket mix and
-capital employed without treating another operator's benchmark as a Flipkart commitment.
+The turnover leg IS the 0.944 result: campus asset turn against a city store's. The margin leg is
+where AOV enters. So the deck's climax and Eternal's disclosed hurdle are two legs of one identity,
+and the campus node's whole case can be stated as: it clears the turnover leg at 94% of a city
+store, and the margin leg is what the basket lever has to buy.
 
 WHAT IS SOLVED AND WHAT IS ASSUMED, stated up front:
-  SOLVED     AOV at which ROCE = 40%; AOV at which ROCE = 0 (reconciled to the Rs573 spine);
+  SOLVED     AOV at which ROCE = 40%; AOV at which ROCE = 0 (reproduces Rs580 as a check);
              payback months; the margin the turnover leg implies.
   SOURCED    take rate, cost lines, fixed base, capex band, NWC days, tax rate, node life anchor.
   ASSUMED    ramp shape inside the 3-month implementation cap (linear, flagged, and the IRR is
@@ -37,11 +37,11 @@ NODE_LIFE_MO  = 60                     # D   5 years, anchored on JPM's 56-month
                                        #     payback: a node must outlive its own payback [T1]
 RAMP_MONTHS   = 3                      # A   the case's own implementation cap; linear ramp
 CAPEX_MID     = (M.CAPEX_LO + M.CAPEX_HI) / 2          # T2  Rs2.35 cr
-LAST_MILE_D2  = SL.volume_weighted()[1]                # D   live D2 circuit model
+LAST_MILE_D2  = SL.volume_weighted()[1]                # D   Rs19.0/order, D2 circuit model
 RESIDUAL_SHARE = B.threshold(B.CONFIGS[-1][1])         # D   48.6%, the REPURPOSE fill rate
 
 # BASIS, AND THIS MATTERS ENOUGH TO BE A CONSTANT RATHER THAN A DEFAULT ARGUMENT.
-# The Rs573 spine is quoted TERM-ONLY: fixed base carried across twelve months, contribution
+# The Rs580 spine is quoted TERM-ONLY: fixed base carried across twelve months, contribution
 # earned across 8.5. Running the same arithmetic on the REPURPOSE configuration (break-period
 # orders at r = 48.6%) gives a LOWER breakeven, because the node is earning through the break.
 # Both are true; they are different configurations. The deck's headline is the term-only one,
@@ -104,7 +104,7 @@ def aov_for_roce(target, ce=None, v=M.CEILING, r=BASIS_R, fixed=CS.CAMPUS_FIXED)
     c = LAST_MILE_D2 + M.STORE_OPS + M.PACKAGING + M.RESIDUAL
     return (target*ce + fixed*12) / (M.TAKE_RATE*n) + c/M.TAKE_RATE
 
-AOV_BREAKEVEN = aov_for_roce(0.0)                      # reconciles to the Rs573 spine
+AOV_BREAKEVEN = aov_for_roce(0.0)                      # reproduces the Rs580 spine as a check
 # Ties to the spine within Rs2.5, and the residual gap is a DAY-COUNT convention rather than a
 # disagreement: this module runs a 365-day year (365 x 8.5/12 = 258.5 active days), the spine runs
 # 12 x 30-day months (255.0 days). 3.5 more active days = Rs2.14 lower breakeven. Stated, not
@@ -118,7 +118,7 @@ BREAKEVEN_TIES_TO_SPINE = abs(DAYCOUNT_GAP) < 2.5
 # basket lever, which is the only way to compare them.
 AOV_BREAKEVEN_REPURPOSE = aov_for_roce(0.0, r=RESIDUAL_SHARE)
 REPURPOSE_WORTH_AOV     = AOV_BREAKEVEN - AOV_BREAKEVEN_REPURPOSE
-AOV_HURDLE    = aov_for_roce(ROCE_HURDLE)              # AOV implied by Eternal's benchmark
+AOV_HURDLE    = aov_for_roce(ROCE_HURDLE)              # the number the deck did not have
 AOV_HURDLE_POSTTAX = aov_for_roce(ROCE_HURDLE/(1-TAX_RATE))
 HURDLE_PREMIUM = AOV_HURDLE - AOV_BREAKEVEN
 
@@ -155,11 +155,11 @@ def npv(aov, rate_annual, life_mo=NODE_LIFE_MO, ramp=RAMP_MONTHS, ce=None):
     return -ce + sum(full*min(1.0, m/ramp)/(1+rm)**m for m in range(1, life_mo+1))
 
 # ---------------- SCENARIOS ----------------
-# Three, using inputs already priced elsewhere in the model. Nothing new is assumed here.
+# Three, on the deck's own already-priced inputs. Nothing new is assumed here.
 import basket as BK
 AOV_BASE  = AOV_BREAKEVEN                                   # the plan as underwritten
-AOV_UP    = BK.SLOPE*BK.NONGROCERY_CEILING_LO + BK.INTERCEPT # 30% floor of Swiggy's disclosed range
-AOV_MAX   = BK.SLOPE*BK.NONGROCERY_CEILING + BK.INTERCEPT    # 40% top of Swiggy's disclosed range
+AOV_UP    = BK.SLOPE*BK.NONGROCERY_CEILING_LO + BK.INTERCEPT # basket at the 30% floor of the ceiling
+AOV_MAX   = BK.SLOPE*BK.NONGROCERY_CEILING + BK.INTERCEPT    # basket at the 40% top of the ceiling
 VOL_SHOCK = 0.70                                             # the -30% register item
 
 SCENARIOS = [
@@ -182,7 +182,7 @@ def scenario_rows():
                         irr=irr(aov) if vmul == 1.0 else np.nan))
     return out
 
-# ---------------- THE EXTERNAL BENCHMARK, CHECKED AGAINST THE BASKET ----------------
+# ---------------- THE HURDLE, CHECKED AGAINST THE BASKET ----------------
 HURDLE_INSIDE_CEILING = AOV_HURDLE <= AOV_MAX
 HURDLE_NONGROCERY_SHARE = (AOV_HURDLE - BK.INTERCEPT)/BK.SLOPE     # share of GOV implied
 HURDLE_HEADROOM_PTS = BK.NONGROCERY_CEILING - HURDLE_NONGROCERY_SHARE
@@ -205,27 +205,26 @@ TURN_ROCE_LEG    = None                                  # set after AOV_HURDLE 
 
 W = 88
 def report():
-    print("\n" + "="*W); print("S30  RETURN ON CAPITAL — BREAKEVEN VS EXTERNAL BENCHMARK".center(W)); print("="*W)
+    print("\n" + "="*W); print("S30  RETURN ON CAPITAL — THE HURDLE, NOT THE BREAKEVEN".center(W)); print("="*W)
     print(f"  Capital employed, base case      Rs{CE_BASE/1e5:,.1f} lakh"
           f"   (capex Rs{CAPEX_MID/1e5:,.1f} L + NWC Rs{WC.WC_ADOPTED/1e5:,.1f} L)")
     for k, v in CE_STATES.items():
         print(f"    {k:<34} Rs{v/1e5:>8,.1f} lakh")
     print(f"  Orders per year (REPURPOSE, r={RESIDUAL_SHARE:.1%})   {orders_year():,.0f}")
-    print(f"  External benchmark [T1, Eternal, Jan 2026]   ROCE north of {ROCE_HURDLE:.0%}")
+    print(f"  Hurdle [T1, Eternal, Jan 2026]   ROCE north of {ROCE_HURDLE:.0%}")
     print()
-    print("-"*W); print("  THE TWO AOVs — BREAKEVEN AND AN EXTERNAL RETURN BENCHMARK"); print("-"*W)
+    print("-"*W); print("  THE TWO AOVs — and the deck has only ever quoted the first"); print("-"*W)
     print(f"    AOV for ROCE = 0   (breakeven)              Rs{AOV_BREAKEVEN:,.0f}"
           f"   <- reproduces the D1/D2 spine")
-    print(f"    AOV for ROCE = {ROCE_HURDLE:.0%}  (Eternal benchmark)     Rs{AOV_HURDLE:,.0f}"
+    print(f"    AOV for ROCE = {ROCE_HURDLE:.0%}  (the external hurdle)   Rs{AOV_HURDLE:,.0f}"
           f"   <- premium of Rs{HURDLE_PREMIUM:,.0f}")
     print(f"    AOV for {ROCE_HURDLE:.0%} POST-TAX at {TAX_RATE:.2%}              Rs{AOV_HURDLE_POSTTAX:,.0f}")
-    print(f"    Non-grocery share of GOV implied by benchmark    {HURDLE_NONGROCERY_SHARE:.1f}%"
-          f"   (Swiggy range max {BK.NONGROCERY_CEILING:.0f}%, headroom {HURDLE_HEADROOM_PTS:+.1f} pts)")
-    print(f"    >>> The benchmark-implied mix is {'WITHIN' if HURDLE_INSIDE_CEILING else 'OUTSIDE'} "
-          f"Swiggy's disclosed {BK.NONGROCERY_CEILING_LO:.0f}-{BK.NONGROCERY_CEILING:.0f}% range.")
-    print("        Cross-operator reference only; not a Flipkart target or commitment.")
+    print(f"    Non-grocery share of GOV implied by the hurdle   {HURDLE_NONGROCERY_SHARE:.1f}%"
+          f"   (ceiling {BK.NONGROCERY_CEILING:.0f}%, headroom {HURDLE_HEADROOM_PTS:+.1f} pts)")
+    print(f"    >>> The hurdle is {'REACHABLE' if HURDLE_INSIDE_CEILING else 'NOT reachable'} inside "
+          f"Eternal's own stated non-grocery ceiling.")
     print()
-    print("-"*W); print("  DUPONT — MARGIN AND TURNOVER LEGS OF THE IDENTITY"); print("-"*W)
+    print("-"*W); print("  DUPONT — the moneyshot is the turnover leg of this identity"); print("-"*W)
     d = dupont(AOV_HURDLE)
     print(f"    ROCE = EBIT margin x capital turnover")
     print(f"         = {d['ebit_margin']:.2%}  x  {d['capital_turn']:.2f}x  =  {d['roce']:.1%}   at AOV Rs{AOV_HURDLE:,.0f}")
@@ -245,7 +244,7 @@ def report():
         print(f"  {r_['name']:<34}{r_['aov']:>7,.0f}{r_['volume']:>10,.0f}{r_['ebit']/1e5:>11,.1f}"
               f"{r_['margin']:>9.2%}{r_['turn']:>7.2f}{r_['roce']:>8.1%}{pb:>12}")
     print()
-    print(f"  IRR at the benchmark AOV, {NODE_LIFE_MO//12}-year life, {RAMP_MONTHS}-month linear ramp [A]"
+    print(f"  IRR at the hurdle AOV, {NODE_LIFE_MO//12}-year life, {RAMP_MONTHS}-month linear ramp [A]"
           f"    {irr(AOV_HURDLE):.1%}")
     print(f"  IRR sensitivity to the ramp        2 mo {irr(AOV_HURDLE, ramp=2):.1%}"
           f"   |  3 mo {irr(AOV_HURDLE, ramp=3):.1%}   |  6 mo {irr(AOV_HURDLE, ramp=6):.1%}")
@@ -254,18 +253,18 @@ def report():
     print(f"  Node life anchored on JPM's {M.FRANCHISE_PAYBACK}-month franchised-store payback [T1]")
     print()
     print("-"*W); print("  THE REPURPOSE LEVER, IN THE SAME UNIT AS THE BASKET LEVER"); print("-"*W)
-    print(f"    breakeven AOV, term-only basis                         Rs{AOV_BREAKEVEN:,.0f}")
+    print(f"    breakeven AOV, term-only basis (the deck's headline)   Rs{AOV_BREAKEVEN:,.0f}")
     print(f"    breakeven AOV, REPURPOSE at r={RESIDUAL_SHARE:.1%}                  Rs{AOV_BREAKEVEN_REPURPOSE:,.0f}")
     print(f"    >>> filling the break from adjacent catchment is worth Rs{REPURPOSE_WORTH_AOV:,.0f} of AOV.")
     print(f"        The site filter and the basket lever are therefore SUBSTITUTES at the margin,")
     print(f"        and the site filter is the cheaper of the two to buy.")
     print()
-    print("-"*W); print("  INTERPRETATION AND SOURCE BOUNDARY"); print("-"*W)
-    print(f"    At Rs{AOV_BREAKEVEN:,.0f} AOV, modeled EBIT is zero on Rs{CE_BASE/1e5:,.1f} lakh of capital employed.")
-    print(f"    A {ROCE_HURDLE:.0%} ROCE benchmark requires Rs{AOV_HURDLE:,.0f} AOV, implying approximately")
-    print(f"    {HURDLE_NONGROCERY_SHARE:.1f}% non-grocery share versus Minutes' estimated {BK.MINUTES_NONGROCERY:.0f}%.")
-    print(f"    The required mix falls within Swiggy's disclosed {BK.NONGROCERY_CEILING_LO:.0f}-{BK.NONGROCERY_CEILING:.0f}% range.")
-    print("    Both comparisons are cross-operator references, not Flipkart targets or commitments.")
+    print("-"*W); print("  WHAT THIS CHANGES, IN ONE PARAGRAPH"); print("-"*W)
+    print(f"    The deck has been underwriting the node at Rs{AOV_BREAKEVEN:,.0f}, which earns ZERO on")
+    print(f"    Rs{CE_BASE/1e5:,.1f} lakh of capital. The external benchmark is {ROCE_HURDLE:.0%}. The gap is")
+    print(f"    Rs{HURDLE_PREMIUM:,.0f} of AOV, or {HURDLE_NONGROCERY_SHARE - BK.MINUTES_NONGROCERY:.1f} points of non-grocery mix above")
+    print(f"    where Minutes sits today ({BK.MINUTES_NONGROCERY:.0f}%). That is the number to put on a")
+    print(f"    financials slide, and it is inside the range Swiggy has disclosed.")
 
 if __name__ == "__main__":
     report()

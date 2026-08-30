@@ -8,23 +8,31 @@ __pycache__/
 .ruff_cache/
 .venv/
 venv/
-.nbdeps/
-node_modules/
 .env
 .env.*
 ~$*
 .~lock.*#
 *.tmp
 
-# Private/licensed source material and local presentation artifacts
+# LICENSED SOURCE — IGNORED BY DEFAULT.
+# These were previously left UNIGNORED with a note to "confirm that every included licence
+# permits the intended distribution before publishing". That check never happened, and an
+# unignored licensed corpus is one `git add -A` away from being published. Paying for access
+# is not permission to redistribute. The model does not need them: Model/data ships the
+# generated derivatives and a clean clone verifies without either directory.
 Research Pulls/
 papers/
-*.pdf
-*.pptx
-!Flipkart_Minutes_WiRED_SemiFinal_FULL_light.pptx
-*.ppt
-*.xlsx
-!Campus_Store_Model.xlsx
-*.xls
-*.docx
-*.doc
+
+# ---- not ours to redistribute, or not part of the package ----
+# vendored notebook dependencies - other people's code, thousands of files
+.nbdeps/
+# staging copy of this repository, not part of it
+_release_repo/
+# archived builders and assets
+_superseded/
+# pre-correction model backup
+_backup_Model_*/
+# the organisers' template - their asset, not ours
+Case/
+# a local run record, not a source file
+Model/_verification.json

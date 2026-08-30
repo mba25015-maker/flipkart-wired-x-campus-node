@@ -16,7 +16,7 @@ import campus_model as M, cost_stack as CS, break_mode as B
 import aishe_district as AD, risk_quadrant as Q, calendar_fragmentation as CF
 import basket as BK, sla as SL, roce as RC, fleet_mix as FM, working_capital as WC
 from deck_checks import DECK_CHECK_COUNT
-import risk_shocks as RS
+import risk_shocks as RS, working_capital as WC
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -237,7 +237,7 @@ must("S8  tornado carries the basket line",      f"{RS.AOV_CEILING_LO:,.0f}")
 
 # ---- the appendix, if it is built --------------------------------------------------
 if HAS_APX:
-    must("A0   the four verification counts",     f"{CC.AUDIT_COUNT}")
+    must("A0   the verification counts",          f"{CC.AUDIT_COUNT}")
     must("A0   declared check count",             f"{DECK_CHECK_COUNT} deck checks")
     must("A0   the repository is named",          "github.com/mba25015-maker/flipkart-wired-x-campus-node")
     # A-1 reports the package's verification of itself, which is circular for THIS run:
@@ -263,6 +263,35 @@ if HAS_APX:
     must("A5b  all-gig on the same leg",          f"{FM.gig_leg_cost():.2f}")
     must("A5b  the block shelf is priced",        f"{FM.shelf_handoff_value()[0]:.2f}")
     must("A5b  the closed-form rule is stated",   "R* =")
+    must("S6   the runner row is the block-shelf unit cost", f"{FM.shelf_handoff_value()[2]:.2f}")
+    must_not_on("S6   door-drop cost is not on the plan slide", f"{FM.shelf_handoff_value()[1]:.2f}")
+    must("A6   the LEVEL basis is named",         f"{RC.AOV_UP:,.0f}")
+    must("A6   the ANCHORED basis is named",      f"{RS.AOV_CEILING_LO:,.0f}")
+    # These two used to be the literals "8.50" and "2.14". The deck hardcoded the same
+    # literals, so checker and slide agreed with each other while both disagreed with the model
+    # (turnover leg 8.44). A check whose expected value is typed rather than computed cannot
+    # detect drift - it can only confirm that two copies of the same typo match.
+    _du = RC.dupont(RC.AOV_HURDLE)
+    must("A6b  the DuPont turnover leg",          f"{_du['capital_turn']:.2f}")
+    must("A6b  the DuPont margin leg",            f"{_du['ebit_margin']*100:.2f}%")
+    must("A6b  the day-count note is present",    f"{RC.DAYCOUNT_GAP:.2f}")
+    must("A6b  capital employed",                 f"{RC.CE_BASE/1e5:,.1f} L")
+    must("A6b  AOV at ROCE = 0",                  f"{RC.AOV_BREAKEVEN:,.0f}")
+    must("A6b  AOV at the hurdle",                f"{RC.AOV_HURDLE:,.0f}")
+    must("A6b  post-tax hurdle AOV",              f"{RC.AOV_HURDLE_POSTTAX:,.0f}")
+    must("A6b  the like-for-like asset turn",     f"{RC.TURN_SLIDE4:.2f}")
+    # A-5: working-capital constructs and the priced shocks, none of which were read before
+    must("A5   working capital, adopted",         f"{WC.WC_ADOPTED/1e5:,.1f} L")
+    must("A5   working capital, 12-day target",   f"{WC.WC_TARGET/1e5:,.1f} L")
+    must("A5   the rejected COGS construct",      f"{WC.WC_OLD/1e5:,.1f} L")
+    must("A5   shock, volume -30%",               f"{RS.AOV_VOLUME:,.0f}")
+    must("A5   shock, shrinkage upper bound",     f"{RS.AOV_SHRINKAGE:,.0f}")
+    must("A5   shock, gig levy",                  f"{RS.AOV_LEVY:,.0f}")
+    must("A5   shock, calendar fragmentation",    f"{RS.AOV_FRAGMENTATION:,.0f}")
+    must("A7   districts clearing the screen",    f"{AD.N_CANDIDATES}")
+    must("A7b  the seven-week derivation",        "21 + 28 = 49")
+    must("A9   the load-bearing paper",           "Kambli")
+    must("A10  the gaps are counted",             "Seven gaps")
 
 # ---- PHRASE BANS: the wording itself, in the built file --------------------------------
 # The CLAIM checks in audit.py assert a property of the MODEL (argmin SLA is not the peak
@@ -270,7 +299,8 @@ if HAS_APX:
 # CLAIM checks kept passing. These read the deck.
 for _p in ("fastest at peak", "fastest at exam-night peak", "fastest and cheapest",       # scan:allow
            "the client manages", "client's own hurdle", "management's own",                # scan:allow
-           "management's stated", "management has already", "management ceiling"):         # scan:allow
+           "management's stated", "management has already", "management ceiling",         # scan:allow
+           "the stated ceiling", "stated ceiling", "their stated ceiling"):                    # scan:allow
     must_not_on(f"BAN  '{_p}'", _p)
 # and the corrected sentence must actually be there, not merely the banned one absent
 # NOTE the numbering: the operating-model page is the deck's S6 and the FILE's slide 7.
@@ -279,17 +309,6 @@ must("S6  the corrected peak claim is present", "ost per order is lowest at exam
 for _s in ("311/311", "311 / 311", "80/80", "80 / 80", "83/83", "83 / 83"):
     must_not_on(f"BAN  stale verification count '{_s}'", _s)
 
-must("S6   the runner row is the block-shelf unit cost", f"{FM.shelf_handoff_value()[2]:.2f}")
-must_not_on("S6   door-drop cost is not on the plan slide", f"{FM.shelf_handoff_value()[1]:.2f}")
-must("A6   the LEVEL basis is named",         f"{RC.AOV_UP:,.0f}")
-must("A6   the ANCHORED basis is named",      f"{RS.AOV_CEILING_LO:,.0f}")
-must("A6b  the DuPont turnover leg",          f"{RC.dupont(RC.AOV_HURDLE)['capital_turn']:.2f}")
-must("A6b  the day-count note is present",    "2.14")
-must("A7   districts clearing the screen",    f"{AD.N_CANDIDATES}")
-must("A7b  the seven-week derivation",        "21 + 28 = 49")
-must("A9   the load-bearing paper",           "Kambli")
-must("A10  the gaps are counted",             "Seven gaps")
-
 # ---- nothing superseded may appear anywhere ---------------------------------------
 must_not("Round 1 breakeven Rs528",   "Rs528")
 must_not("Round 1 Minutes AOV Rs775", "Rs775")
@@ -297,25 +316,58 @@ must_not("Round 1 city asset turn",   "12.6x")
 must_not("superseded working capital", "Rs95.7")
 must_not("superseded breakeven Rs554", "Rs554")
 must_not("stale NWC days",            "NWC 18d")
+# ---- the pre-correction number set must not survive ANYWHERE, appendix included ----------
+# Slides 15 and 18 carried a complete parallel set of these in hardcoded text through every
+# passing layer, because no page-scoped check read those panels and the two that did compared
+# a literal to a literal.
+for _lbl, _v in (("pre-correction CE", "Rs325.0 L"), ("pre-correction WC", "Rs90.0 L"),
+                 ("pre-correction WC target", "Rs77.1 L"), ("pre-correction rejected WC", "Rs117.8 L"),
+                 ("pre-correction breakeven", "Rs578"), ("pre-correction hurdle", "Rs763"),
+                 ("pre-correction post-tax", "Rs825"), ("pre-correction spine", "Rs580"),
+                 ("pre-correction turnover leg", "8.50x"), ("pre-correction margin leg", "4.71%"),
+                 ("pre-correction shock, volume", "Rs647"), ("pre-correction shock, shrinkage", "Rs623"),
+                 ("pre-correction shock, levy", "Rs595"), ("pre-correction shock, fragmentation", "Rs589"),
+                 ("pre-correction last mile", "Rs19.0")):
+    must_not(f"superseded  {_lbl}", _v)
 must_not("placeholder text",          "TBD")
 must_not("cover team fields unfilled", "\u00ab")   # \u00abTEAM NAME\u00bb must be replaced before shipping
-# ...and absence of the placeholder is not the same as PRESENCE of the name. When TEAM_NAME is
-# supplied, verify that exact value. Otherwise validate that the built cover contains real,
-# non-placeholder text; verification must not depend on an undocumented shell variable.
-_expected_team = os.environ.get("TEAM_NAME", "").strip()
-if _expected_team:
-    must("cover carries the configured team name", _expected_team, page=0)
-else:
-    _cover = pages[0].strip() if pages else ""
-    _cover_norm = _norm(_cover)
-    checks.append((bool(_cover_norm) and "TEAM NAME" not in _cover_norm and "\u00ab" not in _cover,
-                   "cover carries a non-placeholder team name",
-                   _cover or "(blank cover)"))
+# ...and absence of the placeholder is not the same as PRESENCE of the name. An empty TEAM_NAME
+# would clear the guillemets and ship a blank cover past the check above.
+must("cover carries the team name", os.environ.get("TEAM_NAME") or P.TEAM_NAME)
 must_not("placeholder text, lorem",   "Lorem")
 
 # The count on A0 is only trustworthy if the constant it is printed from matches the number of
 # checks this file actually runs. Asserting one without the other is how 83 survived on a slide
 # while the checker ran 106.
+# ---- HYPERLINKS MUST EXIST AND POINT SOMEWHERE REAL ------------------------------------
+# The deck carried QR codes and ZERO hyperlink relationships across all 23 slides, so a judge
+# reading on a laptop had to photograph their own screen to follow a link. Presence is asserted
+# here because a QR is not a link, and nothing else in the stack can tell the difference.
+_links = []
+for _sl in Presentation(PPTX).slides:
+    for _rid, _rel in _sl.part.rels.items():
+        if _rel.reltype.endswith("/hyperlink"): _links.append(_rel.target_ref)
+checks.append((len(_links) >= 6, "LINKS  the deck carries real hyperlinks",
+               f"{len(_links)} hyperlink relationships"))
+checks.append((all(u.startswith("https://") for u in _links),
+               "LINKS  every hyperlink is absolute https",
+               "all https" if all(u.startswith("https://") for u in _links)
+               else [u for u in _links if not u.startswith("https://")][:2]))
+
+# ---- NO CHECK MAY BE REGISTERED TWICE -------------------------------------------------
+# A stray `for` loop once swallowed the ten appendix checks that followed it, because they were
+# already indented and the loop body was a single line. They ran SIX times each - 50 phantom
+# rows - and the deck printed "183 deck checks" against a checker that genuinely held 133.
+# Every row still passed, so nothing looked wrong.
+#
+# The SELF count check below could not catch it, because the constant it compares against was
+# being realigned to whatever the run produced. A number regenerated from reality cannot police
+# reality. Registering the same (label, value) twice is never intentional here, so it is an error.
+import collections as _co
+_dup = {k: n for k, n in _co.Counter(tuple(str(x) for x in c[1:]) for c in checks).items() if n > 1}
+checks.append((not _dup, "SELF  no check is registered twice",
+               (f"{len(_dup)} duplicated, first: {list(_dup)[0][0]}" if _dup else "0 duplicates")))
+
 checks.append((len(checks) + 1 == DECK_CHECK_COUNT,
                "SELF  deck_checks.DECK_CHECK_COUNT matches this run",
                f"{DECK_CHECK_COUNT} (actual {len(checks) + 1})"))

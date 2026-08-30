@@ -28,11 +28,23 @@ import risk_shocks as RS, working_capital as WC
 from deck_checks import DECK_CHECK_COUNT
 import check_counts as CC
 import params as PARAMS
+NUMWORD={1:'one',2:'two',3:'three',4:'four',5:'five',6:'six',7:'seven'}
 
 THEME = sys.argv[1] if len(sys.argv) > 1 else "light"
 OUT   = sys.argv[2] if len(sys.argv) > 2 else "Flipkart_Minutes_WiRED_SemiFinal_FULL"
 HERE  = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
 TPL   = os.path.join(ROOT, "Case", "Presentation_template.pptx")
+if not os.path.exists(TPL):
+    # The organisers' template is THEIR asset and is not redistributed with this repository, so a
+    # clean clone can VERIFY the package but cannot rebuild the deck from scratch. Said plainly
+    # here rather than surfacing as a PackageNotFoundError twenty frames deep.
+    raise SystemExit(
+        "\nCannot rebuild: the organisers' template is not in this tree.\n"
+        f"  expected: {os.path.relpath(TPL, ROOT)}\n"
+        "  It is the WiRED X title/content template and is not ours to redistribute.\n\n"
+        "  VERIFICATION does not need it. Run:  python3 Model/run_all.py\n"
+        "  That checks the model, the documents and the built .pptx that ships with this repo.\n"
+        "  Rebuilding (Model/release.py) requires the template in Case/.\n")
 IMG   = os.path.join(HERE, "charts", THEME)
 FONT  = "Calibri"; MONO = "Consolas"
 
@@ -213,7 +225,7 @@ def parse_xml_dash():
 def roce_chart(s, L_, T_, W_, H_):
     """Native clustered column, one series, with the external benchmark's 40% hurdle drawn as a
     gold dashed line. The base case sits BELOW the line -- that is the honest read and
-    the reason the chart exists, so the model-derived base ROCE is navy, not green."""
+    the reason the chart exists, so 32.7% is navy, not green."""
     names  = ["underwritten\n(breakeven)", "basket 30%\nvolume -30%",
               "basket 30%\nnon-grocery", "basket 40%\nnon-grocery"]
     vals   = [round(SCN[i]["roce"]*100, 1) for i in (0, 3, 1, 2)]
@@ -380,7 +392,8 @@ def slide1():
     ay=3.50
     text(s,0.45,ay,9.10,0.13,"THE ASK, AND WHAT IT RETURNS  ·  ONE NODE, FIVE-YEAR LIFE, EVERY FIGURE SOLVED FROM THE MODEL",5.9,FG,bold=True)
     cells=[("CAPITAL EMPLOYED", f"₹{RC.CE_BASE/1e5:,.0f} L", f"capex ₹{RC.CAPEX_MID/1e5:,.0f} L + working capital ₹{WC.WC_ADOPTED/1e5:,.0f} L", FG),
-           ("ROCE, 30% BASKET", f"{SCN[1]['roce']:.1%}", f"and an external {RC.ROCE_HURDLE:.0%} benchmark corresponds to AOV ₹{RC.AOV_HURDLE:,.0f}", POS),
+           ("ROCE, 30% BASKET", f"{SCN[1]['roce']:.1%}", f"and the {RC.ROCE_HURDLE:.0%} external benchmark at AOV ₹{RC.AOV_HURDLE:,.0f}, on a basket "
+            f"inside the 30–40% range Swiggy discloses", POS),
            ("PAYBACK", f"{SCN[1]['payback']:.0f} mo", f"against a {M.FRANCHISE_PAYBACK}-month franchised-store benchmark¹¹", POS),
            ("IRR", f"{RC.irr(RC.AOV_HURDLE):.1%}", f"{RC.irr(RC.AOV_HURDLE,ramp=6):.0%}–{RC.irr(RC.AOV_HURDLE,ramp=2):.0%} across a 2–6 month ramp", POS)]
     cw=9.10/4
@@ -698,7 +711,7 @@ def slide5():
     text(s,5.85,ry+0.78,3.70,0.12,
          "Priced in full on A-7b.",5.2,MUTE,ital=True)
 
-    # ---- the screen, drawn: S5 asserts "111 of 760" three times and never shows the narrowing
+    # ---- the screen, drawn: S5 asserts the ratio three times and never shows the narrowing
     text(s,0.45,4.00,9.10,0.12,
          "THE SCREEN, DRAWN  \u00b7  EVERY STEP IS A REGISTER FIELD, NOT A JUDGEMENT",5.6,FG,bold=True)
     steps=[(f"{AD.N_HEI:,}","institutions","AISHE register",C(0xDF,0xE6,0xF2),FG),
@@ -947,7 +960,7 @@ def slide8():
          f"−30% the node does not pay back within its life. Measure it before capital goes to node two.",5.8,NEG,lsp=0.98)
 
     ty=3.06
-    text(s,6.05,ty,3.50,0.13,"PRICED SHOCKS  \u00b7  AGAINST THE \u20b9580 BREAKEVEN",5.8,FG,bold=True)
+    text(s,6.05,ty,3.50,0.13,f"PRICED SHOCKS  \u00b7  AGAINST THE \u20b9{RC.SPINE_BREAKEVEN:,.0f} BREAKEVEN",5.8,FG,bold=True)
     tornado_chart(s,6.05,ty+0.17,3.50,1.10)
     text(s,6.05,4.40,3.50,0.34,
          f"Coverage is a lift from Minutes' own post-occasion basket: 30% non-grocery reaches "
@@ -990,7 +1003,7 @@ LINKS = {
  "L1": ("L1_Audit_Verification",  f"Every number on the eight content slides is asserted here. {CC.AUDIT_COUNT} assertions, one command, no manual entry."),
  "L2": ("L2_Dead_Zone_Solver",    "Five strategies, four constraints, one basis. BEST = REPURPOSE is the solver's output, not our preference."),
  "L3": ("L3_Return_Model",        "ROCE, DuPont, payback, IRR and the AOV that clears a 40% hurdle — solved in closed form, not searched."),
- "L4": ("L4_District_Screen",     "72,352 institutions, 760 districts, four screen criteria, and the contestedness band that cut 72% of our own shortlist."),
+ "L4": ("L4_District_Screen",     f"72,352 institutions, {AD.N_DISTRICTS} districts, four screen criteria, and the contestedness band that cut 72% of our own shortlist."),
  "L5": ("L5_Fulfilment_Model",    f"The trip identity, the batching rule and the volume weighting that produce ₹{LM:.1f} an order."),
  "L6": ("L6_Basket_Regression",   "Four-quarter fit, R² = 0.918, with the four-point limitation shown explicitly."),
 }
@@ -1067,39 +1080,55 @@ def runit(s, key, l=0.45, t=4.80):
         url, qr = SHEET, "A2_Source_Register_QR.png"
     else:
         stem, _ = LINKS[key]; url = COLAB + stem + ".ipynb"; qr = stem + "_QR.png"
+    href = url if url.startswith("http") else "https://" + url
     b=box(s,l,t,3.05,0.30,None,radius=0.15,line=DHI,lw=1.0)
     f=b.text_frame; f.margin_left=In(0.12); f.vertical_anchor=MSO_ANCHOR.MIDDLE
     p=par(f,True); run(p,"▶  ",9.0,DHI,bold=True)
-    run(p,"RUN IT — "+ (url[:40]+"…" if len(url)>41 else url),7.4,DFG)
+    _r = run(p,"RUN IT — "+ (url[:40]+"…" if len(url)>41 else url),7.4,DFG)
+    # A REAL HYPERLINK, not just a QR. The deck carried QR codes and no clickable link anywhere -
+    # zero hyperlink relationships across 23 slides - so a judge reading on a laptop had to
+    # photograph their own screen. The label and the QR image now both carry the URL.
+    try: _r.hyperlink.address = href
+    except Exception: pass
     qp=os.path.join(QRD,qr)
     if os.path.exists(qp):
         rect(s,l+3.17,t-0.25,0.80,0.80,C(0xFF,0xFF,0xFF))
-        s.shapes.add_picture(qp,In(l+3.20),In(t-0.22),width=In(0.74),height=In(0.74))
+        _pic = s.shapes.add_picture(qp,In(l+3.20),In(t-0.22),width=In(0.74),height=In(0.74))
+        try: _pic.click_action.hyperlink.address = href
+        except Exception: pass
     return b
 
 # ------------------------------- A0 ---------------------------------------
 def a0():
     s = prs.slides.add_slide(L[APX_LAYOUT]); strip_ph(s)
     text(s,0.45,1.30,9.10,0.50,"Appendix · the verification kit",26.0,DFG,bold=True)
+    # THE TILES ARE ENUMERATED AND COUNTED. This page said "four scripts" and "Each of the four"
+    # and drew four tiles, hardcoded, while five verifiers ran. Nothing read it: the layer-count
+    # ban checked the README, the workbook and the notebooks and never opened the deck.
+    cells=[(f"{CC.AUDIT_COUNT}","assertions in audit.py","the model against itself",DHI),
+           (f"{CC.DOCS_COUNT}","HANDOFF figures","the numbers doc against the model",DBLUE),
+           (f"{CC.SPEC_COUNT}","spec figures","the slide copy against the model",DBLUE),
+           (f"{DECK_CHECK_COUNT}","deck checks","the BUILT .pptx against the model",DPOS),
+           (f"{CC.ARTF_COUNT}","artefact checks","workbook, notebooks and manifest",DPOS)]
     text(s,0.45,1.98,8.20,0.50,
          "Every figure on the eight content slides is produced by code in a public repository, and "
-         "checked by four scripts that anyone can run in a browser in under a minute.",
+         f"checked by {NUMWORD[len(cells)]} scripts that anyone can run in a browser in under a minute.",
          10.5,DMUTE,lsp=1.02)
-    cells=[(f"{CC.AUDIT_COUNT}","assertions in audit.py","the model against itself",DHI),
-           ("31","HANDOFF figures","the numbers doc against the model",DBLUE),
-           ("79","spec figures","the slide copy against the model",DBLUE),
-           (str(DECK_CHECK_COUNT),"deck checks","the BUILT .pptx against the model",DPOS)]
-    cw=9.10/4
+    cw=9.10/len(cells)
     for i,(n,lab,sub,col) in enumerate(cells):
         dcard(s,0.45+i*cw,2.85,cw-0.12,0.92)
-        text(s,0.57+i*cw,2.96,cw-0.36,0.30,n,20.0,col,bold=True)
-        text(s,0.57+i*cw,3.28,cw-0.36,0.16,lab,7.0,DFG,bold=True)
-        text(s,0.57+i*cw,3.45,cw-0.36,0.24,sub,6.2,DMUTE,lsp=0.98)
+        text(s,0.57+i*cw,2.96,cw-0.36,0.30,n,18.0,col,bold=True)
+        text(s,0.57+i*cw,3.28,cw-0.36,0.16,lab,6.6,DFG,bold=True)
+        text(s,0.57+i*cw,3.45,cw-0.36,0.24,sub,5.9,DMUTE,lsp=0.98)
     text(s,0.45,4.05,9.10,0.20,
-         "Each of the four is a command with an output. The outputs follow on A-1.",8.0,DFG,ital=True)
+         f"Each of the {NUMWORD[len(cells)]} is a command with an output. The outputs follow on A-1.",
+         8.0,DFG,ital=True)
     b=box(s,0.45,4.45,9.10,0.34,None,radius=0.10,line=DHI,lw=1.0)
     f=b.text_frame; f.margin_left=In(0.13); f.vertical_anchor=MSO_ANCHOR.MIDDLE
-    p=par(f,True); run(p,"THE REPOSITORY   ",7.4,DHI,bold=True); run(p,REPO,7.4,DFG)
+    p=par(f,True); run(p,"THE REPOSITORY   ",7.4,DHI,bold=True)
+    _rr = run(p,REPO,7.4,DFG)
+    try: _rr.hyperlink.address = "https://" + REPO
+    except Exception: pass
     run(p,"   ·   public, no login, six runnable notebooks   ·   paid analyst PDFs deliberately excluded",7.4,DMUTE)
 
 # ------------------------------- A1 ---------------------------------------
@@ -1129,21 +1158,29 @@ def a1():
         text(s,2.45,yy+0.11,2.20,0.16,lab,7.2,DFG,bold=True)
         text(s,2.45,yy+0.29,2.20,0.24,sub,6.2,DMUTE,lsp=0.98)
         yy+=0.70
-    dmono(s,0.45,yy+0.06,4.35,1.28,[
-        ("$ git clone " + REPO.split('/')[-1],True),
-        ("$ python3 Model/run_all.py",True),
-        ("",False),
-        (f"  audit.py        {CC.tile('audit'):>18}   model vs itself",False),
-        (f"  verify_docs.py  {CC.tile('docs'):>18}   HANDOFF vs model",False),
-        (f"  verify_spec.py  {CC.tile('spec'):>18}   spec vs model",False),
-        (f"  verify_deck.py  {CC.tile('deck'):>18}   built slides vs model",False),
-        ("",False),
-        ("one command, four layers, nonzero exit on any failure",True)],
-        "REPRODUCE IT IN UNDER A MINUTE")
-    text(s,0.45,yy+1.44,3.05,0.44,
-         "The notebook below runs the first of the four in a browser, with no local install. Each "
-         "line is a command with an output.",
-         6.4,DMUTE,ital=True,lsp=0.99)
+    # THE LAYER LIST IS ENUMERATED, AND HOW MANY THERE ARE IS COUNTED. Adding the fifth verifier
+    # turned "four layers" into a stale value in eight places at once - the README, the workbook,
+    # this page, the L1 notebook and release.py's own docstring - because the number was typed
+    # everywhere it appeared. A count of the package's own parts is a number about itself, and
+    # those are computed here, never written.
+    _LAYERS = [("audit.py",          "audit",     "model vs itself"),
+               ("verify_docs.py",    "docs",      "HANDOFF vs model"),
+               ("verify_spec.py",    "spec",      "spec vs model"),
+               ("verify_deck.py",    "deck",      "built slides vs model"),
+               ("verify_artifacts.py","artefacts","workbook, notebooks, manifest")]
+    _rows=[("$ git clone " + REPO.split('/')[-1],True),
+           ("$ python3 Model/run_all.py",True),("",False)]
+    for _f,_k,_w in _LAYERS:
+        _rows.append((f"  {_f:<20}{CC.tile(_k):>15}   {_w}",False))
+    _rows += [("",False),
+              (f"one command, {NUMWORD[len(_LAYERS)]} layers, nonzero exit on any failure",True)]
+    dmono(s,0.45,yy+0.06,4.35,1.42,_rows,"REPRODUCE IT IN UNDER A MINUTE")
+    # The caption sits in the 4.55-4.80 gap between the command block and the RUN IT pill. The
+    # block grew by a line when the fifth layer was added and the caption collided with the pill;
+    # measured from the render, not estimated.
+    text(s,0.45,yy+1.50,3.05,0.20,
+         f"The notebook below runs the first of the {NUMWORD[len(_LAYERS)]} in a browser.",
+         6.2,DMUTE,ital=True,lsp=0.98)
     runit(s,"L1")
 
 # ------------------------------- A2 ---------------------------------------
@@ -1301,9 +1338,9 @@ def a5():
         ("volume weighting: 62.7% of orders fall in the peak band,",False),
         (f"so ₹{LM:.1f} — not the ₹28.9 an average hour would give.",True)],"THE TRIP AND THE BATCH")
     yr=dbanner(s,5.20,0.92,4.35,"WORKING CAPITAL — THREE CONSTRUCTS, ONE ADOPTED")
-    rows=[[("NWC days × NOV  [8]",DFG,True),(f"₹{WC.WC_ADOPTED/1e5:.1f} L",DPOS,True),("ADOPTED",DPOS,True)],
-          [("12-day steady state",DFG,False),(f"₹{WC.WC_TARGET/1e5:.1f} L",DFG,False),("sensitivity",DMUTE,False)],
-          [("COGS × 18 days",DFG,False),(f"₹{WC.WC_OLD/1e5:.1f} L",DNEG,False),("REJECTED",DNEG,True)]]
+    rows=[[("NWC days × NOV  [8]",DFG,True),(f"₹{WC.WC_ADOPTED/1e5:,.1f} L",DPOS,True),("ADOPTED",DPOS,True)],
+          [(f"{PARAMS.NWC_DAYS_TARGET:.0f}-day steady state",DFG,False),(f"₹{WC.WC_TARGET/1e5:,.1f} L",DFG,False),("sensitivity",DMUTE,False)],
+          [(f"COGS × {PARAMS.NWC_DAYS_R1:.0f} days",DFG,False),(f"₹{WC.WC_OLD/1e5:,.1f} L",DNEG,False),("REJECTED",DNEG,True)]]
     dtable(s,5.20,yr+0.08,4.35,[("CONSTRUCT",0.52,PP_ALIGN.LEFT),("VALUE",0.24,PP_ALIGN.RIGHT),
            ("STATUS",0.24,PP_ALIGN.RIGHT)],rows,size=6.4,gap=0.215)
     text(s,5.20,yr+0.86,4.35,0.58,
@@ -1378,6 +1415,7 @@ def a6():
 
 # ------------------------------- A6b --------------------------------------
 def a6b():
+    _DU = RC.dupont(RC.AOV_HURDLE)          # margin AND turnover legs, both from the model
     s = apx("Return on capital — the closed form, and the two asset turns reconciled","A-6b")
     x,y,w,h = shot(s,"S4_roce_hurdle.png",5.85,0.92,3.70,2.88)
     text(s,5.85,y+h+0.06,3.70,0.14,"roce.py — solved in closed form, not searched",6.2,DMUTE,ital=True)
@@ -1389,31 +1427,33 @@ def a6b():
     dmono(s,0.45,0.92,5.20,1.18,[
         ("ROCE = EBIT/CE = (EBIT/NOV) × (NOV/CE)        [DuPont]",True),
         ("                   margin leg    turnover leg",False),
-        (f"     = {RC.dupont(RC.AOV_HURDLE)['ebit_margin']*100:.2f}% × {RC.dupont(RC.AOV_HURDLE)['capital_turn']:.2f}×  =  {RC.ROCE_HURDLE:.0%}   at AOV ₹{RC.AOV_HURDLE:,.0f}",True),
+        (f"     = {_DU['ebit_margin']*100:.2f}% × {_DU['capital_turn']:.2f}×  =  {RC.ROCE_HURDLE:.0%}   at AOV ₹{RC.AOV_HURDLE:,.0f}",True),
         ("",False),
         ("AOV* = (ROCE·CE + F·12)/(τ·N) + c/τ      closed form",True),
         ("   no search, no goal-seek, one line of algebra",False)],"THE IDENTITY THE BENCHMARK IS SET ON")
     yr=dbanner(s,0.45,2.20,5.20,"CAPITAL EMPLOYED, AND WHAT IT RETURNS")
-    rows=[[("capex, midpoint of the band [2]",DFG,False),("₹235.0 L",DFG,True)],
-          [("working capital, 14 NWC days [8]",DFG,False),(f"₹{WC.WC_ADOPTED/1e5:.1f} L",DFG,True)],
-          [("capital employed",DFG,True),(f"₹{RC.CE_BASE/1e5:.1f} L",DHI,True)],
+    rows=[[("capex, midpoint of the band [2]",DFG,False),(f"₹{RC.CAPEX_MID/1e5:,.1f} L",DFG,True)],
+          [(f"working capital, {PARAMS.NWC_DAYS:.0f} NWC days [8]",DFG,False),(f"₹{WC.WC_ADOPTED/1e5:,.1f} L",DFG,True)],
+          [("capital employed",DFG,True),(f"₹{RC.CE_BASE/1e5:,.1f} L",DHI,True)],
           [("AOV for ROCE = 0",DFG,False),(f"₹{RC.AOV_BREAKEVEN:,.0f}",DFG,True)],
-          [("AOV for the 40% benchmark",DFG,False),(f"₹{RC.AOV_HURDLE:,.0f}",DHI,True)],
-          [("post-tax at 25.17%",DMUTE,False),(f"₹{RC.AOV_HURDLE_POSTTAX:,.0f}",DMUTE,True)],
+          [(f"AOV for the {RC.ROCE_HURDLE:.0%} hurdle",DFG,False),(f"₹{RC.AOV_HURDLE:,.0f}",DHI,True)],
+          [(f"post-tax at {RC.TAX_RATE:.2%}",DMUTE,False),(f"₹{RC.AOV_HURDLE_POSTTAX:,.0f}",DMUTE,True)],
           [("IRR, 5-year life, 3-month ramp",DFG,False),(f"{RC.irr(RC.AOV_HURDLE):.1%}",DPOS,True)],
-          [("NPV at 12% / 15% [assumed]",DMUTE,False),(f"₹{RC.npv(RC.AOV_HURDLE,0.12)/1e5:.1f} L / ₹{RC.npv(RC.AOV_HURDLE,0.15)/1e5:.1f} L",DMUTE,True)]]
+          [("NPV at 12% / 15% [analytical sensitivities]",DMUTE,False),
+           (f"₹{RC.npv(RC.AOV_HURDLE,0.12)/1e5:,.1f} L / ₹{RC.npv(RC.AOV_HURDLE,0.15)/1e5:,.1f} L",DMUTE,True)]]
     dtable(s,0.45,yr+0.06,5.20,[("",0.66,PP_ALIGN.LEFT),("",0.34,PP_ALIGN.RIGHT)],rows,size=6.4,gap=0.165)
     box(s,0.45,4.04,5.20,0.58,None,radius=0.08,line=DHI,lw=1.0)
     text(s,0.57,4.11,4.96,0.46,
-         "TWO ASSET TURNS, BOTH CORRECT.  6.93× is like-for-like at a COMMON AOV ₹450 — it isolates "
-         f"density × calendar and is the slide-4 quantity. {RC.dupont(RC.AOV_HURDLE)['capital_turn']:.2f}× is the node's own turnover at its "
+         f"TWO ASSET TURNS, BOTH CORRECT.  {RC.TURN_SLIDE4:.2f}× is like-for-like at a COMMON AOV ₹450 — it isolates "
+         f"density × calendar and is the slide-4 quantity. {_DU['capital_turn']:.2f}× is the node's own turnover at its "
          "achieved AOV on capital employed including working capital — the DuPont leg. Always quote "
          "the basis.",6.4,DFG,lsp=0.98)
     runit(s,"L3",t=4.78)
 
 # ------------------------------- A7 ---------------------------------------
 def a7():
-    s = apx("District register and screen — 760 districts, four criteria, 111 candidates","A-7")
+    s = apx(f"District register and screen — {AD.N_DISTRICTS} districts, four criteria, "
+            f"{AD.N_CANDIDATES} candidates","A-7")
     x,y,w,h = shot(s,"S5_aishe_districts.png",0.45,0.92,4.35,1.90)
     text(s,0.45,y+h+0.06,4.35,0.28,
          "aishe_district.py — the register is per-institution and carries the urban/rural flag and the "
@@ -1424,7 +1464,7 @@ def a7():
         ("  urban flag           →  21,000 urban (39.4%)",False),
         ("  non-metro            →  17,805",False),
         ("  ≥ 5 urban colleges + Tier-1/2 + no metro overlap",False),
-        ("                       →  111 of 760 districts",True)],None)
+        (f"                       →  {AD.N_CANDIDATES} of {AD.N_DISTRICTS} districts",True)],None)
     yr=dbanner(s,5.05,0.92,4.50,"TOP CANDIDATES, AND THE FLAG THAT DISQUALIFIED MOST OF THEM")
     try:
         tp=AD.with_proximity(AD.TOP).head(10)
@@ -1615,11 +1655,11 @@ def a10():
 
 
 # ------------------------------- COVER ------------------------------------
-TEAM_NAME = os.environ.get("TEAM_NAME", "\u00abTEAM NAME\u00bb")
+TEAM_NAME = os.environ.get("TEAM_NAME") or PARAMS.TEAM_NAME
 # TEAM_ID IS OPTIONAL - WiRED X does not issue one. Unset means the line is not drawn at all,
 # rather than drawn empty or left as a placeholder. TEAM_NAME keeps its guillemet default so an
 # unset name still FAILS the cover check loudly instead of shipping a blank field.
-TEAM_ID   = os.environ.get("TEAM_ID", "").strip()
+TEAM_ID   = (os.environ.get("TEAM_ID") or PARAMS.TEAM_ID).strip()
 
 def cover():
     """CUSTOM is the organisers' own title slide: the WiRED X lockup, the illustrated figures, a
@@ -1784,6 +1824,30 @@ def _fix_axis_ids(path):
         for info, data in outb: zo.writestr(info, data)
         zo.close(); shutil.move(tmp, path)
     return fixed
+
+# ---- THE ASSET MANIFEST, written by the builder that owns the links -------------------------
+# It was maintained by hand and had gone stale twice over: "311 assertions", and screenshot
+# filenames (S1_audit_311.png, S2_deck_80.png) that no longer exist. A companion artefact nothing
+# generates and nothing reads is the same defect as a slide nothing asserts.
+def _write_manifest():
+    import csv
+    rows=[["Link","Notebook","Runs","Appendix page","What it proves","Colab URL","QR asset","Screenshot asset"]]
+    runs={"L1":"audit.py","L2":"solver.py","L3":"roce.py","L4":"aishe_district.py",
+          "L5":"sla.py","L6":"basket.py"}
+    page={"L1":"A1","L2":"A4","L3":"A6b","L4":"A7","L5":"A5","L6":"A6"}
+    shots={"L1":"assets/screenshots/S1_audit.png; assets/screenshots/S2_deck.png",
+           "L2":"assets/screenshots/S3_solver_repurpose.png","L3":"assets/screenshots/S4_roce_hurdle.png",
+           "L4":"assets/screenshots/S5_aishe_districts.png","L5":"",
+           "L6":"assets/screenshots/S6_basket_regression.png"}
+    for k,(stem,what) in LINKS.items():
+        rows.append([k, stem, runs.get(k,""), page.get(k,""), what,
+                     "https://"+COLAB+stem+".ipynb",
+                     f"assets/qr/{stem}_QR.png", shots.get(k,"")])
+    mf=os.path.join(SHOT, "..", "deck_asset_manifest.csv")
+    with open(os.path.normpath(mf), "w", newline="", encoding="utf-8") as fh:
+        csv.writer(fh).writerows(rows)
+    return os.path.normpath(mf)
+_mf = _write_manifest()
 
 _nfix = _fix_axis_ids(out)
 print("wrote", out, "|", len(prs.slides.__iter__.__self__._sldIdLst), "slides"

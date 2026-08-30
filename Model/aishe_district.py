@@ -24,28 +24,41 @@ VINTAGE WARNING, and it must be stated wherever these counts appear next to the 
 
 TIERS: T1 government register | D derived
 """
-import json
-from pathlib import Path
-
+import json, os
 import pandas as pd
 
-DATA = Path(__file__).resolve().parent / "data"
-SUMMARY = json.loads((DATA / "aishe_summary.json").read_text(encoding="utf-8"))
+# ONE CODE PATH, BOTH TREES. The working folder and the public repository used to run DIFFERENT
+# VARIANTS of this file - one reading the licensed AISHE register, one reading pre-aggregated
+# CSVs - and model_drift/original vs model_drift/public showed the two producing different
+# output. A fork of the model is worse than a duplicated constant, because nothing compares them.
+# Now: this module ALWAYS reads Model/data, and Model/make_public_data.py regenerates Model/data
+# from the licensed source at release time when the source is present. The public data is a
+# projection of the private data, never a second model. See Model/data/README.md for provenance.
+DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+SUMMARY = json.load(open(os.path.join(DATA, "aishe_summary.json"), encoding="utf-8"))
+DIST = pd.read_csv(os.path.join(DATA, "aishe_district_aggregates.csv"))
 
-# Public-safe derivative: one row per state/district. Institution-level records are
-# deliberately not redistributed. See Model/data/README.md for provenance and limits.
-DIST = pd.read_csv(DATA / "aishe_district_aggregates.csv")
-
-N_COL = int(SUMMARY["n_colleges"])
-N_UNI = int(SUMMARY["n_universities"])
-N_STA = int(SUMMARY["n_standalone"])
-N_HEI = N_COL + N_UNI + N_STA
+N_COL = int(SUMMARY["n_colleges"]); N_UNI = int(SUMMARY["n_universities"])
+N_STA = int(SUMMARY["n_standalone"]); N_HEI = N_COL + N_UNI + N_STA
+# PAIR-SAFE. This is the number of (State, District) pairs the screen actually runs over, which
+# is the universe N_CANDIDATES is drawn from. A distinct-NAME count is 3 lower - Bilaspur,
+# Hamirpur and Pratapgarh each exist in two states - and using it as the denominator put the
+# numerator and the denominator on different entity definitions.
 N_DISTRICTS = int(SUMMARY["n_districts"])
+N_DISTRICTS_WITH_COLLEGES = int(SUMMARY.get("n_districts_with_colleges", 0))
+N_DISTRICT_NAMES = int(SUMMARY.get("n_district_names", 0))
 
 # ---- the urban screen, and it is the finding ------------------------------
 URBAN_COL = int(SUMMARY["urban_colleges"])
 RURAL_COL = int(SUMMARY["rural_colleges"])
 URBAN_SHARE_COL = URBAN_COL / (URBAN_COL + RURAL_COL)
+N_STA_URBAN_HP = int(SUMMARY["urban_high_propensity_standalone"])
+
+def district_table():
+    return DIST.copy()
+
+def with_cohort(t):
+    return t if "urb_hp_standalone" in t.columns else t.assign(urb_hp_standalone=0)
 
 # ---- the archetype screen, made operational ------------------------------
 # S17 selected "Tier-1/2 dense cluster" and S17 also flagged that JM's "Tier-1/2" is a RENT-BAND
@@ -79,13 +92,8 @@ N_CANDIDATES = len(CANDIDATES)
 # The register's Standalone Type is a usable cohort proxy. Technical/Polytechnic, PGDM, Pharmacy
 # and Hotel Management are residential, urban-skewed and closest to the E&T/IT cohort that Round 1
 # identified as the propensity core. Nursing and Teacher Training are large but rurally distributed.
-N_STA_URBAN_HP = int(SUMMARY["urban_high_propensity_standalone"])
-
-def with_cohort(t):
-    if "urb_hp_standalone" in t.columns:
-        return t
-    hp = DIST[["State", "District", "urb_hp_standalone"]]
-    return t.merge(hp, on=["State","District"], how="left").fillna({"urb_hp_standalone":0})
+HIGH_PROPENSITY_STA = {"Technical/Polytechnic","PGDM Institute","Pharmacy Institution",
+                       "Hotel Management and Catering Institute","Standalone Institution Under Ministry"}
 
 # ---- CLUSTER GEOMETRY: is the node underwritten by one campus or by a cluster? ----
 # S17: "high-enrolment/low-density = one campus can underwrite a node; low-enrolment/high-density =

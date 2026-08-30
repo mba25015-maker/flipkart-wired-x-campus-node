@@ -64,12 +64,13 @@ BANNED = [
     "management's own", "management's stated", "management has already",
     "management ceiling", "management's ceiling", "a ceiling management",
     "the client's hurdle",
+    "stated ceiling",          # implies someone stated it as a ceiling; Swiggy disclosed a RANGE
 ]
 # Records of what we once believed, not things anything is built from.
 EXCLUDE_DIRS = ("_backup", "_superseded", "Research Pulls", "papers", "__pycache__",
                 "_deck_pages", "Earlier wired case solution template", "skill-observations",
                 "Case", "Semi Final Case", "Pngs")
-EXCLUDE_FILES = ("Decisions_Log.md", "PROF_REVIEW_ADJUDICATION.md",
+EXCLUDE_FILES = ("Decisions_Log.md", "PROF_REVIEW_ADJUDICATION.md", "SYNC_REVIEW_2026-08-30.md",
                  "VERIFICATION_ARCHITECTURE_v2.md", "CHANGE_REPORT_2026-08-29.md",
                  "source_scan.py", "FINAL_AUDIT.md", "CORPUS_SWEEP_2026-08-27.md",
                  "DECK_TEARDOWN_WiRED9.md", "RUBRIC_CHECK.md")
@@ -96,9 +97,98 @@ def attribution_hits():
                         hits.append(f"{os.path.relpath(f, ROOT)}:{i}  ...{b}...")
     return sorted(set(hits))
 
+
+# ---------------------------------------------------------------- 3. stale cost bases
+# THE DEFECT: a superseded value passed as a LITERAL where a model quantity belongs.
+#   audit.py:  breakeven_d2_consistent(CAMPUS_FIXED, 19.0, ...)   <- Rs19 last mile, now 17.61
+#   cost_stack: def s19_report(d2_cost=19.0)                      <- as a function DEFAULT
+#   gap_check:  breakeven_d2_consistent(CAMPUS_FIXED, 19.0, opd)  <- labelled "adopted basis"
+# All three computed a stale answer that a stale literal on the other side then agreed with, so
+# the check passed while asserting a number the deck does not contain. Function defaults are the
+# quietest hiding place - the same shape as campus_model.NWC_DAYS = 18 and wc_old_construct(days=18.0).
+SUPERSEDED_BASES = {19.0, 8.50, 325.0, 90.0, 578.0, 763.0, 580.0, 647.1, 622.7, 595.4,
+                    589.1, 4.71, 825.0, 117.8, 77.1, 185.0}
+BASIS_FUNCS = {"breakeven_d2_consistent", "consolidation_implied_by_d2", "cm_per_order",
+               "wc_old_construct", "wc_nwc_on_nov", "s19_report", "aov_for_roce", "dupont"}
+
+def stale_bases():
+    """A superseded value passed as a literal argument to a basis-taking function, or sitting
+    as one of its defaults."""
+    bad = []
+    for f in sorted(glob.glob(os.path.join(HERE, "*.py"))):
+        base = os.path.basename(f)
+        if base in ("params.py", "source_scan.py"): continue
+        try:
+            src = open(f, encoding="utf-8").read(); tree = ast.parse(src)
+        except SyntaxError: continue
+        lines = src.split("\n")
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call):
+                fn = getattr(node.func, "attr", None) or getattr(node.func, "id", None)
+                if fn in BASIS_FUNCS:
+                    for a in list(node.args) + [k.value for k in node.keywords]:
+                        if isinstance(a, ast.Constant) and isinstance(a.value, (int, float)) \
+                           and float(a.value) in SUPERSEDED_BASES:
+                            if "scan:allow" in lines[node.lineno-1]: continue
+                            bad.append(f"{base}:{node.lineno}  {fn}(... {a.value} ...)")
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name in BASIS_FUNCS:
+                for d in node.args.defaults:
+                    if isinstance(d, ast.Constant) and isinstance(d.value, (int, float)) \
+                       and float(d.value) in SUPERSEDED_BASES:
+                        bad.append(f"{base}:{node.lineno}  def {node.name}(... = {d.value})")
+    return sorted(set(bad))
+
+# ---------------------------------------------------------------- 4. stale figures in documents
+# verify_docs and verify_spec check the figures they were TOLD to check - 31 and 79 of them - so a
+# superseded value anywhere outside those lists passes untouched. HANDOFF passed 31/31 while
+# stating CE Rs325.0L and 8.50x; the spec passed 79/79 while listing shocks 647/623/595/589.
+# Positive checks cannot find a figure nobody listed. Absence scans can.
+DOC_STALE = {"Rs325.0": "CE (now 323.9)", "₹325.0": "CE (now 323.9)",
+             "Rs90.0 L": "WC (now 88.9)", "₹90.0 L": "WC (now 88.9)",
+             "Rs578": "ROCE breakeven (now 571)", "₹578": "ROCE breakeven (now 571)",
+             "Rs763": "hurdle (now 755)", "₹763": "hurdle (now 755)",
+             "Rs825": "post-tax (now 817)", "₹825": "post-tax (now 817)",
+             "8.50x": "turn (now 8.44)", "8.50×": "turn (now 8.44)",
+             "32.7%": "ROCE 30% (now 34.4%)", "57.1%": "ROCE 40% (now 58.8%)",
+             "12.9%": "downside ROCE (now 14.0%)", "67 mo": "downside payback (now 62)",
+             "67-month": "downside payback (now 62)",
+             "Rs77.1": "WC target (now 76.2)", "₹77.1": "WC target (now 76.2)",
+             "Rs647": "shock (now 640)", "₹647": "shock (now 640)",
+             "Rs623": "shock (now 615)", "₹623": "shock (now 615)",
+             "Rs595": "shock (now 588)", "₹595": "shock (now 588)",
+             "Rs589": "shock (now 582)", "₹589": "shock (now 582)",
+             "311/311": "audit count", "80/80": "deck count", "83/83": "deck count",
+             "Rs19.0": "last mile (now 17.6)", "₹19.0": "last mile (now 17.6)",
+             "of 760": "district denominator (now 765 pairs)",
+             "four verification commands": "the layer count (one command, every layer)",
+             "all four layers": "the layer count", "ALL FOUR LAYERS": "the layer count",
+             "760 districts": "district denominator (now 765 pairs)"}
+DOCS = ("HANDOFF.md", "DECK_SPEC_SemiFinal.md", "PPT_BUILD_PROMPT_SemiFinal.md", "README.md",
+        "DECK_ASSET_PLAN_SemiFinal.md", "Napkin_Prompts_SemiFinal.md", "BUILD_PLAN.md")
+# The GENERATORS are build inputs too. `make_workbook.py` typed "of 760 districts" into the sheet
+# it generates - a hardcoded literal inside the file written to stop hardcoded literals.
+GENERATORS = ("Model/make_workbook.py", "Model/make_readme.py", "Model/make_public_data.py",
+              "Model/make_screenshots.py", "Model/clean_notebooks.py")
+
+def stale_in_documents():
+    bad = []
+    for d in DOCS + GENERATORS:
+        p = os.path.join(ROOT, d)
+        if not os.path.exists(p): continue
+        for i, line in enumerate(open(p, encoding="utf-8").read().split("\n"), 1):
+            if "scan:allow" in line or "SUPERSEDED" in line or "Round 1" in line: continue
+            for k, what in DOC_STALE.items():
+                if k in line: bad.append(f"{d}:{i}  {k}  ({what})")
+    return sorted(set(bad))
+
 if __name__ == "__main__":
     pr, ah = policy_redeclarations(), attribution_hits()
+    sb, sd = stale_bases(), stale_in_documents()
     print(f"policy literals redeclared outside params.py: {len(pr)}")
     for b in pr: print("   ", b)
     print(f"unsupported attribution in build inputs:      {len(ah)}")
     for b in ah: print("   ", b)
+    print(f"superseded value used as a cost basis:         {len(sb)}")
+    for b in sb: print("   ", b)
+    print(f"superseded figures in build documents:         {len(sd)}")
+    for b in sd: print("   ", b)

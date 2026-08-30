@@ -52,6 +52,20 @@ recon("working_capital adopted basis == params.NWC_DAYS",
       WC.ETERNAL_NWC_DAYS_NOW, PM.NWC_DAYS)
 recon("campus_model ceiling == params cluster volume",
       M.CEILING, PM.CLUSTER_VOLUME)
+# ENTITY SAFETY ON THE SCREEN'S DENOMINATOR. "111 of 760" put the numerator and the denominator
+# on different definitions: 111 is a count of (State, District) PAIRS that passed the screen; 760
+# was a count of distinct district NAMES among colleges. Bilaspur, Hamirpur and Pratapgarh each
+# exist in two states. The screen runs over the pair table, so the denominator must be pairs.
+chk("S24    register districts are PAIRS, not names", 765, AD.N_DISTRICTS, 0.001)
+chk("S24    pairs carrying at least one college",     763, AD.N_DISTRICTS_WITH_COLLEGES, 0.001)
+chk("S24    distinct district NAMES (lower, by 3)",   762, AD.N_DISTRICT_NAMES, 0.001)
+checks.append((AD.N_DISTRICTS > AD.N_DISTRICT_NAMES,
+               "SELF  the denominator counts pairs, not names",
+               "pairs > names", f"{AD.N_DISTRICTS} > {AD.N_DISTRICT_NAMES}"))
+checks.append((int(AD.DIST["District"].isna().sum()) == 0,
+               "SELF  no blank district in the screen's universe", 0,
+               int(AD.DIST["District"].isna().sum())))
+
 # THE SLA TABLE ON S6. Four cost cells that nothing read until they went stale through the
 # roster-pricing change: the deck kept showing 64.8 / 33.0 / 7.7 / 6.6 while the model said
 # 54.5 / 28.9 / 8.5 / 7.6, and every layer passed.
@@ -72,6 +86,19 @@ checks.append((not _redecl, "SCAN  no policy literal redeclared outside params.p
 _attr = SS.attribution_hits()
 checks.append((not _attr, "SCAN  no unsupported attribution in any build input",
                0, len(_attr) if not _attr else _attr[:3]))
+# A superseded value passed as a literal where a model quantity belongs. Three of these were
+# live: audit's own shock check on a Rs19 basis, cost_stack's s19_report default, and two
+# gap_check calls labelled "adopted basis". Each computed a stale answer that a stale literal
+# then agreed with, so the check passed while asserting a figure the deck does not contain.
+_sb = SS.stale_bases()
+checks.append((not _sb, "SCAN  no superseded value used as a cost basis",
+               0, len(_sb) if not _sb else _sb[:3]))
+# verify_docs and verify_spec check the figures they were TOLD to check. HANDOFF passed 31/31
+# while stating CE Rs325.0L and 8.50x; the spec passed 79/79 while listing the old shock set.
+# A positive check cannot find a figure nobody listed.
+_sd = SS.stale_in_documents()
+checks.append((not _sd, "SCAN  no superseded figure in HANDOFF/spec/prompt/README",
+               0, len(_sd) if not _sd else _sd[:3]))
 
 recon("break_mode restart state == params.RESTART_CREDIT_STATE",
       1.0 if abs(B.reactivation(0.0)["working_capital"] -
@@ -273,16 +300,8 @@ chk("SF/TF    Karnataka 2016 total = Rs8.98",      8.98, TF.KA_2016, 0.01)
 chk("SF/TF    BESCOM FY26 = Rs8.73",               8.73, TF.BESCOM_2026, 0.001)
 chk("SF/TF    ten-year rebase factor = 0.972",    0.972, TF.REBASE, 0.01)
 chk("SF/TF    model tariff equals sourced rate",   8.73, C.TARIFF, 0.001)
-if hasattr(TF, "T2016"):
-    _tariff_values = (TF.T2016["total_p"] / 100).dropna()
-    _tariff_n = len(_tariff_values)
-    _tariff_cv = float(_tariff_values.std() / _tariff_values.mean()) * 100
-else:
-    # Public clones contain licensed-table aggregates, not the paid state-level rows.
-    _tariff_n = TF.N_STATES_UTS
-    _tariff_cv = TF.CROSS_SECTION_CV * 100
-chk("SF/TF    48 states/UTs in the cross-section",   48, _tariff_n, 0.001)
-chk("SF/TF    state tariff CV = 30%",                30, _tariff_cv, 0.05)
+chk("SF/TF    48 states/UTs in the cross-section",   48, len((TF.T2016["total_p"]/100).dropna()), 0.001)
+chk("SF/TF    state tariff CV = 30%",                30, float((TF.T2016["total_p"]/100).std()/(TF.T2016["total_p"]/100).mean())*100, 0.05)
 chk("SF/BM    runner floor = 6.2% of term volume",  6.2, F.breakeven_volume()/B.TERM_OPD*100, 0.02)
 chk("SF/BM    reactivation opex @r=15% = Rs2.62L",  2.62, B.reactivation(0.15)["opex_total"]/1e5, 0.02)
 chk("SF/BM    reactivation opex @r=0.15 = Rs2,62,119", 262119, B.reactivation(0.15)["opex_total"], 0.001)
@@ -421,7 +440,7 @@ chk("S24    colleges in register = 54,014",          54014, AD.N_COL, 0.001)
 chk("S24    universities = 1,428",                    1428, AD.N_UNI, 0.001)
 chk("S24    standalone = 16,910",                    16910, AD.N_STA, 0.001)
 chk("S24    total HEIs = 72,352",                    72352, AD.N_HEI, 0.001)
-chk("S24    districts covered = 760",                  760, AD.N_DISTRICTS, 0.001)
+chk("S24    districts covered = 765",                  765, AD.N_DISTRICTS, 0.001)
 chk("S24    urban colleges = 21,000",                21000, AD.URBAN_COL, 0.001)
 chk("S24    rural colleges = 32,336",                32336, AD.RURAL_COL, 0.001)
 chk("S24    URBAN SHARE of colleges = 39.4%",         39.4, AD.URBAN_SHARE_COL*100, 0.005)
@@ -462,8 +481,12 @@ chk("S26    all-short-gaps calendar qualifies = NO",  0,
     1 if CF.qualifies([6.0,4.0,3.0,2.2]) else 0, 1.0)
 chk("S26    typical calendar qualifies = YES",        1,
     1 if CF.qualifies([8.0,4.0,3.2]) else 0, 0.001)
-chk("S26    -30% volume shock on ADOPTED basis = Rs647",
-    647.1, C.breakeven_d2_consistent(C.CAMPUS_FIXED, 19.0, M.CEILING*0.7), 0.005)
+# WAS: 647.1 asserted against breakeven_d2_consistent(..., 19.0, ...) - a literal on the slide
+# side AND the SUPERSEDED Rs19 last mile on the computed side. The two agreed with each other and
+# neither matched the deck, which shows Rs640 from risk_shocks. Both sides now come from the model.
+chk("S26    -30% volume shock on ADOPTED basis = Rs640",
+    round(RS.AOV_VOLUME, 1),
+    C.breakeven_d2_consistent(C.CAMPUS_FIXED, SL.volume_weighted()[1], M.CEILING*0.7), 0.005)
 
 # ---- CC-2/S8: four shocks on one axis (risk_shocks.py) ------------------------
 chk("S8      shock base = D2-consistent Rs573",      573.1, RS.BASE_AOV, 0.005)
@@ -530,7 +553,10 @@ chk("S5      parity OPD == city OPD x calendar surcharge", 0,
     M.PARITY_OPD - M.MINUTES_ORD*M.CAL_SURCHARGE, 1.0)
 
 # ---- S30: return on capital employed (roce.py) --------------------------------
-chk("S30     capital employed rounds to Rs324 lakh", 324.0, RC.CE_BASE/1e5, 0.005)
+# WAS: 325.0 with tol 0.005 against a model value of 323.851 - err/tol 0.71, so it passed on
+# tolerance alone while asserting a figure the deck does not contain (the deck says Rs323.9 L).
+# A tolerance wide enough to absorb a superseded value is not a check.
+chk("S30     capital employed = Rs323.9 lakh",      323.9, RC.CE_BASE/1e5, 0.0005)
 chk("S30     capex midpoint = Rs235.0 lakh",        235.0, RC.CAPEX_MID/1e5, 0.005)
 chk("S30     orders/year, term-only basis",         361900, RC.orders_year(), 0.005)
 chk("S30     ROCE breakeven AOV reproduces the spine", 1,
@@ -539,9 +565,11 @@ chk("S30     day-count gap to the spine = Rs2.14",   2.14, RC.DAYCOUNT_GAP, 0.02
 chk("S30     AOV for ROCE = 0 is Rs571",            571, RC.AOV_BREAKEVEN, 0.005)
 chk("S30     AOV for the 40% hurdle is Rs755",      755, RC.AOV_HURDLE, 0.005)
 chk("S30     post-tax hurdle AOV is Rs817",         817, RC.AOV_HURDLE_POSTTAX, 0.005)
-chk("S30     hurdle premium over breakeven = Rs185", 185, RC.HURDLE_PREMIUM, 0.02)
+# Same class as the two above, found by the sweep: 185 against a model 184.38, absorbed by a 2%
+# tolerance. The deck shows Rs184.
+chk("S30     hurdle premium over breakeven = Rs184", 184, RC.HURDLE_PREMIUM, 0.005)
 chk("S30     non-grocery share implied by the hurdle = 32.3%", 32.3, RC.HURDLE_NONGROCERY_SHARE, 0.02)
-chk("S30     hurdle sits within the external comparator range", 1, 1 if RC.HURDLE_INSIDE_CEILING else 0, 0.001)
+chk("S30     hurdle sits inside the range Swiggy discloses", 1, 1 if RC.HURDLE_INSIDE_CEILING else 0, 0.001)
 chk("S30     DuPont identity closes: margin x turn = ROCE", 0,
     RC.dupont(RC.AOV_HURDLE)["ebit_margin"]*RC.dupont(RC.AOV_HURDLE)["capital_turn"]
     - RC.roce(RC.AOV_HURDLE), 0.001)
@@ -555,6 +583,13 @@ chk("S30     IRR at the hurdle AOV = 34.4%",        34.4, RC.irr(RC.AOV_HURDLE)*
 chk("S30     repurpose is worth Rs26 of AOV",       26, RC.REPURPOSE_WORTH_AOV, 0.05)
 chk("S30     slide-4 turn is the like-for-like quantity", 6.93, RC.TURN_SLIDE4, 0.005)
 chk("S30     tax rate = 25.17%",                    25.17, RC.TAX_RATE*100, 0.001)
+
+# Same guard as verify_deck: a duplicated registration inflates the count while every row
+# still passes, and the SELF check cannot see it because the constant tracks the run.
+import collections as _co
+_dupa = {k: n for k, n in _co.Counter(tuple(str(x) for x in c[1:]) for c in checks).items() if n > 1}
+checks.append((not _dupa, "SELF  no check is registered twice",
+               0, len(_dupa)))
 
 checks.append((len(checks)+1 == CC.AUDIT_COUNT,
                "SELF  check_counts.AUDIT_COUNT matches this run",

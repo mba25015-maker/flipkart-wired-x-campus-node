@@ -515,11 +515,11 @@ ADS_ALREADY_IN_TAKE_RATE = True
 # D1's breakeven divides the standard-zone rider cost (Rs42/order) by a consolidation
 # factor of 3.0x. D2's circuit model computes the campus last mile from first principles
 # -- employed runner, e-cart, dynamic batch, volume-weighted across the daypart -- and
-# now comes from the live SLA model. The older Rs42/3.0 proxy did not reconcile to that model.
+# lands at Rs19.0/order. Rs42/3.0 = Rs14.0. The two deliverables disagreed by Rs5.0/order.
 # The project rule locked at S1 is that D2 arithmetic runs BEFORE D1 costing. D1 must
 # therefore take D2's number, not a proxy for it.
 def consolidation_implied_by_d2(d2_cost_per_order):
-    return M.LAST_MILE / d2_cost_per_order
+    return M.LAST_MILE / d2_cost_per_order          # Rs42.0 / Rs19.0 = 2.21x
 
 def breakeven_d2_consistent(fixed, d2_cost_per_order, opd=M.CEILING, take=M.TAKE_RATE):
     """D1 breakeven with the last-mile line taken straight from the D2 model."""
@@ -527,9 +527,10 @@ def breakeven_d2_consistent(fixed, d2_cost_per_order, opd=M.CEILING, take=M.TAKE
             + d2_cost_per_order + M.STORE_OPS + M.PACKAGING + M.RESIDUAL) / take
 
 def s19_report(d2_cost=None):
+    # WAS d2_cost=19.0 - the superseded last mile as a function default, the same defect that let
+    # campus_model.NWC_DAYS = 18 survive. Defaults are the quietest place for a stale basis to live.
     if d2_cost is None:
-        import sla
-        d2_cost = sla.volume_weighted()[1]
+        import sla as _SL; d2_cost = _SL.volume_weighted()[1]
     imp = consolidation_implied_by_d2(d2_cost)
     be_old = breakeven_at(CAMPUS_FIXED)
     be_new = breakeven_d2_consistent(CAMPUS_FIXED, d2_cost)

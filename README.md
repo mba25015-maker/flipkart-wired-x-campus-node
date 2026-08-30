@@ -1,79 +1,102 @@
 # Flipkart WiRED X — Campus Node Model
 
-Reproducible analytical model, final deck, notebooks, and workbook supporting Team ANAVRIN's Flipkart WiRED X semi-final submission.
+Reproducible analytical model and verification package for the Flipkart WiRED X semi-final
+submission. Team **ANAVRIN**.
 
-## Verify everything
+Every headline figure in `Flipkart_Minutes_WiRED_SemiFinal_FULL_light.pptx` is computed by the model in `Model/` and asserted
+against the built file. Nothing in the deck is typed by hand.
 
-From the repository root, run one command:
+## Verify it — one command, no arguments
 
 ```bash
 python3 Model/run_all.py
 ```
 
-Expected output:
-
-```text
-344/344 checks pass
-31/31 HANDOFF figures tie out to the model
-79/79 spec figures tie out to the model
-133/133 deck checks pass
-ALL FOUR LAYERS PASS
+```
+audit.py             352/352 checks pass
+verify_docs.py       31/31 HANDOFF figures tie out
+verify_spec.py       79/79 spec figures tie out
+verify_deck.py       167/167 deck checks pass
+verify_artifacts.py  22/22 artefact checks pass
 ```
 
-`run_all.py` exits nonzero if any layer fails and verifies the exact presentation named by `Model/params.py`.
+All five layers passed on the last recorded run.
+
+`run_all.py` exits nonzero if any layer fails and verifies the exact presentation named by
+`Model/params.FINAL_DECK`. It takes no arguments by design: the previous workflow was several
+separate commands, one of which needed an explicit filename, and it defaulted to a superseded
+build when run without one.
+
+To rebuild the deck and re-verify the exact stamped file:
+
+```bash
+python3 Model/release.py
+```
+
+Team identity is a model parameter (`Model/params.TEAM_NAME`), so both commands work on a clean
+clone with no environment setup.
 
 ## Run the models in Google Colab
 
-No local installation is required. Each link opens a runnable copy directly from this GitHub repository.
+No install, no clone — each notebook runs the module it names against the package in this
+repository.
 
-| Notebook | What it proves | Open |
+| Notebook | What it reproduces | Open |
 |---|---|---|
-| L1 — Audit and verification | Runs all four verification layers on the model, documents, specification, and final deck | [![Open L1 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L1_Audit_Verification.ipynb) |
-| L2 — Dead-zone solver | Compares five strategies under the operating constraints | [![Open L2 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L2_Dead_Zone_Solver.ipynb) |
-| L3 — Return model | Reproduces ROCE, payback, IRR, DuPont, and benchmark-implied AOV | [![Open L3 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L3_Return_Model.ipynb) |
-| L4 — District screen | Runs the public-safe AISHE district screening model | [![Open L4 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L4_District_Screen.ipynb) |
-| L5 — Fulfilment model | Reproduces SLA, batching, fleet topology, and ₹17.61 cost per order | [![Open L5 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L5_Fulfilment_Model.ipynb) |
-| L6 — Basket regression | Reproduces the four-quarter basket fit and mix ladder | [![Open L6 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L6_Basket_Regression.ipynb) |
+| **L1** — Audit and verification | runs every verification layer: model, documents, specification, final deck and companion artefacts | [![Open L1 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L1_Audit_Verification.ipynb) |
+| **L2** — Dead-zone solver | compares five strategies under the operating constraints | [![Open L2 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L2_Dead_Zone_Solver.ipynb) |
+| **L3** — Return model | reproduces ROCE, payback, IRR, DuPont and the benchmark-implied AOV | [![Open L3 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L3_Return_Model.ipynb) |
+| **L4** — District screen | runs the AISHE district screen on the public-safe aggregates | [![Open L4 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L4_District_Screen.ipynb) |
+| **L5** — Fulfilment model | reproduces the SLA, batching, fleet topology and cost per order | [![Open L5 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L5_Fulfilment_Model.ipynb) |
+| **L6** — Basket regression | reproduces the four-quarter basket fit and the mix ladder | [![Open L6 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L6_Basket_Regression.ipynb) |
+
+## What each layer checks
+
+| layer | scope |
+|---|---|
+| `audit.py` | model against itself, incl. cross-module reconciliation, source scans and claim checks |
+| `verify_docs.py` | HANDOFF.md figures against the model |
+| `verify_spec.py` | deck specification and build prompt against the model |
+| `verify_deck.py` | opens the built .pptx, reads every run of text and every native chart value, and checks presence AND absence |
+| `verify_artifacts.py` | the workbook, the six notebooks, the asset manifest and the public data |
+
+The absence checks matter as much as the presence ones. A superseded figure sitting in a panel
+nothing reads is invisible to a positive check, which is how a stale appendix survived four
+passing layers once already.
+
+## What a clean clone can and cannot do
+
+`python3 Model/run_all.py` works with no setup: the repository ships the built deck, the
+documents, and `Model/data` — district aggregates and parsed tables generated from the licensed
+source. All five layers verify.
+
+`python3 Model/release.py` rebuilds the deck and needs two things this repository does not
+redistribute: the organisers' template in `Case/`, and the licensed source under `Research Pulls/`.
+Both are other people's assets. The build says so plainly if they are absent.
+
+`Model/data` is generated by `Model/make_public_data.py`, not maintained by hand, and the model
+reads it in both trees — there is no public variant of any module. An earlier arrangement kept
+separate public and private copies of three modules, and they had already drifted apart.
 
 ## Setup
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python3 -m pip install --upgrade pip
-python3 -m pip install -r requirements.txt
-python3 Model/run_all.py
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
-On Windows, activate the environment with `.venv\Scripts\Activate.ps1`.
+## Layout
 
-## Publication package
-
-| Item | Purpose |
+| path | what |
 |---|---|
-| `Model/run_all.py` | Runs all four verification layers |
-| `Model/audit.py` | Model assertions and cross-module reconciliations |
-| `Model/params.py` | Single source for contested policy constants and release paths |
-| `Model/solver.py` | Dead-zone strategy comparison |
-| `Model/roce.py` | ROCE, payback, IRR, and hurdle-AOV analysis |
-| `Model/aishe_district.py` | Public-safe district screening model |
-| `Model/sla.py` and `Model/fleet_mix.py` | Fulfilment, roster, SLA, and cost-per-order logic |
-| `Model/basket.py` | Basket regression and mix ladder |
-| `notebooks/` | Six judge-runnable notebook wrappers |
-| `Campus_Store_Model.xlsx` | Auditable calculation workbook |
-| `Flipkart_Minutes_WiRED_SemiFinal_FULL_light.pptx` | Exact deck checked by the verifier |
+| `Model/params.py` | every contested policy constant, defined once |
+| `Model/run_all.py` | the only supported verification entrypoint |
+| `Model/release.py` | build → verify → capture → stamp → re-verify |
+| `Model/source_scan.py` | scans the source tree, not just the artifact |
+| `notebooks/` | six runnable notebooks, L1–L6 |
+| `Flipkart_Minutes_WiRED_SemiFinal_FULL_light.pptx` | the submission |
 
-## Data and source boundary
+## Reproducibility note
 
-The public repository contains permitted aggregate and derived inputs under `Model/data/`. Paid or licence-restricted PDFs and source tables are deliberately excluded. A paid subscription or downloaded copy does not automatically grant public redistribution rights.
-
-The model records source provenance and assumptions, while the verification scripts establish internal consistency and reproducibility. They do not independently certify every third-party source or redistribution licence.
-
-## Reproducibility notes
-
-- Run commands from the repository root.
-- The adopted topology is two employed runners per gate across three gates; pooling remains a priced conditional upside.
-- Working capital uses one definition throughout the model.
-- Last-mile cost is separated into a volume-weighted city leg and a roster-priced in-gate leg.
-- The joint downside remains visible: payback exceeds the 60-month node life.
-- The included presentation is the exact verified release copy. Rebuilding its visual shell requires the internal case template, which is not part of this public package; verification does not require that template.
+The counts above are generated from the recorded verification run, not typed. If you change the
+model, `run_all.py` fails until the deck and documents are rebuilt to match — that is the point.

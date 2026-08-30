@@ -3,7 +3,7 @@ Figures for the SEMI-FINAL slides 5 and 6. Every value is read from the model.
 
   13. lever_ladder    (S5)  residual-demand threshold by lever configuration, drawn as a
                             descending ladder, with the gap the levers CANNOT close shaded.
-  14. district_screen (S6)  the two-stage screen: 760 districts -> 111 candidates, then the
+  14. district_screen (S6)  the two-stage screen: 765 (State, District) pairs -> 111 candidates, then the
                             contestedness bands inside our own candidate list.
 
 Nothing is typed. If a number is not in the model, this file does not draw it.

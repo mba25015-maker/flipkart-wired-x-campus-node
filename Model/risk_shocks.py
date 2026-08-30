@@ -8,7 +8,7 @@ units - Rs/month, +% of dead-zone cost, Rs lakh/month, Rs of AOV - which cannot 
 against each other and therefore cannot be prioritised on a slide.
 
 THE FIX: restate every shock on the deck's own headline axis, the D2-consistent breakeven
-campus AOV (Rs573). Each shock becomes "how many rupees of basket does this cost us", which
+campus AOV (Rs580). Each shock becomes "how many rupees of basket does this cost us", which
 is directly comparable to the basket ladder's headroom. That makes the risk slide answer the
 only question that matters: DOES THE BASKET STILL COVER IT?
 
@@ -27,8 +27,8 @@ import basket as BK
 import calendar_fragmentation as CF
 import working_capital as WC
 
-D2_LAST_MILE = SL.volume_weighted()[1]                                   # live D2 circuit model
-BASE_AOV = C.breakeven_d2_consistent(C.CAMPUS_FIXED, D2_LAST_MILE)       # Rs573, ADOPTED
+D2_LAST_MILE = SL.volume_weighted()[1]                                   # Rs19.0/order
+BASE_AOV = C.breakeven_d2_consistent(C.CAMPUS_FIXED, D2_LAST_MILE)       # Rs580, ADOPTED
 
 VOLUME_SHOCK = 0.30          # D  the -30% case the risk register has always carried (item 3)
 TERM_ORDERS  = B.TERM_OPD * 30 * B.TERM_MONTHS   # orders over the active year, break_mode basis
@@ -94,16 +94,16 @@ SHOCKS.sort(key=lambda s: -s[1])
 
 # ---------------------------------------------------------------------------
 # THE VERDICT LINE: can the basket ladder still cover each shock?
-# basket.py's lever is non-grocery share of GOV. Swiggy's disclosed 30-40% range is used only
-# as a cross-operator reference. The AOV at each end of that range is the coverage test.
+# basket.py's lever is non-grocery share of GOV, and management states a 30-40% ceiling.
+# The AOV reachable at each end of that ceiling is the coverage test.
 # ---------------------------------------------------------------------------
 def aov_at_nongrocery_share(share):
     """Invert basket.share_needed: the AOV reachable at a given non-grocery share,
     anchored on Minutes' current position after the term-start occasion lever."""
     return BK.OCCASION_AOV + (share - BK.MINUTES_NONGROCERY) * BK.SLOPE
 
-AOV_CEILING_LO = aov_at_nongrocery_share(BK.NONGROCERY_CEILING_LO)   # 30% range floor
-AOV_CEILING_HI = aov_at_nongrocery_share(BK.NONGROCERY_CEILING)      # 40% range maximum
+AOV_CEILING_LO = aov_at_nongrocery_share(BK.NONGROCERY_CEILING_LO)   # 30% mgmt floor
+AOV_CEILING_HI = aov_at_nongrocery_share(BK.NONGROCERY_CEILING)      # 40% mgmt ceiling
 COVERED_AT_LO = [n for n, a, _ in SHOCKS if a <= AOV_CEILING_LO]
 COVERED_AT_HI = [n for n, a, _ in SHOCKS if a <= AOV_CEILING_HI]
 ALL_COVERED_AT_HI = len(COVERED_AT_HI) == len(SHOCKS)
@@ -113,7 +113,7 @@ def report():
     W = 92
     print("=" * W)
     print("SLIDE 8  -  FOUR SHOCKS, ONE AXIS".center(W))
-    print("restated as breakeven campus AOV, the model's common comparison unit".center(W))
+    print("restated as breakeven campus AOV, the deck's headline unit".center(W))
     print("=" * W)
     print(f"  BASE   D2-consistent breakeven campus AOV        Rs{BASE_AOV:.0f}")
     print()
@@ -123,16 +123,15 @@ def report():
         print(f"  {name:<28}{f'Rs{aov:.0f}':>15}{f'+{aov-BASE_AOV:.0f}':>9}   {why[:38]:<38}")
     print("  " + "-" * (W - 2))
     print()
-    print("  CAN THE BASKET STILL COVER IT?  (basket.py lever, Swiggy disclosed range)")
+    print("  CAN THE BASKET STILL COVER IT?  (basket.py lever, the range disclosed by Swiggy)")
     print(f"    AOV reachable at {BK.NONGROCERY_CEILING_LO:.0f}% non-grocery   Rs{AOV_CEILING_LO:.0f}")
     print(f"    AOV reachable at {BK.NONGROCERY_CEILING:.0f}% non-grocery   Rs{AOV_CEILING_HI:.0f}")
-    print(f"    covered at the {BK.NONGROCERY_CEILING_LO:.0f}% range floor  "
+    print(f"    covered inside the {BK.NONGROCERY_CEILING_LO:.0f}% floor    "
           f"{len(COVERED_AT_LO)} of {len(SHOCKS)}  ({', '.join(COVERED_AT_LO)})")
-    print(f"    covered at the {BK.NONGROCERY_CEILING:.0f}% range maximum "
+    print(f"    covered inside the {BK.NONGROCERY_CEILING:.0f}% ceiling  "
           f"{len(COVERED_AT_HI)} of {len(SHOCKS)}")
     print()
-    print("  >>> READ-OUT. Every priced shock stays within the AOV band implied by Swiggy's range.")
-    print("      This is a cross-operator comparator, not evidence of a Flipkart commitment.")
+    print("  >>> READ-OUT. Every priced shock stays inside the basket lever's disclosed range.")
     print("      The volume shock is the one that needs the basket to work HARDER than the")
     print(f"      conservative {BK.NONGROCERY_CEILING_LO:.0f}% case - which is the honest way to say the plan has")
     print("      one binding dependency, not four.")

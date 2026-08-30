@@ -9,4 +9,4 @@ Now: build_full.py imports this to print it, and verify_deck.py asserts BOTH tha
 check list is this long AND that the number on A0 matches. Add a check without updating this
 constant and verify_deck fails loudly instead of letting the slide drift.
 """
-DECK_CHECK_COUNT = 133
+DECK_CHECK_COUNT = 167

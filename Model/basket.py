@@ -1,8 +1,8 @@
 """
 D1 #4: CAN THE CAMPUS BASKET REACH THE BREAKEVEN AOV?
 
-THE PROBLEM, STATED HONESTLY. S19/S20 put the D2-consistent minimum viable campus AOV at Rs573.
-Round 1 already conceded that Rs528 sat "above every student-basket estimate". Rs573 sits further
+THE PROBLEM, STATED HONESTLY. S19/S20 put the D2-consistent minimum viable campus AOV at Rs580.
+Round 1 already conceded that Rs528 sat "above every student-basket estimate". Rs580 sits further
 above it. A well-audited impossibility is still an impossibility, so the deck has to show the path
 or drop the standalone-viability claim.
 
@@ -49,8 +49,9 @@ MINUTES_AOV_NOW    = M.MINUTES_AOV            # Rs450, T1, journalist-confirmed
 import cost_stack as _CS, sla as _SL
 TARGET_AOV         = _CS.breakeven_d2_consistent(_CS.CAMPUS_FIXED, _SL.volume_weighted()[1])
 
-# External comparator range; it is evidence, not a Flipkart target or commitment.
-NONGROCERY_CEILING = 40.0     # T1  Swiggy disclosed non-grocery range: 30-40% of GOV
+# Management's own ceiling, and it is a real constraint, not a modelling choice:
+NONGROCERY_CEILING = 40.0     # T1  Swiggy management: non-grocery capped at 30-40% of GOV
+                              #     "to retain the benefits of being on a high frequency platform"
 NONGROCERY_CEILING_LO = 30.0
 
 def aov_at_share(share):
@@ -108,7 +109,7 @@ THRESHOLD_GAP = FREE_DELIVERY_THRESHOLD["Blinkit"] - FREE_DELIVERY_THRESHOLD["Fl
 
 # ---------------------------------------------------------------------------
 # 5. THE THIRD LEVER: OCCASION CONCENTRATION
-#    Not every order has to reach Rs573. The ANNUAL AVERAGE has to.
+#    Not every order has to reach Rs580. The ANNUAL AVERAGE has to.
 # ---------------------------------------------------------------------------
 def blended_aov(base_aov, occasion_aov, occasion_share):
     return base_aov*(1-occasion_share) + occasion_aov*occasion_share
@@ -165,8 +166,8 @@ def report():
     print(f"  Non-grocery share required, mix lever alone      {SHARE_NEEDED:.1f}% of GOV")
     print(f"  Non-grocery share required, after occasions      {SHARE_NEEDED_AFTER_OCCASION:.1f}% of GOV")
     print(f"  Minutes today                                    {MINUTES_NONGROCERY:.1f}% of GOV")
-    print(f"  External comparator range (Swiggy, disclosed)    {NONGROCERY_CEILING_LO:.0f}-{NONGROCERY_CEILING:.0f}% of GOV")
-    print(f"  VERDICT  {'WITHIN the external comparator range' if FITS_AFTER_OCCASION else 'ABOVE the external comparator range'}"
+    print(f"  Management ceiling (Swiggy, stated)              {NONGROCERY_CEILING_LO:.0f}-{NONGROCERY_CEILING:.0f}% of GOV")
+    print(f"  VERDICT  {'REACHABLE inside the range Swiggy discloses' if FITS_AFTER_OCCASION else 'NOT reachable inside the ceiling'}"
           f"  (headroom {NONGROCERY_CEILING-SHARE_NEEDED_AFTER_OCCASION:+.1f} pts)")
     print()
     print("  SECOND LEVER -- free-delivery threshold, and Minutes is the market outlier")

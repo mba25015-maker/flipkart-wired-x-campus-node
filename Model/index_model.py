@@ -1,7 +1,7 @@
 """Campus Opportunity Index. AISHE 2023-24 (T-31, T-42) + HCES 2023-24 urban MPCE."""
 import pandas as pd, numpy as np, itertools, campus_model as M
-from pathlib import Path
-_DATA = Path(__file__).resolve().parent / "data"
+import os as _os
+_ROOT = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))  # repo root, portable across sessions
 
 # AISHE 2023-24 T-42, avg enrolment per college (campus concentration)
 CONC = {"Andhra Pradesh":517,"Arunachal Pradesh":642,"Assam":864,"Bihar":1884,"Chandigarh":1942,
@@ -20,8 +20,18 @@ RES = {"Andhra Pradesh":399991,"Arunachal Pradesh":10513,"Assam":84411,"Bihar":1
 "Puducherry":23003,"Punjab":172815,"Rajasthan":153329,"Sikkim":5680,"Tamil Nadu":693996,
 "Telangana":245113,"Tripura":8182,"Uttar Pradesh":355305,"Uttarakhand":65978,"West Bengal":176808}
 
-urb = pd.read_csv(_DATA / "hces_urban_mpce_2023_24.csv")
-MPCE = dict(zip(urb.State, urb.MPCE))
+_HCES = _os.path.join(_ROOT, "Research Pulls", "HCES.xlsx")
+_MPCE_CSV = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "data",
+                          "hces_urban_mpce_2023_24.csv")
+if _os.path.exists(_HCES):
+    mp = pd.read_excel(_HCES, sheet_name="MonthlyPerCapitaConsumptionExpe", header=0)
+    mp.columns=["Year","State","Sector","Imputation","MPCE"]
+    urb = mp[(mp.Year=="2023-24")&(mp.Sector=="Urban")&(mp.Imputation=="Without Imputation")]
+    MPCE = dict(zip(urb.State, urb.MPCE))
+else:
+    # The published urban MPCE series the repository ships, generated from the source.
+    _m = pd.read_csv(_MPCE_CSV)
+    MPCE = dict(zip(_m.iloc[:,0], _m.iloc[:,1]))
 MPCE["Jammu & Kashmir"]=MPCE.get("Jammu & Kashmir", MPCE.get("Jammu and Kashmir"))
 
 df = pd.DataFrame({"State":list(CONC)}).assign(

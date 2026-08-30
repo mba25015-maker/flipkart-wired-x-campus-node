@@ -60,7 +60,7 @@ SHRINKAGE_PCT_NOV = 0.018  # T1  Eternal 22 Jul 2026: "about 1.8% of NOV, largel
 # ---------------------------------------------------------------------------
 # 2. THREE CONSTRUCTS FOR THE SAME QUANTITY. Report all three; adopt one.
 # ---------------------------------------------------------------------------
-DAILY_GOV = B.TERM_OPD * B.CAMPUS_AOV          # 1,400 x current D2-consistent AOV
+DAILY_GOV = B.TERM_OPD * B.CAMPUS_AOV          # 1,400 x Rs580
 DAILY_NOV = DAILY_GOV * NOV_OVER_GOV
 DAILY_COGS = DAILY_GOV * (1 - M.TAKE_RATE)
 

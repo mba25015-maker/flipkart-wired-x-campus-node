@@ -5,5 +5,4 @@ scipy
 scikit-learn
 openpyxl
 python-pptx
-XlsxWriter
 Pillow

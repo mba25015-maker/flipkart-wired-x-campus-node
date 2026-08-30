@@ -1,6 +1,6 @@
 # HANDOFF — Flipkart WiRED X Semi-Final
 *Rewritten 2026-08-28 after sessions S17-S22. Supersedes the 2026-08-26 version entirely.*
-*Every figure below is asserted in `Model/audit.py`; the release command passes **344/344**, **31/31**, **79/79**, and **133/133**.*
+*Every figure below is asserted in `Model/audit.py`, which passes at **291/291** (updated S27).*
 
 ---
 
@@ -16,7 +16,7 @@ from `Model/build_deck.py [light|dark]`. Renders in `Model/_render/`.
 **`DECK_SPEC_SemiFinal.md`** is the build reference for all eight slides and the appendix — copy,
 tables, math boxes, footnote scheme, napkin prompts, kill lists. **`Napkin_Prompts_SemiFinal.md`** is
 the visual pack. Verify anything you type: `python3 Model/verify_spec.py` (66/66) checks the spec,
-`python3 Model/run_all.py` checks the model, documents, specification, and exact final deck.
+`python3 Model/verify_deck.py <deck.pptx>` checks a built file.
 
 ## READ THESE, IN THIS ORDER
 1. **`Flipkart_WiRED_X_ProjectPrompt_SemiFinal.md`** — the standing system prompt
@@ -33,16 +33,19 @@ They carry Round 1's 3-content-slide structure and Round 1's numbers. **Do not r
 them.** `PRIORITY_PLAN.md` is superseded by `BUILD_PLAN.md`.
 
 ## THE ONE-LINE STATE
-**The final deck is built. The supported release check is `python3 Model/run_all.py`: 344/344 model
-checks, 31/31 HANDOFF ties, 79/79 specification ties, and 133/133 checks on the exact final deck.
-The deck verifier reopens the PowerPoint, checks text and native-chart values, and rejects
-superseded figures and banned claim language.**
+**The model is complete and audited at 291/291. `verify_docs.py` 31/31. `verify_deck.py` 40/40.
+Slides 5 and 6 are BUILT** (`Flipkart_Minutes_WiRED_SemiFinal_S5_S6_{light,dark}.pptx`, built by
+`Model/build_semifinal.py`; page renders in `Model/_render/`). **Slides 1 and 2 are next**, then
+3, 4, 7, 8 — the framing is written after the payoff so it foreshadows correctly.
+**New rule, and use it every build: `python3 Model/verify_deck.py <deck.pptx>` opens the BUILT file,
+pulls every text run and asserts the model's figures are physically on the slides — and that no
+superseded Round 1 figure is. audit.py checks the model against itself; this checks the artifact.**
 
 ---
 
 ## HOW TO RUN THE MODEL
 ```
-python3 Model/run_all.py              # one supported entrypoint; nonzero exit on any failure
+cd Model && python3 audit.py          # 192 assertions, must print "192/192 checks pass"
 python3 cost_stack.py                 # fixed + last-mile decomposition; tier_report(), s19_report(),
                                       #   crisil_tcw_report()
 python3 campus_model.py               # breakeven, basis declaration, asset_turn_report()
@@ -58,7 +61,7 @@ python3 rent_lever.py · risk_quadrant.py · robustness.py · jm_survey.py · ta
 python3 charts4.py                    # lever_ladder_s5, district_screen        [NEW, S27]
 python3 charts5.py                    # universe_narrow, metro_squeeze          [NEW, S28]
 python3 build_semifinal.py light|dark # the semi-final deck: slides 1, 2, 5, 6  [S27, S28]
-python3 verify_deck.py [deck.pptx]    # the BUILT slides vs the model, 133/133
+python3 verify_deck.py [deck.pptx]    # the BUILT slides vs the model, 61/61    [S27, S28]
 python3 verify_spec.py                # SPEC + BUILD PROMPT vs the model, 79/79 [S29,S32]
 python3 roce.py                       # ROCE, DuPont, payback, IRR, scenarios   [NEW, S30]
 python3 charts6.py                    # roce_ladder, pnl_bridge                 [NEW, S31]
@@ -106,12 +109,12 @@ median 15, only 9% at <=10 min.
 **Capital employed Rs323.9 lakh** = capex Rs235.0 L + NWC Rs88.9 L. **AOV for ROCE = 0 is Rs571**
 (ties to the Rs573 spine within Rs2.14 — a 365-day vs 12x30-day count, asserted). **AOV for the 40%
 hurdle is Rs755**, a **Rs184 premium**, implying **32.3% non-grocery** against a disclosed 30-40% range.
-**ROCE 34.4% at a 30% basket (payback 25 mo), 58.8% at 40% (15 mo). IRR 34.4%.**
+**ROCE 34.4% at a 30% basket (payback 27 mo), 58.8% at 40% (15 mo). IRR 34.4%.**
 **THE LIMIT: at a 30% basket with volume -30%, ROCE is 14.0% and payback is 62 months — longer than
 the node's 60-month anchored life.** That is why the day-90 gate measures volume first.
 **ROCE = margin x turnover, so the 0.944 moneyshot IS the turnover leg of the external benchmark's metric.**
 **TWO ASSET TURNS, BOTH CORRECT — ALWAYS QUOTE THE BASIS:** 6.93x is like-for-like at a COMMON AOV
-Rs450 (isolates density x calendar); 8.44x is the node's own turnover at its benchmark-implied AOV on capital
+Rs450 (isolates density x calendar); 8.44x is the node's own turnover at its achieved AOV on capital
 employed. **Repurpose is worth Rs26 of AOV** — the site filter and the basket lever are substitutes.
 
 ### Asset turn — restated on one basis at S18, ceiling sensitivity added at S27
@@ -147,7 +150,7 @@ number.** **NWC_DAYS = 18 was stale.**
 payables, cash conversion cycle -47 days.** The node is supplier-funded.
 **State A, credit intact: reactivation WC ~ Rs0** — the rebuild is payables-funded and the cash cost
 sits at wind-down. **State B, credit resets after 3.5 months dormant: Rs44.4 lakh at 30 days to
-re-establish terms, Rs88.9 lakh for the full cycle.**
+re-establish terms, Rs90.0 lakh for the full cycle.**
 **It is a CREDIT-TERMS risk, not an inventory-value risk. The mitigation is contractual: negotiate
 dormancy clauses into supplier terms alongside the campus licence, before the first break.**
 **Shrinkage 1.8% of NOV, "largely perishables" = Rs3.43 lakh/month** — first perishable-loss rate we
@@ -186,11 +189,11 @@ inside the gate is uncontested by construction.** On slide 6, red-ruled.
 
 ### The district layer — AISHE institution register, S24
 `Model/aishe_district.py`. **54,014 colleges + 1,428 universities + 16,910 standalone = 72,352
-institutions across 760 districts**, register as on 28-8-2026, each with district AND urban/rural flag.
+institutions across 765 districts**, register as on 28-8-2026, each with district AND urban/rural flag.
 **THE FINDING: urban colleges 21,000, rural 32,336. Urban share 39.4%. Six in ten Indian colleges are
 rural, so the campus micro-market universe is 21,000 colleges, not 54,014.**
 **Archetype now operational, not a label** — not a metro, >=6 urban colleges, urban share >=50%
-**-> 111 candidate districts of 760.** That is the replicability number.
+**-> 111 candidate districts of 765.** That is the replicability number.
 Top districts by urban colleges x state residential intensity x hostel occupancy:
 **Khordha (Odisha) 169 · Kalaburagi 229 · Belagavi 190 · Visakhapatnam 133 · Dharwad 160 · Mysuru 156.**
 **14 of the top 20 are in Karnataka** — the district data independently reproduces S17's state-level

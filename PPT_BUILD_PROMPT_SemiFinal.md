@@ -1,6 +1,6 @@
 # PPT BUILD PROMPT — Flipkart WiRED X Semi-Final  ·  v2, template-native
 *Built against the actual `Presentation_template.pptx`, measured. v1 assumed a 13.33×7.5 canvas and is
-wrong — it is in `_superseded/`. Every figure below is asserted by `python3 Model/run_all.py` (344/344 model checks plus three artifact layers).*
+wrong — it is in `_superseded/`. Every figure below is asserted in `Model/audit.py` (345/345).*
 
 ---
 
@@ -172,7 +172,7 @@ One dark store per 3–6 college cluster, sited on the academic calendar rather 
 CLUSTER · inside the gate · 8.5 months"* and *"ADJACENT CATCHMENT · ≥569 orders/day uncontested ·
 12 months"*. A gold brace joins both into one navy circle 0.75 in across: **"ONE NODE · 2,000 sqft"**.
 Three thin arrows out to three small labels: *asset turn 0.944 of a city store* · *break survivable by
-construction* · *111 of 760 districts qualify*.
+construction* · *111 of 765 districts qualify*.
 
 **Decision list (6 rows, label in #FFC220 caps 6pt, text 7pt):**
 BUILD — 1 pilot node, 3–6 college cluster, non-metro Tier-1/2 district ·
@@ -183,14 +183,14 @@ BREAK — repurpose the catchment; the node never closes ·
 GATE — go/no-go at day 90 on four instrumented metrics
 
 **EXHIBIT 2 — four stat tiles (accent bars: blue, green, green, green):**
-| CAPITAL EMPLOYED **₹324 L** capex ₹235 L + working capital ₹88.9 L | ROCE, 30% BASKET **34.4%**; an external 40% benchmark corresponds to AOV ₹755 |
-| PAYBACK **25 months** against a 56-month franchised-store benchmark¹¹ | IRR, 5-YEAR **34.4%** 31–35% across a 2–6 month ramp |
+| CAPITAL EMPLOYED **₹325 L** capex ₹235 L + working capital ₹90 L | ROCE, 30% BASKET **34.4%** and 40% at AOV ₹755, inside the range Swiggy discloses |
+| PAYBACK **27 months** against a 56-month franchised-store benchmark¹¹ | IRR, 5-YEAR **34.4%** 31–35% across a 2–6 month ramp |
 
 **EXHIBIT 3 — comparison table.** Header row two cells: left **"TREATED AS A COST PROBLEM"** on
 #C0392B, right **"TREATED AS A SITE-SELECTION PROBLEM"** on #1E7A46, white 6pt caps. Four body rows:
 | Cost problem | Site problem |
 |---|---|
-| Lever ladder moves the requirement 70.8% → 48.6% of term volume, then stops | 111 of 760 districts clear a four-part operational screen |
+| Lever ladder moves the requirement 70.8% → 48.6% of term volume, then stops | 111 of 765 districts clear a four-part operational screen |
 | 48.6 points still unfunded through a break that delivers nothing | Density buys the calendar back: 6.93× against a city store's 7.34× |
 | Holding costs ₹31.6 L; relocating costs ₹89 L and forfeits a catchment that returns on a published date | The same node returns 34.4% on a basket mix already called reachable |
 | Network basket ₹450 against a required ₹573 | Repurposing the break is worth ₹26 of AOV — cheaper than lifting the basket |
@@ -347,7 +347,7 @@ non-grocery mix it implies **32.3% of GOV** · the 30–40% range disclosed by S
  band @4.76 · footnote @5.29
 ```
 
-**Action title:** Underwrite on 569 orders a day of uncontested adjacent demand: 111 districts of 760 clear the screen, and we then disqualified 72% of our own shortlist
+**Action title:** Underwrite on 569 orders a day of uncontested adjacent demand: 111 districts of 765 clear the screen, and we then disqualified 72% of our own shortlist
 
 **Kicker:** The filter binds on losing the campus, not on surviving the break — 513 orders a day against 471 — so it is set at the higher of the two.
 
@@ -391,7 +391,7 @@ Karnataka, 190, 11.2, 26 · Visakhapatnam, Andhra Pradesh, 133, 15.0, 18 · Dhar
  red concession strip @4.64 · band @4.76 · footnote
 ```
 
-**Action title:** Split the trip at the gate and pay for the batch with time — last mile falls from ₹42.0 to ₹17.6 an order, while cost per order is lowest at exam-night peak
+**Action title:** Split the trip at the gate and pay for the batch with time — last mile falls from ₹42.0 to ₹17.6 an order, and the product is fastest at exam-night peak
 
 **Kicker:** Two decisions on one page. The fleet is a labour class, not a vehicle. The SLA is a batching rule, not a promise.
 
@@ -443,14 +443,14 @@ orders, up from 42%¹²
  red callout 0.45→9.55 @4.30 (the limit) · band @4.76 · footnote
 ```
 
-**Action title:** One node earns ₹111 lakh of EBIT and 34.4% on capital at a 30% non-grocery basket; a disclosed external 40% benchmark corresponds to ₹755
+**Action title:** One node earns ₹130 lakh of EBIT and 34.4% on capital at a 30% non-grocery basket, and clears the 40% hurdle at ₹755
 
 **Kicker:** The basket is fitted, not assumed — the one disclosed quarterly series where an Indian operator actually lifted AOV. Every point of non-grocery mix is worth ₹11.28.
 
 **EXHIBIT 23** — `pnl_bridge.png`. Header line above it: 361,958 orders a year at AOV ₹755, NOV ₹27.6 cr.
 
-**Capital rows:** capex, midpoint of the band **₹235 L** · working capital at 14 NWC days **₹88.9 L** ·
-**capital employed ₹323.9 L** · cash conversion cycle **−47 days — the node is supplier-funded**⁹
+**Capital rows:** capex, midpoint of the band **₹235 L** · working capital at 14 NWC days **₹90 L** ·
+**capital employed ₹325 L** · cash conversion cycle **−47 days — the node is supplier-funded**⁹
 
 **EXHIBIT 24** — `basket_ladder.png`. Caption: ₹450 → ₹525 on term-start durables → ₹573 at 24.3%
 non-grocery, from 20% today. The 40% hurdle needs 32.3% — still inside the disclosed 30–40% range,
@@ -463,9 +463,9 @@ IRR, 5-year, 3-month ramp **34.4%** · ramp 2–6 months 35%–31% · node life 
 | Scenario | AOV | Margin | Turn | ROCE | Payback |
 |---|---|---|---|---|---|
 | Underwritten, at breakeven | ₹571 | 0.00% | 6.44× | 0.0% | — |
-| Basket at 30% non-grocery | ₹729 | 4.22% | 8.15× | **34.4%** | 25 mo |
+| Basket at 30% non-grocery | ₹729 | 4.03% | 8.12× | **34.4%** | 27 mo |
 | Basket at 40% non-grocery | ₹842 | 6.09% | 9.38× | **58.8%** | 15 mo |
-| **30% basket, volume −30%** | ₹729 | 2.27% | 5.69× | **14.0%** | **67 mo** |
+| **30% basket, volume −30%** | ₹729 | 2.27% | 5.69× | **14.0%** | **62 mo** |
 
 **Red callout:** THE LIMIT, COMPUTED NOT ASSERTED — at a 30% basket with volume 30% below plan the node returns 14.0% and pays back in 62 months, longer than the 60 months its life is anchored on. Under that combination it does not pay back within its life. That is why day 90 measures volume before anything else, and why node two is not funded until it clears.
 
@@ -504,8 +504,8 @@ Term-Weighted CM + Break Runway ≥ 1.0× · Calendar-Linked Labour Share ≥ 50
 1's metrics doing the job they were designed for — the cumulative build the brief asks for, made
 operational rather than restated.
 
-**EXHIBIT 29** — `risk_tornado.png`. Caption: volume −30% → ₹647 · shrinkage → ₹623 (upper bound) ·
-gig levy → ₹595 · fragmentation → ₹589. Three of four are covered inside a 30% basket (₹729); all four
+**EXHIBIT 29** — `risk_tornado.png`. Caption: volume −30% → ₹640 · shrinkage → ₹615 (upper bound) ·
+gig levy → ₹588 · fragmentation → ₹582. Three of four are covered inside a 30% basket (₹729); all four
 inside 40% (₹842). Shrinkage is an upper bound — the stack was calibrated on a reported contribution
 figure already net of it, so charging it again double-counts.
 

@@ -24,7 +24,7 @@ _D2_LM   = SL.volume_weighted()[1]                 # D2 circuit model, NOT re-ty
                                                    # a hardcoded 19.0 lived here and would
                                                    # have survived the roster-basis change
 _D2_CONS = M.LAST_MILE / _D2_LM                    # 2.21x, the consolidation D2 actually delivers
-CAMPUS_AOV = C.breakeven_d2_consistent(C.CAMPUS_FIXED, _D2_LM)          # Rs573, D1/D2 tie-out
+CAMPUS_AOV = C.breakeven_d2_consistent(C.CAMPUS_FIXED, _D2_LM)          # Rs580, D1/D2 tie-out
 FIXED      = C.CAMPUS_FIXED                                             # Rs9,02,000/month
 RENT, STAFF, UTIL, OTHER = (C.JM_NONMETRO["rent"], C.JM_NONMETRO["labour"],
                             C.UTILITIES_POWER, C.OTHER_FIXED)

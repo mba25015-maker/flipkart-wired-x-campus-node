@@ -1,8 +1,10 @@
 """
-REGENERATE ALL SIX PUBLICATION SCREENSHOTS FROM REAL RUNS.
+REGENERATE THE TERMINAL SCREENSHOTS ON A-1 FROM A REAL RUN.
 
-The appendix images are generated from the same scripts that the public notebooks execute.
-This prevents audit counts, model outputs, and narrative labels from drifting independently.
+The two images on slide 11 were captured when audit.py ran 311 checks and verify_deck ran 80.
+They kept showing 311/311 and 80/80 while the tiles beside them said 336 and 116 - on the page  # scan:allow
+whose entire argument is that nothing drifts. An image is as capable of going stale as a
+literal, and it is harder to notice because no assertion reads pixels.
 
 So the images are now GENERATED from the live command output, and verify_deck bans the stale
 strings from the deck text. Run this AFTER release.py step 2, so the output being photographed
@@ -47,11 +49,20 @@ def capture(script):
                        capture_output=True, text=True, cwd=ROOT)
     return r.stdout.strip().split("\n")
 
-def first(lines, n):
-    """Keep a terminal capture legible while preserving the headline result."""
-    return lines[:n] + (["  ... output continues in the linked notebook"] if len(lines) > n else [])
+def grab(script, out, keep=None, head=14, width=1180):
+    """Capture a module's live stdout. `keep` filters to the lines that carry the argument."""
+    lines = capture(script)
+    if keep:
+        lines = [l for l in lines if any(k in l for k in keep)] or lines
+    lines = [l for l in lines if l.strip()][:head]
+    shot([f"$ python3 Model/{script}"] + lines, os.path.join(OUT, out), w=width)
 
 if __name__ == "__main__":
+    # ALL SIX ARE GENERATED. Four of them (S3-S6) were captured on 29 Aug 12:35 and never
+    # refreshed, so they kept showing the pre-correction model - campus AOV Rs580 on the solver  # scan:allow
+    # panel, the old ROCE ladder, the old district screen - under slides whose text had moved on.
+    # An image is the one thing on a slide that no assertion can read, which makes hand-captured
+    # screenshots the most reliable place in a package for a stale number to survive.
     a = capture("audit.py")
     head = [l for l in a if l.strip().startswith(("OK", "FAIL"))]
     tail = [l for l in a if "checks pass" in l]
@@ -64,14 +75,11 @@ if __name__ == "__main__":
     shot(["$ python3 Model/verify_deck.py"] + dh[:5] + ["  ..."] + dh[-3:] + [""] + dt,
          os.path.join(OUT, "S2_deck.png"))
 
-    shot(["$ python3 Model/solver.py"] + first(capture("solver.py"), 33),
-         os.path.join(OUT, "S3_solver_repurpose.png"), w=1680, sz=14, lh=20)
-
-    shot(["$ python3 Model/roce.py"] + first(capture("roce.py"), 55),
-         os.path.join(OUT, "S4_roce_hurdle.png"), w=1680, sz=15, lh=22)
-
-    shot(["$ python3 Model/aishe_district.py"] + first(capture("aishe_district.py"), 32),
-         os.path.join(OUT, "S5_aishe_districts.png"), w=1680, sz=14, lh=20)
-
-    shot(["$ python3 Model/basket.py"] + first(capture("basket.py"), 35),
-         os.path.join(OUT, "S6_basket_regression.png"), w=1680, sz=14, lh=20)
+    grab("solver.py",          "S3_solver_repurpose.png",
+         keep=("minimise","subject","burn","Repurpose","Hold","Wind","Rs","OPTIM","threshold"), head=15)
+    grab("roce.py",            "S4_roce_hurdle.png",
+         keep=("Capital employed","AOV for","ROCE","hurdle","DuPont","margin","turnover","payback","IRR"), head=15, width=1080)
+    grab("aishe_district.py",  "S5_aishe_districts.png",
+         keep=("Register","districts","candidates","uncontested","contested","stacked","screen"), head=13)
+    grab("basket.py",          "S6_basket_regression.png",
+         keep=("Target","Starting","Gap","non-grocery","R2","AOV =","ladder","reach"), head=13)

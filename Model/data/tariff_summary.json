@@ -1,11 +1,4 @@
 {
-  "n_states_uts": 48,
-  "karnataka_2016_rs_per_kwh": 8.98,
-  "bescom_2026_rs_per_kwh": 8.73,
-  "rebase_factor": 0.9721603563474388,
-  "cross_section_cv": 0.3028226478454051,
-  "cross_section_min_2016": 3.33,
-  "cross_section_median_2016": 8.02,
-  "cross_section_max_2016": 14.63,
-  "source_note": "Summary statistics derived from a licensed IndiaStat tariff cross-section; no state-level paid table included."
+  "lt_commercial_rate_assumed": null,
+  "source_note": "Derived tariff summary; no source tables redistributed."
 }

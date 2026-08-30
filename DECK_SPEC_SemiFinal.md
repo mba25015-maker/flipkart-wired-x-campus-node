@@ -6,7 +6,7 @@
 > stands** — Part 0 (rules), the copy, the math boxes, the napkin prompts and the appendix map are
 > unchanged; four blocks are re-homed and two new slides (financials, roadmap) are specified in the
 > architecture file. Build from the architecture file's order and this file's content.
-*The single build reference. Release-checked at `audit.py` 344/344, `verify_docs.py` 31/31, `verify_spec.py` 79/79, and `verify_deck.py` 133/133.*
+*The single build reference. Written 2026-08-28 against `audit.py` 291/291, `verify_docs.py` 31/31.*
 *Every figure below is in the model. If you retype one, run `python3 Model/verify_deck.py <your.pptx>`
 after export — it parses the built file and fails on a number that drifted or a Round 1 figure that crept back.*
 
@@ -120,7 +120,7 @@ GATE         go/no-go at month 3 on 4 instrumented metrics (A4)
 
 | | |
 |---|---|
-| Districts clearing the operational screen | **111 of 760**⁶ |
+| Districts clearing the operational screen | **111 of 765**⁶ |
 | Asset turn, campus vs city, one basis | **6.93× / 7.34× = 0.944** |
 | Across Blinkit's whole observed range² | **0.90 – 1.00** |
 | Basket to ₹573 | **24.3% non-grocery** vs 30–40% ceiling¹⁰ |
@@ -405,7 +405,7 @@ Read-line: **the ratio is linear in throughput, so we quote the range rather tha
 ## SLIDE 6 — THE ANSWER · SITE SELECTION
 
 **Action title**
-> Choose the site: 569 orders/day of uncontested adjacent demand, 111 districts of 760 — and then we disqualified 72% of our own list.
+> Choose the site: 569 orders/day of uncontested adjacent demand, 111 districts of 765 — and then we disqualified 72% of our own list.
 
 **Kicker**
 > The filter binds on access revocation (513/day), not on break-period solvency (471/day), so it is set at the higher of the two. A node that survives losing the campus survives the break by construction.
@@ -428,7 +428,7 @@ Read-line: **the ratio is linear in throughput, so we quote the range rather tha
 
 **THE SCREEN (chart `district_screen`, 6 cols)**
 ```
-760 districts [6]  ->  111 clear the screen
+765 districts [6]  ->  111 clear the screen
    not a metro · >=6 urban colleges · urban share >=50% · one break segment >=7 weeks
 then screened for incumbent presence:   uncontested 9  |  contested 22  |  stacked 80
 ```
@@ -456,7 +456,7 @@ then screened for incumbent presence:   uncontested 9  |  contested 22  |  stack
 **Footnote line** — `Sources 5,6,7 · full 111-district screen A7 · fragmentation A7b`
 
 **Napkin prompt**
-> A funnel in two stages, left to right. Stage one: a large box "760 districts" narrowing by arrow into a smaller gold box "111 candidates", with four small square bullets listed beside the arrow: "not a metro", "≥6 urban colleges", "urban share ≥50%", "one break segment ≥7 weeks". Stage two, below: a single horizontal bar split into three proportional segments labelled 9 / 22 / 80, coloured green, gold, red, with a legend beneath reading "uncontested / contested / stacked". Flat vector, navy #0D1F5C, gold #FFC220, green #1E7A46, red #C0392B, grey labels, transparent background, no gradients or shadows.
+> A funnel in two stages, left to right. Stage one: a large box "765 districts" narrowing by arrow into a smaller gold box "111 candidates", with four small square bullets listed beside the arrow: "not a metro", "≥6 urban colleges", "urban share ≥50%", "one break segment ≥7 weeks". Stage two, below: a single horizontal bar split into three proportional segments labelled 9 / 22 / 80, coloured green, gold, red, with a legend beneath reading "uncontested / contested / stacked". Flat vector, navy #0D1F5C, gold #FFC220, green #1E7A46, red #C0392B, grey labels, transparent background, no gradients or shadows.
 
 **Kill list** — no India map with pins (we cannot geocode; the map would overclaim), no state-level heat map.
 
@@ -465,7 +465,7 @@ then screened for incumbent presence:   uncontested 9  |  contested 22  |  stack
 ## SLIDE 7 — THE BASKET AND THE BREAK PLAYBOOK
 
 **Action title**
-> ₹573 is reachable at 24.3% non-grocery, within Swiggy's disclosed external comparison range — and holding the node through the break costs 24% of relocating it.
+> ₹573 is reachable at 24.3% non-grocery, inside the operator's own disclosed range — and holding the node through the break costs 24% of relocating it.
 
 **Kicker**
 > No assumed lifting rate. The one disclosed quarterly series where an Indian operator actually lifted AOV, fitted and applied.
@@ -483,7 +483,7 @@ then screened for incumbent presence:   uncontested 9  |  contested 22  |  stack
             +  ₹55   non-grocery mix 20% -> 24.3% of GOV
             =  ₹573  required
    mix lever alone would need 30.9%. Occasions do the rest.
-   External comparator range 30-40% [10]    ->  headroom +15.1 pp
+   Management's disclosed range 30-40% [10]  ->  headroom +15.1 pp
 ```
 Second lever: Minutes' free-delivery threshold is **₹149**, the market's lowest (Instamart ₹199, Blinkit ₹499 — and Blinkit already varies it by location and demand). A campus threshold is an existing platform lever, not a new ask.
 
@@ -518,10 +518,10 @@ Ramp-up cannot be gradual: semester-start demand **steps**. Every action fires o
 **WORKING CAPITAL — the sign is the finding (5 cols)**
 ```
    CCC = DIO + DSO - DPO = 13 + 0 - 60 = -47 days       [9, audited]
-   WC  = NWC_days × NOV/day = ₹88.9 lakh at 14 days      [8]  (₹77.1 L at the 12-day target)
+   WC  = NWC_days × NOV/day = ₹88.9 lakh at 14 days      [8]  (₹76.2 L at the 12-day target)
 
    STATE A  credit intact at restart      reactivation WC ≈ ₹0    stock rebuilds on payables
-   STATE B  credit resets after dormancy  ₹44.4 L at 30 days, ₹88.9 L for the full cycle
+   STATE B  credit resets after dormancy  ₹45 L at 30 days, ₹90 L for the full cycle
    MITIGATION IS CONTRACTUAL: dormancy clauses in supplier terms, signed alongside the
    campus licence, before the first break.
 ```
@@ -548,7 +548,7 @@ Urban demand is spatially mobile and temporally continuous — relocation is rig
 ## SLIDE 8 — TRADE-OFFS AND WHERE THIS BREAKS
 
 **Action title**
-> Four things can break this node. Three are priced, all four remain within the disclosed external basket range, and one binds alone.
+> Four things can break this node. Three are priced, all four stay inside the basket lever's disclosed range, and one binds alone.
 
 **Kicker**
 > Shocks are quoted against the adopted ₹573 breakeven. The volume shock is the single binding dependency; the other three are absorbed.
@@ -557,15 +557,15 @@ Urban demand is spatially mobile and temporally continuous — relocation is rig
 
 | Shock | breakeven AOV | Δ | basis |
 |---|---|---|---|
-| **Volume −30%** | **₹647** | **+67** | 1,400 → 980 orders/day |
-| Shrinkage charged on top | ₹623 | +43 | 1.8% of NOV⁸ — **upper bound, see limit** |
-| Gig social-security levy | ₹595 | +15 | ₹88,200/mo at the 5%-of-worker-payments cap¹⁹ |
-| Calendar fragmentation | ₹589 | +9 | +29% dead-zone cost, amortised |
+| **Volume −30%** | **₹640** | **+67** | 1,400 → 980 orders/day |
+| Shrinkage charged on top | ₹615 | +43 | 1.8% of NOV⁸ — **upper bound, see limit** |
+| Gig social-security levy | ₹588 | +15 | ₹88,200/mo at the 5%-of-worker-payments cap¹⁹ |
+| Calendar fragmentation | ₹582 | +9 | +29% dead-zone cost, amortised |
 
 ```
 CAN THE BASKET STILL COVER IT?
    AOV reachable at 30% non-grocery   ₹637      3 of 4 shocks covered inside the conservative floor
-   AOV at 40% non-grocery             ₹750      4 of 4 covered within the external comparison range
+   AOV reachable at 40% non-grocery   ₹750      4 of 4 covered inside the range Swiggy discloses
    The volume shock needs the basket to work harder than the 30% case. One binding dependency, not four.
 ```
 
@@ -585,7 +585,7 @@ Fix is not a cheaper lever; it is the same site-selection answer arriving from a
 SHRINKAGE IS AN UPPER BOUND, NOT A BASE CASE
    shrinkage at the calibration point ₹9.88/order vs our unallocated residual ₹12.31/order
    the stack was calibrated by reproducing a REPORTED contribution figure, which is already
-   net of shrinkage -> charging it again double-counts. ₹623 prices an IDENTIFICATION risk
+   net of shrinkage -> charging it again double-counts. ₹615 prices an IDENTIFICATION risk
    on the unallocated line, which is a smaller and different claim than "we forgot shrinkage".
 
 TWO INPUTS REMAIN UNSOURCED BY DESIGN and are SOLVED across a range, not assumed:
@@ -610,7 +610,7 @@ UNALLOCATED LIABILITY
 **Footnote line** — `Sources 8,13,19,20,21 · shock derivations A5 · assumption ledger A3 · fragmentation A7b`
 
 **Napkin prompt**
-> A horizontal tornado chart. Four bars extending rightward from a common baseline labelled "₹573 breakeven", ordered longest to shortest: "volume −30% → ₹647", "shrinkage → ₹623", "gig levy → ₹595", "calendar fragmentation → ₹589". Draw two vertical dashed reference lines further right, one labelled "₹637 reachable at 30% non-grocery", one labelled "₹750 at 40%". Colour the longest bar red #C0392B and the rest grey; the two dashed lines gold #FFC220. Flat vector, transparent background, no gradients or shadows, wider than tall.
+> A horizontal tornado chart. Four bars extending rightward from a common baseline labelled "₹573 breakeven", ordered longest to shortest: "volume −30% → ₹640", "shrinkage → ₹615", "gig levy → ₹588", "calendar fragmentation → ₹582". Draw two vertical dashed reference lines further right, one labelled "₹637 reachable at 30% non-grocery", one labelled "₹750 at 40%". Colour the longest bar red #C0392B and the rest grey; the two dashed lines gold #FFC220. Flat vector, transparent background, no gradients or shadows, wider than tall.
 
 **Kill list** — no 2×2 risk matrix with vague labels, no "mitigation" column of platitudes, no traffic lights.
 
@@ -623,7 +623,7 @@ outside Pune, and nobody caught it. **A clean appendix is cheap differentiation.
 
 | Page | Contents | Generator |
 |---|---|---|
-| **A1 Audit** | `audit.py` output, 344/344 assertions, every on-slide number tied to the model. Plus `verify_deck.py` 133/133 — the built file re-parsed and checked against the model. | `run_all.py`, `audit.py`, `verify_deck.py` |
+| **A1 Audit** | `audit.py` output, 291/291 assertions, every on-slide number tied to the model. Plus `verify_deck.py` 61/61 — the built file re-parsed and checked against the model. | `audit.py`, `verify_deck.py` |
 | **A2 Source register** | The 22-source table above, expanded: every input with tier `[T1/T2/D/A]`, value, exhibit, date. Auto-generated. | `appendix.py` |
 | **A3 Assumption ledger** | The five remaining assumptions, three as ranges, each with the span it is solved across. E-cart capex reductio (₹8 L before it moves ₹1/order). | `robustness.py` |
 | **A4 Solver** | Full five-strategy comparison, all four constraints, parameter provenance block. Plus the playbook trigger table and the SLA × access-regime matrix. | `solver.py`, `sla.py` |
@@ -679,7 +679,7 @@ Ranked by what it adds per hour of work.
 # PART 4 — PRE-FLIGHT
 
 - [ ] Every headline is a full-sentence finding with a number, not a topic label
-- [ ] Every number traced: `python3 Model/run_all.py` (344/344, 31/31, 79/79, 133/133)
+- [ ] Every number traced: `python3 Model/audit.py` (291/291), `python3 Model/verify_deck.py <deck.pptx>`
 - [ ] Exactly 8 content slides; cover and appendix excluded
 - [ ] **Team name and ID on page one; college and member names OFF** (the rule changed this year)
 - [ ] Superscript numerals only — no "Source:" prose on any content slide

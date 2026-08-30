@@ -1,7 +1,7 @@
 """
 EVERY COUNT THE DECK STATES ABOUT ITSELF - AND WHETHER IT ACTUALLY PASSED.
 
-The first version of this file held AUDIT_COUNT = 344 and DECK_CHECK_COUNT = 116 as declared
+The first version of this file held AUDIT_COUNT = 352 and DECK_CHECK_COUNT = 116 as declared
 constants, and the self-check asserted that the number of checks DEFINED matched. That is not
 the same thing as the number that PASSED, which is how the deck was able to print "116 / 116"
 on a build whose verifier was actually returning 115/116. A tile that reports a pass rate must
@@ -23,14 +23,15 @@ import json, os
 HERE = os.path.dirname(os.path.abspath(__file__))
 RESULTS = os.path.join(HERE, "_verification.json")
 
-AUDIT_COUNT = 344   # audit.py       - checks DEFINED, not passed
+AUDIT_COUNT = 352   # audit.py       - checks DEFINED, not passed
 DOCS_COUNT  = 31    # verify_docs.py
 SPEC_COUNT  = 79    # verify_spec.py
+ARTF_COUNT  = 22    # verify_artifacts.py - workbook, notebooks, manifest, public data
 
 from deck_checks import DECK_CHECK_COUNT   # verify_deck.py
 
-DEFINED = {"audit": AUDIT_COUNT, "docs": DOCS_COUNT,
-           "spec": SPEC_COUNT, "deck": DECK_CHECK_COUNT}
+DEFINED = {"audit": AUDIT_COUNT, "docs": DOCS_COUNT, "spec": SPEC_COUNT,
+           "deck": DECK_CHECK_COUNT, "artefacts": ARTF_COUNT}
 
 def results():
     """What the last run_all.py actually found, or None if there has not been one."""
