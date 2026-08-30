@@ -62,12 +62,20 @@ def main():
     # is unambiguous, and some mounts refuse deletion.
     with open(RESULTS, "w", encoding="utf-8") as fh: fh.write("{}\n")
     run([py, "Model/build_full.py", "light"], "1 BUILD  (A-1 prints 'checks defined')")
+    # STAGE BEFORE VERIFY, AND AGAIN BEFORE RE-VERIFY. verify_artifacts asserts that
+    # _release_repo/ matches the tree that just verified, and step 1 has this moment made the
+    # working tree newer than the staged one - so staging has to bracket both verification
+    # passes, not sit between them. Staging is an rsync from a manifest; running it twice costs
+    # nothing and means neither pass can be run against a stale published tree.
+    run([py, "Model/stage_release.py"],       "1a STAGE _release_repo/ from the manifest")
     run([py, "Model/run_all.py"],             "2 VERIFY (records _verification.json)")
     run([py, "Model/make_screenshots.py"],    "3a CAPTURE the clean run into A-1's screenshots")
     run([py, "Model/make_readme.py"],         "3a' REGENERATE README.md from that run")
     run([py, "Model/make_workbook.py"],       "3a\" REGENERATE Campus_Store_Model.xlsx from the model")
     run([py, "Model/clean_notebooks.py"],     "3a\"' CLEAN the notebooks (outputs, paths, typed counts)")
+    run([py, "Model/sync_push_instructions.py"], "3a\"'' SYNC the internal push note to the live counts")
     run([py, "Model/build_full.py", "light"], "3b STAMP  (A-1 prints passed/total)")
+    run([py, "Model/stage_release.py"],       "3c STAGE the stamped package into _release_repo/")
     # RE-VERIFY THE WHOLE PACKAGE, not just the deck. Steps 3a-3a"' regenerate the
     # screenshots, README, workbook, notebooks and manifest AFTER step 2 checked them, so a
     # verify_deck-only step 4 left every regenerated artefact unverified in its final form - the

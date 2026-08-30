@@ -157,6 +157,43 @@ chk((_want in open(_pi, encoding="utf-8").read()) if os.path.exists(_pi) else Tr
     "LAYERS  push instructions quote the live counts",
     _want if os.path.exists(_pi) else "not in this tree (internal, by design)")
 
+# ---------------------------------------------------------------- the STAGED tree
+# THE TREE THAT ACTUALLY GETS PUSHED, CHECKED AGAINST THE ONE THAT WAS VERIFIED.
+# _release_repo/ was assembled and refreshed BY HAND. After the last round the working folder
+# verified at one set of counts while the staged tree still held the PREVIOUS build's deck,
+# workbook, README and four .py files. Nothing could detect it: every verifier ran inside one
+# tree or the other and never compared them. That is the same defect the package was built to
+# eliminate, sitting in the one tree a judge reads.
+#
+# It is now derived by stage_release.py from a manifest, and this asserts the derivation is
+# current. In the staged tree itself there is no _release_repo/, so the check passes on absence
+# and the artefact COUNT stays the same in both trees.
+import hashlib as _hl
+def _md5(p_):
+    with open(p_, "rb") as fh: return _hl.md5(fh.read()).hexdigest()
+_stage = os.path.join(ROOT, "_release_repo")
+_stale = []
+if os.path.isdir(_stage):
+    try:
+        import stage_release as _SR
+        _pairs = [(os.path.join(ROOT, f), os.path.join(_stage, f)) for f in _SR.ROOT_FILES]
+        for _t in _SR.TREES:
+            for _dp, _dn, _fn in os.walk(os.path.join(ROOT, _t)):
+                _dn[:] = [d for d in _dn if d not in _SR.EXCLUDE]
+                for _f in _fn:
+                    if _f in _SR.EXCLUDE or _f.startswith(".") or _f.endswith((".pyc", ".pyo")):
+                        continue
+                    _a = os.path.join(_dp, _f)
+                    _pairs.append((_a, os.path.join(_stage, os.path.relpath(_a, ROOT))))
+        for _a, _b in _pairs:
+            if not os.path.exists(_b) or _md5(_a) != _md5(_b):
+                _stale.append(os.path.relpath(_a, ROOT))
+    except Exception as _e:
+        _stale = [f"could not compare: {_e}"]
+chk(not _stale, "STAGE  the staged tree matches the verified tree",
+    (f"{len(_stale)} stale, first: {_stale[0]}" if _stale
+     else ("current" if os.path.isdir(_stage) else "no staged tree here (this IS the staged tree)")))
+
 # ---------------------------------------------------------------- the public data
 DATA = os.path.join(HERE, "data")
 chk(os.path.exists(os.path.join(DATA, "README.md")), "DATA  provenance file present")

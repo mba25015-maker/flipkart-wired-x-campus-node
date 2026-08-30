@@ -102,6 +102,24 @@ TEAM_ID   = ""
 # work as advertised. The environment still overrides, for a one-off build under another name.
 # TEAM_ID is empty because WiRED X does not issue one; empty means the line is not drawn at all.
 
+# ---------------------------------------------------------------- DEMAND BASE
+ORDERS_PER_RESIDENT_DAY = 0.180
+# D  1.5x Blinkit's disclosed 3.6 orders/month per transacting user, at full penetration of the
+#    hostel-resident base: 3.6 x 1.5 / 30. THE ONLY orders-per-resident figure in the model.
+#
+#    campus_model carried a SECOND one - ORD_RES = 0.25, with CLUSTER = 5,600 and GATE = 28,000
+#    derived from it. Nothing imported them and no assertion read them, so they sat unnoticed
+#    while the audited chain ran on 0.18 -> 7,778 residents -> 38,889 state gate. An unasserted
+#    constant is not dormant; it is a wrong answer waiting for someone to quote it. One did.
+MIN_CLUSTERS_PER_STATE = 5
+
+def cluster_residents(cluster_volume=None):
+    """Hostel residents one node must reach to generate its daily volume."""
+    return (CLUSTER_VOLUME if cluster_volume is None else cluster_volume) / ORDERS_PER_RESIDENT_DAY
+
+def state_gate_residents():
+    return cluster_residents() * MIN_CLUSTERS_PER_STATE
+
 # ---------------------------------------------------------------- BUILD TARGETS
 FINAL_DECK = "Flipkart_Minutes_WiRED_SemiFinal_FULL_light.pptx"
 # verify_deck.py defaulted to Flipkart_Minutes_WiRED_SemiFinal_light.pptx - the

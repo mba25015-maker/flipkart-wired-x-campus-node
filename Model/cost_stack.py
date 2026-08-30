@@ -335,8 +335,32 @@ GEOM = {
  "Type A campus, door-drop, pre-approved": [CITY_LEG_MIN, GATE_PREAPP_MIN, CAMPUS_LEG_MIN,
                                             HANDOFF_MIN, CAMPUS_LEG_MIN, CITY_LEG_MIN],
  "Type A campus, gate-drop":           [CITY_LEG_MIN, GATE_PREAPP_MIN, HANDOFF_MIN, CITY_LEG_MIN],
+ # ---- PG ACCOMMODATION, the brief's third segment, in TWO service models --------------------
+ # The deck's cost case comes from consolidation: one trip serves many orders because there is a
+ # gate to drop at and a runner behind it. A PG doorstep has neither, so it is priced as an
+ # UNCONSOLIDATED trip - closer than a standard zone (PGs cluster tightly around campuses) but
+ # with a per-order handoff. It is cheaper than standard residential and dearer than campus.
  "Type B urban PG cluster":            [CITY_LEG_MIN*0.5, HANDOFF_MIN+1.5, CITY_LEG_MIN*0.5],
+ # ...but "a PG has no gate" is too absolute, and it was my overstatement. A large PG building or
+ # a managed PG block commonly has a reception desk, a warden or a locker bank - the same
+ # common-drop primitive the campus case runs on. Where that exists, a PG behaves like a small
+ # campus: one drop, many orders. Priced here as a scenario, NOT adopted, because whether a given
+ # cluster supports it is a site question the pilot answers, not a modelling assumption.
+ "Type B PG cluster, common-drop":     [CITY_LEG_MIN*0.5, GATE_PREAPP_MIN, HANDOFF_MIN,
+                                        CITY_LEG_MIN*0.5],
 }
+def segment_cpo(batch=None):
+    """Last-mile Rs/order for EVERY geometry at ONE common batch size.
+
+    THE LIKE-FOR-LIKE COLUMN. The deck's headline Rs17.61 is a consolidated figure - a
+    batched city leg plus a rostered in-gate runner - and comparing it to a single
+    unconsolidated PG trip flatters the campus case. Every value here is priced at the
+    same batch, so the column isolates GEOMETRY. Consolidation is priced separately in
+    sla.cost_legs(). Read together they show the actual result: the campus gate geometry
+    is DEARER than a standard residential drop; the whole advantage is consolidation.
+    """
+    return {n: last_mile(trip(legs), batch) for n, legs in GEOM.items()}
+
 DOOR = last_mile(trip(GEOM["Type A campus, door-drop, manual gate"]))
 
 def affordable_fee(batch, benchmark=None):

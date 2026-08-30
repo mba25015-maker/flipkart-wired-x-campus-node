@@ -466,7 +466,7 @@ def slide2():
           "out¹⁴. In the standard dataset this micro-market is not small. It is absent.",6.3,FG)
     band(s,4.76,[("We narrow our own addressable market and still recommend entry. ",True),
                  ("The question is where, and at what return.",False)])
-    foot(s,"Sources 5,6,7,14,15  ·  full screen A7  ·  register vs report note A2")
+    foot(s,"Sources 5,6,7,14,15  ·  full screen A7  ·  register vs report note A2  ·  the brief’s three segments priced, and which the base case underwrites, on A-5c")
 
 # ============================== SLIDE 3 ==============================
 def slide3():
@@ -1785,7 +1785,88 @@ def a5b():
          6.0,DFG,lsp=0.97)
     runit(s,"L5",t=4.95)
 
-APPENDIX = (a0, a1, a2, a3, a4, a5, a5b, a6, a6b, a7, a7b, a8, a9, a10)
+# ------------------------------- A5c --------------------------------------
+def a5c():
+    """THE BRIEF'S THIRD SEGMENT, PRICED AND POSITIONED.
+
+    The case names three micro-markets: clusters around major campuses, student hostels,
+    and PG accommodation. The deck modelled the first two and described the third. Worse,
+    the cost case implied that CAMPUS GEOMETRY was the source of the advantage, and it is
+    not - a campus gate trip is DEARER than a standard residential drop on the same basis.
+    The advantage is consolidation. This page prices every geometry at one common batch so
+    that column isolates geometry, prices the plan separately, and states which segment the
+    base case is actually underwritten on.
+    """
+    s = apx("The brief\u2019s three micro-markets \u2014 what is priced, and what the base case underwrites","A-5c")
+    _SEG = CS.segment_cpo()
+    _std = _SEG["Standard 2-3 km residential"]
+    _gate= _SEG["Type A campus, gate-drop"]
+    _pg  = _SEG["Type B urban PG cluster"]
+    _pgc = _SEG["Type B PG cluster, common-drop"]
+    _legs= SL.cost_legs()
+    text(s,0.45,0.90,9.10,0.30,
+         "The brief names three segments \u2014 high-density clusters around major university campuses, student "
+         "hostels, and paying-guest accommodation. All three are modelled here. Two are underwritten in the "
+         "base case and one is not, and the difference is demand evidence, not cost.",6.4,DMUTE,ital=True,lsp=0.99)
+    yl=dbanner(s,0.45,1.26,5.30,"LAST-MILE COST BY GEOMETRY  \u00b7  ROWS 1\u20134 AT ONE COMMON BATCH, SO THE COLUMN ISOLATES GEOMETRY")
+    rows=[[("Standard 2\u20133 km residential",DFG,False),
+           (f"{CS.trip(CS.GEOM['Standard 2-3 km residential']):.1f}",DMUTE,False),
+           (f"\u20b9{_std:.2f}",DFG,True),("BENCHMARK",DMUTE,False)],
+          [("Campus gate-drop, no runner",DFG,False),
+           (f"{CS.trip(CS.GEOM['Type A campus, gate-drop']):.1f}",DMUTE,False),
+           (f"\u20b9{_gate:.2f}",DNEG,True),("geometry alone is DEARER",DNEG,True)],
+          [("Urban PG cluster, doorstep",DFG,False),
+           (f"{CS.trip(CS.GEOM['Type B urban PG cluster']):.1f}",DMUTE,False),
+           (f"\u20b9{_pg:.2f}",DFG,True),("Phase 2 \u00b7 demand not underwritten",DHI,False)],
+          [("PG cluster, common-drop",DFG,False),
+           (f"{CS.trip(CS.GEOM['Type B PG cluster, common-drop']):.1f}",DMUTE,False),
+           (f"\u20b9{_pgc:.2f}",DFG,True),("Phase 2 \u00b7 scenario, site-dependent",DHI,False)],
+          [("Campus + hostel, CONSOLIDATED",DHI,True),("\u2014",DMUTE,False),
+           (f"\u20b9{_legs['total']:.2f}",DPOS,True),("BASE CASE \u00b7 the plan",DPOS,True)]]
+    dtable(s,0.45,yl+0.08,5.30,[("SEGMENT AND SERVICE MODEL",0.42,PP_ALIGN.LEFT),
+           ("TRIP MIN",0.14,PP_ALIGN.RIGHT),("\u20b9/ORDER",0.16,PP_ALIGN.RIGHT),
+           ("STATUS",0.28,PP_ALIGN.RIGHT)],rows,size=6.3,gap=0.205)
+    text(s,0.45,2.92,5.30,0.50,
+         "THE LAST ROW IS NOT THE SAME QUANTITY AS THE OTHER FOUR, AND THAT IS THE POINT. Rows 1\u20134 price a "
+         "single trip at one common batch, so they compare geometry against geometry. Row 5 prices the plan: a "
+         "city leg batched to demand plus a rostered in-gate runner. It is quoted with its basis wherever it "
+         "appears, and it is never set against a PG figure as though the two were like-for-like.",
+         6.3,DNEG,ital=True,lsp=0.98)
+    dmono(s,0.45,3.50,5.30,1.14,[
+        ("WHERE THE ADVANTAGE COMES FROM \u2014 IT IS NOT THE GATE",True),
+        (f"  campus gate trip, unconsolidated      \u20b9{_gate:6.2f}",False),
+        (f"  standard residential, same basis      \u20b9{_std:6.2f}",False),
+        (f"  the gate is {_gate/_std-1:+.1%} on geometry ALONE",True),
+        ("",False),
+        (f"  city leg, batched and volume-weighted \u20b9{_legs['city']:6.2f}",False),
+        (f"  in-gate leg, rostered runner          \u20b9{_legs['in_gate']:6.2f}",False),
+        (f"  THE PLAN                              \u20b9{_legs['total']:6.2f}",True)],None)
+    yr=dbanner(s,6.05,1.26,3.50,"THE POSITION WE ARE TAKING")
+    text(s,6.05,yr+0.09,3.50,0.14,"PHASE 1 \u2014 WHAT THE BASE CASE UNDERWRITES",6.4,DPOS,bold=True)
+    text(s,6.05,yr+0.27,3.50,0.74,
+         "Phase 1 is underwritten solely on institutional hostel demand inside multi-college clusters \u2014 "
+         "residents behind a gate, reached through one common drop and a runner. PG demand is EXCLUDED from "
+         "base-case volumes, so no ROCE, payback, breakeven or cluster figure in this deck depends on it.",
+         6.3,DFG,lsp=0.98)
+    text(s,6.05,yr+1.09,3.50,0.14,"PHASE 2 \u2014 THE PG ADJACENCY",6.4,DHI,bold=True)
+    text(s,6.05,yr+1.27,3.50,0.90,
+         "PGs sit tighter to campus than a standard zone, so they are geometrically CHEAPER to reach than the "
+         "benchmark. What is missing is demand evidence: the AISHE register carries no PG count, so density is "
+         "unmeasured, and whether a given block supports a common drop is a site question. PGs are therefore a "
+         "Phase-2 adjacency, subject to pilot validation of density and common-drop feasibility.",
+         6.3,DFG,lsp=0.98)
+    box(s,6.05,3.42,3.50,0.66,None,radius=0.09,line=DHI,lw=1.0)
+    text(s,6.17,3.49,3.26,0.56,
+         "WHAT WOULD PROMOTE IT. Two additions to the pilot, neither needing new capital: a count of managed PG "
+         "beds inside the served radius, and one common-drop trial at a PG block with a reception desk or "
+         "locker bank. Until both read through, PG volume stays out of the plan and out of every number on it.",
+         6.1,DHI,lsp=0.97)
+    text(s,6.05,4.18,3.50,0.30,
+         "Every figure on this page is computed by cost_stack.segment_cpo() and sla.cost_legs(), and asserted "
+         "in audit.py. None of it is typed.",6.0,DMUTE,ital=True,lsp=0.98)
+    runit(s,"L5",t=4.86)
+
+APPENDIX = (a0, a1, a2, a3, a4, a5, a5b, a5c, a6, a6b, a7, a7b, a8, a9, a10)
 
 cover()
 for fn in (slide1, slide2, slide3, slide4, slide5, slide6, slide7, slide8):

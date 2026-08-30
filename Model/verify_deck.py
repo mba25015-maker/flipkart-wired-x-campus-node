@@ -123,10 +123,17 @@ else:
 S1, S2, S5, S6 = PAGE.get("S1"), PAGE.get("S2"), PAGE.get("S5"), PAGE.get("S6")
 
 # The appendix, when it is present. Content slides are 1-8; A0 onwards follow in order.
-APX_ORDER = ["A0","A1","A2","A3","A4","A5","A5b","A6","A6b","A7","A7b","A8","A9","A10"]
+APX_ORDER = ["A0","A1","A2","A3","A4","A5","A5b","A5c","A6","A6b","A7","A7b","A8","A9","A10"]
 HAS_APX = len(pages) - COVER - 8 == len(APX_ORDER)
 if HAS_APX:
     PAGE.update({k: 8 + COVER + i for i, k in enumerate(APX_ORDER)})
+# AND IF IT DOES NOT MATCH, SAY SO. This list is typed and the appendix is built, so the two
+# can disagree - and when they did, HAS_APX simply went False and 36 page-scoped checks
+# quietly became deck-wide ones. The run still reported "all pass", on 36 fewer checks. A
+# structure mirrored by hand needs an assertion that the mirror is still true; silence is the
+# defect, not the mismatch. Adding a5c to the appendix is what surfaced this.
+checks.append((HAS_APX, "SELF  appendix page map covers every appendix slide",
+               f"{len(APX_ORDER)} mapped, {len(pages) - COVER - 8} in the deck"))
 
 # ---- slide 1: the executive summary --------------------------------------------
 must("S1  headline asset-turn ratio",            f"{M.TURN_RATIO:.0%}")
@@ -263,6 +270,24 @@ if HAS_APX:
     must("A5b  all-gig on the same leg",          f"{FM.gig_leg_cost():.2f}")
     must("A5b  the block shelf is priced",        f"{FM.shelf_handoff_value()[0]:.2f}")
     must("A5b  the closed-form rule is stated",   "R* =")
+
+    # ---- A-5c  the brief's three micro-markets -------------------------------------
+    # The four geometry figures AND the claim they support. A page can carry every correct
+    # number and still make the wrong argument, so the ordering sentence is checked as prose
+    # and the ordering itself is asserted in audit.py.
+    _SEG = CS.segment_cpo()
+    must("A5c  standard residential benchmark",   f"{_SEG['Standard 2-3 km residential']:.2f}")
+    must("A5c  campus gate geometry, unconsolidated", f"{_SEG['Type A campus, gate-drop']:.2f}")
+    must("A5c  urban PG cluster, doorstep",       f"{_SEG['Type B urban PG cluster']:.2f}")
+    must("A5c  PG cluster, common-drop",          f"{_SEG['Type B PG cluster, common-drop']:.2f}")
+    must("A5c  the plan is quoted with its basis", f"{SL.cost_legs()['total']:.2f}")
+    must("A5c  the city leg is shown separately", f"{SL.cost_legs()['city']:.2f}")
+    must("A5c  the in-gate leg is shown separately", f"{SL.cost_legs()['in_gate']:.2f}")
+    must("A5c  the advantage is named as consolidation", "not the gate")
+    must("A5c  PG demand is excluded from the base case", "EXCLUDED from")
+    must("A5c  the PG position is Phase 2",       "Phase-2 adjacency")
+    must("A5c  the promotion test is stated",     "common-drop feasibility")
+    must("A5c  the brief's three segments are named", "paying-guest")
     must("S6   the runner row is the block-shelf unit cost", f"{FM.shelf_handoff_value()[2]:.2f}")
     must_not_on("S6   door-drop cost is not on the plan slide", f"{FM.shelf_handoff_value()[1]:.2f}")
     must("A6   the LEVEL basis is named",         f"{RC.AOV_UP:,.0f}")
@@ -367,6 +392,14 @@ import collections as _co
 _dup = {k: n for k, n in _co.Counter(tuple(str(x) for x in c[1:]) for c in checks).items() if n > 1}
 checks.append((not _dup, "SELF  no check is registered twice",
                (f"{len(_dup)} duplicated, first: {list(_dup)[0][0]}" if _dup else "0 duplicates")))
+
+# THE DELETED DEMAND CONSTANT MUST NOT REAPPEAR. campus_model carried a second
+# orders/resident/day of 0.25, with a 5,600-resident cluster and a 28,000-resident state gate
+# derived from it. Nothing imported them and no assertion read them, so they read as fact for
+# weeks. params.py is now the only home; these three are the deck-side half of the guard.
+for _lbl, _v in (("cluster", "5,600"), ("cluster, unpunctuated", "5600"),
+                 ("state gate", "28,000")):
+    must_not(f"superseded  pre-params {_lbl} residents", _v)
 
 checks.append((len(checks) + 1 == DECK_CHECK_COUNT,
                "SELF  deck_checks.DECK_CHECK_COUNT matches this run",

@@ -13,11 +13,11 @@ python3 Model/run_all.py
 ```
 
 ```
-audit.py             352/352 checks pass
+audit.py             366/366 checks pass
 verify_docs.py       31/31 HANDOFF figures tie out
 verify_spec.py       79/79 spec figures tie out
-verify_deck.py       167/167 deck checks pass
-verify_artifacts.py  22/22 artefact checks pass
+verify_deck.py       183/183 deck checks pass
+verify_artifacts.py  23/23 artefact checks pass
 ```
 
 All five layers passed on the last recorded run.

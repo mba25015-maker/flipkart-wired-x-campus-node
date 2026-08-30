@@ -193,6 +193,47 @@ chk("SF/D2    Type A door-drop penalty = +62%",    62, (C.DOOR/M.LAST_MILE-1)*10
 chk("SF/D2    pre-approved gate saves Rs6.4",      6.4, C.DOOR-C.last_mile(C.trip(C.GEOM["Type A campus, door-drop, pre-approved"])), 0.02)
 chk("SF/D2    Type B last mile = Rs26.9",          26.9, C.last_mile(C.trip(C.GEOM["Type B urban PG cluster"])), 0.01)
 chk("SF/D2    gate-drop 4x last mile = Rs12.8",    12.8, C.last_mile(C.trip(C.GEOM["Type A campus, gate-drop"]), 4.0), 0.01)
+
+# ---------------------------------------------------------------------------------------
+# A-5c  THE BRIEF'S THREE MICRO-MARKETS. The deck implied the cost advantage came from
+# campus GEOMETRY. It does not: at one common batch the gate trip is DEARER than a standard
+# residential drop, and the whole advantage is consolidation. That is a CLAIM, so it is
+# asserted as an ordering, not only as a number - the class of check that catches a
+# conclusion inverting while every individual figure stays correct.
+_SEGC = C.segment_cpo()
+chk("A5c    standard residential = Rs42.06",  42.06, _SEGC["Standard 2-3 km residential"], 0.002)
+chk("A5c    campus gate-drop = Rs42.65",      42.65, _SEGC["Type A campus, gate-drop"], 0.002)
+chk("A5c    urban PG cluster = Rs26.87",      26.87, _SEGC["Type B urban PG cluster"], 0.002)
+chk("A5c    PG common-drop = Rs23.95",        23.95, _SEGC["Type B PG cluster, common-drop"], 0.002)
+checks.append((_SEGC["Type A campus, gate-drop"] > _SEGC["Standard 2-3 km residential"],
+               "CLAIM A5c campus GEOMETRY alone is dearer than standard residential",
+               "gate > standard",
+               f'{_SEGC["Type A campus, gate-drop"]:.2f} vs {_SEGC["Standard 2-3 km residential"]:.2f}'))
+checks.append((_SEGC["Type B PG cluster, common-drop"] < _SEGC["Type B urban PG cluster"],
+               "CLAIM A5c PG common-drop beats PG doorstep", "common < doorstep",
+               f'{_SEGC["Type B PG cluster, common-drop"]:.2f} vs {_SEGC["Type B urban PG cluster"]:.2f}'))
+checks.append((SL.cost_legs()["total"] < _SEGC["Type A campus, gate-drop"],
+               "CLAIM A5c the advantage is CONSOLIDATION, not the gate", "plan < gate geometry",
+               f'{SL.cost_legs()["total"]:.2f} vs {_SEGC["Type A campus, gate-drop"]:.2f}'))
+recon("segment_cpo prices every geometry at ONE batch",
+      float(len(_SEGC)), float(len(C.GEOM)))
+
+# ONE DEMAND CONSTANT. campus_model carried a SECOND orders/resident/day (0.25) with a
+# 5,600-resident cluster and a 28,000 state gate derived from it. Nothing imported them and
+# no assertion read them, so they sat in the tree for weeks reading as fact - and were
+# quoted as fact once. They are deleted and params.py is the only home; these assertions are
+# what keep it that way.
+recon("index_model demand constant == params.ORDERS_PER_RESIDENT_DAY",
+      I.ORD_RES, PM.ORDERS_PER_RESIDENT_DAY)
+recon("index_model CLUSTER == params.cluster_residents()",
+      I.CLUSTER, PM.cluster_residents())
+recon("index_model GATE == params.state_gate_residents()",
+      I.GATE, PM.state_gate_residents())
+for _dead in ("ORD_RES", "CLUSTER", "GATE"):
+    checks.append((not hasattr(M, _dead),
+                   f"RECON campus_model.{_dead} stays deleted (the 5,600-resident logic)",
+                   "absent", "absent" if not hasattr(M, _dead) else "PRESENT"))
+
 # The fee
 chk("SF/D2    fee ceiling vs city @4x = Rs29.2",   29.2, C.affordable_fee(4.0), 0.01)
 chk("SF/D2    fee ceiling vs door-drop @4x = Rs55.2", 55.2, C.affordable_fee(4.0, C.DOOR), 0.01)

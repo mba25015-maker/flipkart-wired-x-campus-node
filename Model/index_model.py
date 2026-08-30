@@ -41,9 +41,10 @@ df = pd.DataFrame({"State":list(CONC)}).assign(
 
 # ---- SCALE GATE, derived from campus_model, not chosen ----
 OD_BE   = M.CEILING                                 # 1,400 orders/day, inside Blinkit's observed 1,334-1,487
-ORD_RES = round(M.BLINKIT_FREQ*1.5/30, 3)           # 1.5x Blinkit disclosed frequency, full penetration
+import params as P
+ORD_RES = P.ORDERS_PER_RESIDENT_DAY                  # [params] 1.5x Blinkit disclosed frequency
 CLUSTER = OD_BE/ORD_RES                             # ~7,800 residents per viable cluster
-MIN_CLUSTERS = 5
+MIN_CLUSTERS = P.MIN_CLUSTERS_PER_STATE
 GATE = CLUSTER*MIN_CLUSTERS
 df["Clusters supportable"] = (df.Residents/CLUSTER).round(1)
 df["Clears gate"] = df.Residents >= GATE

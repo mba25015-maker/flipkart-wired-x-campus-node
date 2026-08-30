@@ -100,10 +100,9 @@ density = pd.DataFrame([{
   "Within 1,400 ceiling":("no" if cm_per_order(a,3.0)<=0 or orders_per_day(a,3.0)>CEILING else "yes")}
   for a in (400,450,500,528,550,600,650)])
 
-ORD_RES = 0.25
-CLUSTER = CEILING/ORD_RES
-MIN_CLUSTERS = 5
-GATE = CLUSTER*MIN_CLUSTERS
+# ORD_RES / CLUSTER / GATE DELETED. They were 0.25, 5,600 and 28,000 - a Round-1 basis nothing
+# imported and no assertion read, while the audited chain ran on params.ORDERS_PER_RESIDENT_DAY
+# = 0.18 -> 7,778 -> 38,889. The demand constant now lives in params.py and nowhere else.
 residents = pd.DataFrame([{"Orders per resident per day":r,
   "Hostel residents per viable cluster":round(CEILING/r,-2)} for r in (0.15,0.20,0.25,0.30)])
 
@@ -122,7 +121,8 @@ sens=pd.DataFrame([{"Blended take rate":f"{t:.2%}","Full breakeven AOV @3x":roun
 if __name__=="__main__":
     print(f"take rate {TAKE_RATE:.2%} (sourced)  |  implied variable Rs{IMPLIED_VC:.1f}"
           f"  |  itemised Rs{ITEMISED:.0f}  |  residual Rs{RESIDUAL:.1f}")
-    print(f"calendar surcharge {CAL_SURCHARGE:.3f}x  |  cluster {CLUSTER:,.0f} residents  |  state gate {GATE:,.0f}\n")
+    print(f"calendar surcharge {CAL_SURCHARGE:.3f}x  |  cluster {P.cluster_residents():,.0f} residents"
+          f"  |  state gate {P.state_gate_residents():,.0f}\n")
     for n,d in [("VALIDATION",validation),("BREAKEVEN AOV",req),("WATERFALL",wf),
                 ("DENSITY",density),("RESIDENTS",residents),("ASSET TURN",asset),("SENSITIVITY",sens)]:
         print(f"--- {n} ---"); print(d.to_string(index=False)); print()

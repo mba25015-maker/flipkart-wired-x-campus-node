@@ -36,3 +36,5 @@ _backup_Model_*/
 Case/
 # a local run record, not a source file
 Model/_verification.json
+# internal: names local paths and sandbox workflow, never published
+PUSH_INSTRUCTIONS.md
