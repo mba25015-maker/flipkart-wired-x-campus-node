@@ -16,12 +16,15 @@ the playbook must fire on dates, not on observed volume.
 TIERS: T1 disclosure/analyst | T2 trade press | D derived | A assumed
 """
 import campus_model as M, cost_stack as C, fleet_mix as F, rent_lever as R
+import params as P, sla as SL
 
 TERM_MONTHS, BREAK_MONTHS = M.ACTIVE_MONTHS, 12 - M.ACTIVE_MONTHS      # 8.5 / 3.5
 TERM_OPD   = M.CEILING                                                  # 1,400 orders/day
-_D2_LM   = 19.0                                    # D2 circuit model, sla.volume_weighted()
+_D2_LM   = SL.volume_weighted()[1]                 # D2 circuit model, NOT re-typed:
+                                                   # a hardcoded 19.0 lived here and would
+                                                   # have survived the roster-basis change
 _D2_CONS = M.LAST_MILE / _D2_LM                    # 2.21x, the consolidation D2 actually delivers
-CAMPUS_AOV = C.breakeven_d2_consistent(C.CAMPUS_FIXED, _D2_LM)          # Rs580, D1/D2 tie-out
+CAMPUS_AOV = C.breakeven_d2_consistent(C.CAMPUS_FIXED, _D2_LM)          # Rs573, D1/D2 tie-out
 FIXED      = C.CAMPUS_FIXED                                             # Rs9,02,000/month
 RENT, STAFF, UTIL, OTHER = (C.JM_NONMETRO["rent"], C.JM_NONMETRO["labour"],
                             C.UTILITIES_POWER, C.OTHER_FIXED)
@@ -99,9 +102,16 @@ def reactivation(r, fixed_fn=cfg_footprint):
     # Rider supply: fleet sized on term volume. JPM: 21 orders/rider/day.
     riders = TERM_OPD/21.0
     rider = riders*(1-r)*RIDER_REACQ
-    # Working capital: NWC 18 days (Eternal, Jan 2026 call). Released on drawdown, re-injected at restart.
+    # Working capital: released on drawdown, re-injected at restart. ADOPTED CONSTRUCT ONLY.
+    # NWC days are NET and stated on NOV (params.NWC_DAYS = 14), so this scales the adopted
+    # figure by the share of volume that actually stood down. The COGS/day x 18-day construct
+    # that lived here gave Rs100.16 lakh against Rs76.46 lakh at r=0.15 - a Rs23.7 lakh error,
+    # in a package whose own working_capital.py calls that construct "wrong twice over". Both
+    # passed audit because neither was ever checked against the other. See audit.recon().
+    import working_capital as WC          # lazy: working_capital imports this module
     daily_gov = TERM_OPD*CAMPUS_AOV
-    wc = daily_gov*(1-M.TAKE_RATE)*M.NWC_DAYS*(1-r)   # only the volume that actually stood down
+    wc = WC.reactivation_wc({'A':'A','B30':'B','B':'B'}[P.RESTART_CREDIT_STATE],
+                            days_credit=30 if P.RESTART_CREDIT_STATE=='B30' else None)*(1-r)
     return {"rehire":rehire, "cold":cold, "rider":rider, "opex_total":rehire+cold+rider,
             "working_capital":wc, "to_rehire":to_rehire, "riders":riders}
 
@@ -149,7 +159,7 @@ if __name__=="__main__":
         print(f"  Re-attract {x['riders']*(1-r):.0f} of {x['riders']:.0f} gig riders          Rs{x['rider']:>10,.0f}  [A]")
         print(f"  {'-'*54}")
         print(f"  Reactivation opex                            Rs{x['opex_total']:>10,.0f}")
-        print(f"  Working capital re-injection (NWC {M.NWC_DAYS}d)      Rs{x['working_capital']:>10,.0f}  [T1]")
+        print(f"  Working capital re-injection (NWC {P.NWC_DAYS:.0f}d, on NOV) Rs{x['working_capital']:>10,.0f}  [T1]")
         print(f"  Reactivation opex as months of term surplus   {x['opex_total']/term_surplus_monthly():>10.2f}")
 
     print("\n"+"="*86); print("THE RULES-BASED PLAYBOOK - triggers, lead times, owners".center(86)); print("="*86)

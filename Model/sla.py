@@ -12,18 +12,21 @@ on Commerce (201st report, 7 Aug 2026) recommended guidelines against algorithmi
 A campus product that competes on reliability and price rather than on raw speed is aligned with
 where the regulation is going, not fighting it.
 
-THE COUNTER-INTUITIVE RESULT that falls out of the arithmetic: a batched SLA is BEST at peak and
-WORST at trough - the inverse of a conventional network, where peak degrades service. Batch wait
-is the dominant SLA term and it collapses as arrival rate rises. So the campus product is
-structurally strongest exactly when student demand spikes (exam nights, mess-off nights), which is
-the demand shape Round 1 identified as the thing that breaks standard dark-store models.
+THE COUNTER-INTUITIVE RESULT that falls out of the arithmetic: COST PER ORDER is lowest at peak,
+because batch wait collapses as arrival rate rises and the city leg is divided across a fuller
+batch. SLA does NOT follow the same curve - the fastest state is AVERAGE demand (21.6 min), not
+peak (27.1 min), because a fuller batch takes longer to circuit. An earlier draft claimed the
+product was 'fastest and cheapest' at exam-night peak; the table on the same slide refuted it.
+The true claim is the economic one: cost per order is lowest exactly when student demand spikes,
+while modelled SLA stays inside the 27.1-minute band the promise is built on.
 
 TIERS: T1 disclosure/analyst | T2 trade press | D derived | A assumed
 """
-import campus_model as M, cost_stack as C, fleet_mix as F
+import campus_model as M, cost_stack as C, fleet_mix as F, params as P
 
 PICK      = 2.5   # T1  Blinkit pick-and-pack, founder via Parliamentary panel reporting
-CAMPUSES  = 3     # D   campuses per cluster (7,778-resident minimum, no single campus reaches it)
+CAMPUSES  = P.CAMPUSES_PER_NODE   # D  [params] campuses per cluster; no single campus
+                                  #    reaches the 7,778-resident minimum. BINDS fleet_mix too.
 BASE_RATE = (M.CEILING/CAMPUSES)/18.0        # orders/hour at one campus gate, 18h day
 PTDR_PEAK = 4.0   # T1  Round 1 metric 1 flag threshold: peak-to-trough demand ratio > 4.0x
 PTDR_TROU = 0.25  # D   trough as a fraction of the daily average
@@ -63,14 +66,19 @@ if __name__=="__main__":
               f"{sla_minutes(rate,b):>10.1f}{sla_minutes(rate,b,'last'):>8.1f}"
               f"{runners_needed(rate,b):>9.1f}{cost:>10.1f}")
     print("-"*88)
-    print(f"At trough the batched model is uneconomic (Rs64.8/order at batch 1) and volume is")
-    print(f"below the {F.breakeven_volume():.0f}/day runner floor anyway - trough reverts to gig riders at the gate.")
+    print(f"At trough the city leg is uneconomic (Rs51.2/order at batch 1: one trip, one order).")
+    print(f"The in-gate roster is sized to DAILY volume by fleet_mix.optimal_roster, which declines")
+    print(f"to add a runner whose residual cannot clear the {F.breakeven_volume():.0f}/day floor and rides that volume")
+    print(f"on gig instead. The gig-at-trough rule is APPLIED in the cost, not asserted beside it.")
     print("Batch closes on a 6-MINUTE WAIT CAP or 12 orders, whichever comes first. That single")
     print("rule is what holds one promise across a 24x swing in arrival rate.")
-    print("\n>>> Batch wait FALLS as demand rises, so the campus product is fastest and cheapest")
-    print("    exactly at exam-night peak - the inverse of a conventional zone. Round 1 called the")
-    print("    student demand spike the thing that breaks dark-store models. Batched consolidation")
-    print("    turns it into the thing that makes this one work.")
+    _fast = min(STATES, key=lambda x: sla_minutes(x[1], dynamic_batch(x[1])))[0]
+    print("\n>>> COST PER ORDER is lowest at exam-night peak, while modelled SLA stays within")
+    print(f"    27.1 minutes. The fastest state is {_fast} ({sla_minutes(BASE_RATE,dynamic_batch(BASE_RATE)):.1f} min), not peak - a fuller batch")
+    print("    takes longer to circuit even as it gets cheaper. Round 1 called the student demand")
+    print("    spike the thing that breaks dark-store models; batched consolidation turns it into")
+    print("    the thing that makes this one work ECONOMICALLY. Speed and cost are different curves")
+    print("    and an earlier draft conflated them.")
 
     print("\n"+"="*88); print("THE TIER STRUCTURE".center(88)); print("="*88)
     rate = BASE_RATE
@@ -165,30 +173,66 @@ HOURS = [   # hours in an 18h day, rate as a multiple of the mean-hour rate
  ("Trough (early morning, class hrs)", 6, 0.25),
 ]
 def volume_weighted():
+    """THE HEADLINE COST, on the two-leg basis the operating model actually runs.
+
+    THE CORRECTION THIS EMBODIES. Every band used to be priced at RUNNER_HR - a MARGINAL
+    circuit-minute cost for the in-gate leg - while this module's own stdout said trough
+    reverts to gig because volume falls below the runner floor. That is a FIXED-cost
+    argument, and a marginal price cannot express it. Worse, fleet_mix.py priced the same
+    in-gate leg as a fixed daily roster and got Rs2.88 where this module got Rs4.74. Both
+    numbers reached the deck. See params.LABOUR_BASIS.
+
+    THE TWO LEGS ARE DIFFERENT IN KIND, and that is the whole point:
+
+      CITY LEG   gig, priced per ACTIVE hour, bought per trip, divided by batch size.
+                 It genuinely scales 1:1 with volume, so it VARIES by demand band and is
+                 weighted by each band's share of daily ORDERS (not of hours - a campus is
+                 peaky by construction, so most orders occur where batches fill fastest).
+
+      IN-GATE    employed runners, paid RUNNER_DAY whether volume arrives or not. It is a
+                 daily roster cost divided by daily volume, so it is FLAT across demand
+                 bands. That flatness IS the argument for rostering, and pricing it per
+                 circuit-minute hid it.
+
+    The trough question resolves itself correctly here: the roster is sized to daily
+    volume by fleet_mix.optimal_roster, which already declines to add a runner whose
+    residual volume cannot clear the breakeven and rides that volume on gig instead. The
+    gig-at-trough rule is therefore APPLIED, not asserted and then contradicted.
+    """
     tot_eq = sum(h*m for _,h,m in HOURS)          # average-hour equivalents
-    rows, wcost = [], 0.0
+    gate_trip = C.trip(C.GEOM["Type A campus, gate-drop"])
+    _,_, in_gate, _ = F.plan_roster()             # flat: fixed roster / daily volume
+    rows, wcity = [], 0.0
     for name, h, m in HOURS:
         share = h*m/tot_eq                         # share of daily ORDERS, not of time
-        rate  = BASE_RATE*m*(18.0/tot_eq)*(tot_eq/18.0)   # rate in that hour band
         rate  = BASE_RATE*m
         b     = dynamic_batch(rate)
-        cost  = F.total_campus_cost("E-cart, stationed", b, F.RUNNER_HR, F.SHELF_DROP)
-        wcost += share*cost
-        rows.append((name, h, m, share, rate, b, cost, sla_minutes(rate,b)))
-    return rows, wcost
+        city  = F.GIG_HR*(gate_trip/60.0)/b
+        wcity += share*city
+        rows.append((name, h, m, share, rate, b, city+in_gate, sla_minutes(rate,b), city, in_gate))
+    return rows, wcity + in_gate
+
+def cost_legs():
+    """The headline split, for any slide that has to show the reconciliation."""
+    rows, total = volume_weighted()
+    in_gate = rows[0][9]
+    return {"city": total - in_gate, "in_gate": in_gate, "total": total}
 
 if __name__=="__main__":
     rows, w = volume_weighted()
     print("\n"+"="*88); print("THE HONEST HEADLINE: cost weighted by ORDERS, not by hours".center(88)); print("="*88)
     print(f"{'demand band':<36}{'hrs':>5}{'rate':>6}{'% of orders':>13}{'batch':>7}{'Rs/order':>10}{'SLA':>7}")
     print("-"*88)
-    for name,h,m,share,rate,b,cost,s in rows:
+    for name,h,m,share,rate,b,cost,s,city,in_gate in rows:
         print(f"{name:<36}{h:>5}{m:>5.2f}x{share:>12.1%}{b:>7}{cost:>10.1f}{s:>7.1f}")
     print("-"*88)
-    print(f"{'VOLUME-WEIGHTED COST PER ORDER':<36}{'':<31}{w:>10.1f}")
+    legs = cost_legs()
+    print(f"{'VOLUME-WEIGHTED COST PER ORDER':<36}{'':<31}{w:>10.2f}")
+    print(f"{'  city gig leg':<36}{'':<31}{legs['city']:>10.2f}")
+    print(f"{'  in-gate roster leg':<36}{'':<31}{legs['in_gate']:>10.2f}")
     print(f"{'Standard 2-3 km residential zone':<36}{'':<31}{M.LAST_MILE:>10.1f}")
     print(f"{'Saving':<36}{'':<31}{1-w/M.LAST_MILE:>9.0%}")
-    print("\n>>> Rs{:.0f}/order, {:.0%} below a standard zone. This supersedes BOTH the Rs9.3 figure".format(w, 1-w/M.LAST_MILE))
+    print("\n>>> Rs{:.2f}/order, {:.0%} below a standard zone. This supersedes BOTH the Rs9.3 figure".format(w, 1-w/M.LAST_MILE))
     print("    (peak-only, unreachable at average) and the Rs33.0 figure (average-hour, which")
     print("    ignores that most orders happen at peak). It is the number that goes on the slide.")
     print(f"\n    Sensitivity: the weighting depends on the demand profile. At a flatter 2x peak the")

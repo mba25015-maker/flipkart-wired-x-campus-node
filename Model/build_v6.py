@@ -8,8 +8,10 @@ import campus_model as M, index_model as I
 
 THEME = sys.argv[1] if len(sys.argv)>1 else "light"
 OUT   = sys.argv[2] if len(sys.argv)>2 else "Flipkart_Minutes_WiRED_Round1"
-TPL   = "/sessions/bold-modest-albattani/mnt/Flipkart/Case/Presentation_template.pptx"
-IMG   = f"/sessions/bold-modest-albattani/mnt/Flipkart/Model/charts/{THEME}"
+HERE  = os.path.dirname(os.path.abspath(__file__))
+ROOT  = os.path.dirname(HERE)
+TPL   = os.path.join(ROOT, "Case", "Presentation_template.pptx")
+IMG   = os.path.join(HERE, "charts", THEME)
 FONT  = "Calibri"
 
 if THEME=="light":
@@ -315,7 +317,7 @@ run(p,"Access-regime and behavioural inputs are coded from a keyword-retrieved p
       "Two inputs have no source and are solved for rather than assumed: campus AOV and orders per resident per day.",
       6.6,A_MUTE)
 
-p=f"/sessions/bold-modest-albattani/mnt/Flipkart/{OUT}.pptx"
+p=os.path.join(ROOT, f"{OUT}.pptx")
 prs.save(p)
 
 # force the theme hyperlink colour so links stay legible on the appendix background

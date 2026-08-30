@@ -350,7 +350,7 @@ def slide3():
 
     band(s,4.76,[("Cost levers are exhausted at 48.6% and a break delivers zero. ",False),
                  ("The gap has to be filled by demand — which makes it a siting decision, not an operating one.",True)])
-    foot(s,"Sources 1,11,17,18  ·  last mile ₹19.0/order derived on slide 6  ·  solver and constraints A4  ·  fixed-base derivation A5  ·  Physicswallah ~850bps calendar swing [11]; Kambli 2020 labour-beats-capital [18]")
+    foot(s,"Sources 1,11,17,18  ·  last mile ₹17.61/order derived on slide 6  ·  solver and constraints A4  ·  fixed-base derivation A5  ·  Physicswallah ~850bps calendar swing [11]; Kambli 2020 labour-beats-capital [18]")
 
 # ============================== SLIDE 4 ==============================
 def slide4():
@@ -501,7 +501,7 @@ def slide6():
     head(s, f"Split the trip at the gate and buy the batch with time: last mile falls "
             f"₹{M.LAST_MILE:.0f} → ₹{LM:.1f} per order, and the product is fastest at exam-night peak",
          "Two decisions, one page: the fleet is a labour class, not a vehicle; and the SLA is a batching rule, "
-         "not a promise. Both are what make the ₹19.0 on slide 3 real.")
+         "not a promise. Both are what make the ₹17.61 on slide 3 real.")
 
     mathbox(s,0.45,1.44,3.05,1.20,[
         ("t_trip = 2·(d/v) + b·τ         trip minutes",True),
@@ -577,7 +577,7 @@ def slide6():
         run(p,lab+"  ",5.6,col,bold=True); run(p,val,7.2,FG,bold=True)
         p2=par(f,lsp=0.90); run(p2,body,5.5,MUTE)
     band(s,4.76,[("The operating model is a labour-class decision and a queueing rule. ",True),
-                 ("Both are cheap, both are reversible, and together they are the ₹19.0 the whole D1 case rests on.",False)])
+                 ("Both are cheap, both are reversible, and together they are the ₹17.61 the whole D1 case rests on.",False)])
     foot(s,"Sources 1,3,11,12,13,14,16  ·  trip identity and volume weighting A5  ·  labour-class provenance A2  ·  SLA × access-regime matrix A4")
 
 # ============================== SLIDE 7 ==============================
@@ -693,7 +693,7 @@ def slide8():
          f"−30% the node does not pay back within its life. Measure it before capital goes to node two.",5.8,NEG,lsp=0.98)
 
     ty=3.06
-    text(s,6.05,ty,3.50,0.13,"PRICED SHOCKS  ·  AGAINST THE ₹580 BREAKEVEN",5.8,FG,bold=True)
+    text(s,6.05,ty,3.50,0.13,"PRICED SHOCKS  ·  AGAINST THE ₹573 BREAKEVEN",5.8,FG,bold=True)
     rows=[[("Volume −30%",FG,True),("₹647",NEG,True),("+67",NEG,True)],
           [("Shrinkage on top (upper bound)",FG,False),("₹623",FG,False),("+43",MUTE,False)],
           [("Gig social-security levy¹⁹",FG,False),("₹595",FG,False),("+15",MUTE,False)],

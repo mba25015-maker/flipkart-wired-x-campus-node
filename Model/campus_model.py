@@ -9,6 +9,7 @@ The two inputs with no source anywhere (campus AOV, orders per resident per day)
 are SOLVED FOR, never assumed.
 """
 import numpy as np, pandas as pd
+import params as P
 
 # ---------------- SOURCED INPUTS ----------------
 # T1 = company disclosure / analyst model built on company data
@@ -16,8 +17,12 @@ TAKE_RATE   = 0.1941   # T1  Blinkit revenue take rate FY26E (JM Financial, Eter
 BLINKIT_AOV = 694.0    # T1  Blinkit AOV FY26E (same model)
 BLINKIT_CP  = 29.4     # T1  Blinkit contribution profit per order FY26E (same model)
 CEIL_LO, CEIL_HI = 1334, 1487   # T1  Blinkit orders/day/dark store, 9-quarter range (JM Exhibit 29)
-CEILING     = 1400     # working ceiling inside that observed range
-NWC_DAYS    = 18       # T1  Eternal earnings call, Jan 2026 ("not beyond 18 days")
+CEILING     = P.CLUSTER_VOLUME   # working ceiling inside that observed range [params]
+# NWC_DAYS DELETED. It was 18 (Eternal, Jan 2026) and stayed importable and tagged T1
+# for twelve days after Eternal's Q1FY27 call superseded it with 14. break_mode.py
+# imported it and rebuilt the rejected COGS construct on it, a Rs23.7 lakh error that
+# passed a 322-assertion audit because every module was internally consistent.
+# The adopted figure lives in params.NWC_DAYS and nowhere else.
 ROCE_TARGET = 0.40     # T1  Eternal earnings call, Jan 2026 ("north of 40%")
 
 # T2 = industry press, range-quoted

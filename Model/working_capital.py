@@ -20,7 +20,7 @@ WHAT THE REBUILD FOUND:
 
 TIERS: T1 disclosure/analyst | T2 trade press | D derived | A assumed
 """
-import campus_model as M, cost_stack as C, break_mode as B
+import campus_model as M, params as P, cost_stack as C, break_mode as B
 
 # ---------------------------------------------------------------------------
 # 1. THE DISCLOSED EVIDENCE
@@ -40,10 +40,15 @@ BLINKIT_STORES_FY25    = 1301          # T1  disclosed
 BLINKIT_STORES_FY26    = (1800, 2000)  # D   store count not disclosed for FY26; range
 INV_PER_STORE_RESOLVED = False
 
-ETERNAL_NWC_DAYS_NOW    = 14.0   # T1  Eternal Q1FY27 call, 22 Jul 2026 ("down from 18")
-ETERNAL_NWC_DAYS_TARGET = 12.0   # T1  same call, steady-state target
-ETERNAL_NWC_DAYS_OLD    = 18.0   # T1  Jan 2026 call - the figure the model was carrying
-NWC_PCT_NOV = {12.0: 0.033, 18.0: 0.050}   # T1  Eternal's disclosed conversion, both points given
+# THE POLICY LIVES IN params.py AND NOWHERE ELSE. These were three literals here and a fourth
+# (18) as a function default, which is the same duplicate-constant defect that let
+# campus_model.NWC_DAYS = 18 survive twelve days past its supersession. audit.py now scans the
+# source tree and FAILS if any of these values is redeclared outside params.py.
+ETERNAL_NWC_DAYS_NOW    = P.NWC_DAYS          # T1  Eternal Q1FY27 call, 22 Jul 2026
+ETERNAL_NWC_DAYS_TARGET = P.NWC_DAYS_TARGET   # T1  same call, steady-state target
+ETERNAL_NWC_DAYS_R1     = P.NWC_DAYS_R1       # T1  Jan 2026 call - REJECTED, shown for contrast
+ETERNAL_NWC_DAYS_OLD    = ETERNAL_NWC_DAYS_R1 # back-compat alias
+NWC_PCT_NOV = {P.NWC_DAYS_TARGET: 0.033, P.NWC_DAYS_R1: 0.050}   # T1  Eternal's own conversion, both points given
 
 ZEPTO_INV_DAYS, ZEPTO_PAY_DAYS = 13.0, 60.0     # T1  EMIS/Zepto: 13 days inventory vs ~60 payables
 ZEPTO_CCC = ZEPTO_INV_DAYS - ZEPTO_PAY_DAYS      # -47 days. Supplier-funded, cash-positive cycle.
@@ -55,11 +60,12 @@ SHRINKAGE_PCT_NOV = 0.018  # T1  Eternal 22 Jul 2026: "about 1.8% of NOV, largel
 # ---------------------------------------------------------------------------
 # 2. THREE CONSTRUCTS FOR THE SAME QUANTITY. Report all three; adopt one.
 # ---------------------------------------------------------------------------
-DAILY_GOV = B.TERM_OPD * B.CAMPUS_AOV          # 1,400 x Rs580
+DAILY_GOV = B.TERM_OPD * B.CAMPUS_AOV          # 1,400 x current D2-consistent AOV
 DAILY_NOV = DAILY_GOV * NOV_OVER_GOV
 DAILY_COGS = DAILY_GOV * (1 - M.TAKE_RATE)
 
-def wc_old_construct(days=18.0):
+def wc_old_construct(days=None):
+    days = P.NWC_DAYS_R1 if days is None else days
     """What the model was doing: COGS/day x NWC days. Double-counts the netting."""
     return DAILY_COGS * days
 

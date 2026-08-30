@@ -6,7 +6,7 @@
 > stands** — Part 0 (rules), the copy, the math boxes, the napkin prompts and the appendix map are
 > unchanged; four blocks are re-homed and two new slides (financials, roadmap) are specified in the
 > architecture file. Build from the architecture file's order and this file's content.
-*The single build reference. Written 2026-08-28 against `audit.py` 291/291, `verify_docs.py` 31/31.*
+*The single build reference. Release-checked at `audit.py` 344/344, `verify_docs.py` 31/31, `verify_spec.py` 79/79, and `verify_deck.py` 133/133.*
 *Every figure below is in the model. If you retype one, run `python3 Model/verify_deck.py <your.pptx>`
 after export — it parses the built file and fails on a number that drifted or a Round 1 figure that crept back.*
 
@@ -38,7 +38,7 @@ table stakes — which is exactly why doing it in a form that costs no space is 
 | 7 | AISHE 2023-24 report — enrolment, hostel occupancy. **Different instrument from [6]. Never mix a count from one with an enrolment from the other.** |
 | 8 | Eternal / Blinkit FY26 disclosures — take rate 19.41%, contribution ₹29.4/order, shrinkage 1.8% of NOV, NWC days |
 | 9 | Zepto, MCA-filed audited consolidated accounts — 13 days inventory, ~60 days payables |
-| 10 | Swiggy Instamart quarterly disclosures — non-grocery share of GOV vs AOV; disclosed 30–40% reference range |
+| 10 | Swiggy Instamart quarterly disclosures — non-grocery share of GOV vs AOV; the disclosed 30–40% ceiling |
 | 11 | J.P. Morgan quick-commerce channel work — 4.0 orders/active hour, sub-2km leg, rider cost; Physicswallah note 9 Jul 2026 |
 | 12 | UBS Evidence Lab rider survey, n=100, Nov–Dec 2025 — batching incidence, food-delivery productivity |
 | 13 | Walmart Q1 FY27 earnings call, 21 May 2026 — >800 MFCs, <13 minutes, >30 cities |
@@ -114,7 +114,7 @@ GATE         go/no-go at month 3 on 4 instrumented metrics (A4)
 | Cost ladder cuts the residual demand needed | **70.8% → 48.6%** of term volume, and stops |
 | Dead-zone burn, no levers | **₹31.6 L** per break |
 | Relocate instead | **₹89 L** once, **₹178 L** to return |
-| Network basket vs required basket | **₹450⁴ → ₹580** |
+| Network basket vs required basket | **₹450⁴ → ₹573** |
 
 **Panel C — WHY A SITE PROBLEM (4 cols)**
 
@@ -123,7 +123,7 @@ GATE         go/no-go at month 3 on 4 instrumented metrics (A4)
 | Districts clearing the operational screen | **111 of 760**⁶ |
 | Asset turn, campus vs city, one basis | **6.93× / 7.34× = 0.944** |
 | Across Blinkit's whole observed range² | **0.90 – 1.00** |
-| Basket to ₹580 | **24.9% non-grocery** vs Swiggy's 30–40% disclosed range¹⁰ |
+| Basket to ₹573 | **24.3% non-grocery** vs 30–40% ceiling¹⁰ |
 | Holding through the break vs relocating | **24% of one relocation** |
 
 **Limit strip (full width, ruled, not shaded)**
@@ -186,7 +186,7 @@ store density per urban college  metro 1.35  |  non-metro 0.13      10.0x headro
 ## SLIDE 3 — D2 · ACCESS GEOMETRY AND THE FLEET
 
 **Action title**
-> The campus is not an expensive zone; it is expensive to serve the way we serve everywhere else. Volume-weighted last mile falls ₹42.0 → ₹19.0 per order.
+> The campus is not an expensive zone; it is expensive to serve the way we serve everywhere else. Volume-weighted last mile falls ₹42.0 → ₹17.6 per order.
 
 **Kicker**
 > Split the trip at the gate. Gig rider to the gate, institution-employed runner inside it. The fleet decision is a labour class, not a vehicle.
@@ -231,7 +231,7 @@ INCENTIVE  NOT AVAILABLE. UBS base+incentive split is in the corpus, not in a mo
 | On-foot | yes | 41.3 | 16.8 | — | — |
 | **E-cart, stationed** | yes | **15.4** | **7.2** | **4.7** | **4.1** |
 
-Full campus, gate-drop → e-cart, room delivery: **₹19.0 at n=4**, ₹8.4 at n=12. Door-drop by 2W: ₹31.1. Standard 2–3 km residential zone: **₹42.0**. Type A campus served door-to-door: ₹68.0.
+Full campus, gate-drop → e-cart, room delivery: **₹17.6 at n=4**, ₹8.4 at n=12. Door-drop by 2W: ₹31.1. Standard 2–3 km residential zone: **₹42.0**. Type A campus served door-to-door: ₹68.0.
 
 **PRECEDENT strip**
 > `INSTITUTION AS PAID OPERATOR` UC Davis runs its own in-perimeter last mile and charges per parcel: **$2/package, 12 packages per stop against 3 for a third-party truck (4×), 99.6% same-day, ~400 packages/day**¹⁶. Our fee band: floor **₹9.6** (runner cost), ceiling **₹29.2** (what the leg is worth to us). **Scope it as continuous circuits, never as the parcel desk's accumulate-and-sort round** — that scoping error kills the service level, not the economics.
@@ -245,7 +245,7 @@ Full campus, gate-drop → e-cart, room delivery: **₹19.0 at n=4**, ₹8.4 at 
 **Footnote line** — `Sources 1,11,12,16 · parameter provenance A2 · fleet derivation A5`
 
 **Napkin prompt**
-> A split-trip schematic across the page. LEFT: a dark store icon with one thick arrow labelled "city leg — gig rider, ₹168/active hr" pointing to a tall campus GATE icon in the middle. RIGHT of the gate: one small e-cart icon with four short thin arrows fanning to four hostel-block icons, labelled "in-gate leg — employed runner, ₹72/rostered hr". Under the left arrow: "₹42.0 standard zone". Under the right fan: "₹19.0 volume-weighted". A vertical dashed line runs through the gate labelled "the labour class changes here". Flat vector, navy #0D1F5C, gold #FFC220 gate, green #1E7A46 for the right-hand fan, grey labels, transparent background, no gradients or shadows.
+> A split-trip schematic across the page. LEFT: a dark store icon with one thick arrow labelled "city leg — gig rider, ₹168/active hr" pointing to a tall campus GATE icon in the middle. RIGHT of the gate: one small e-cart icon with four short thin arrows fanning to four hostel-block icons, labelled "in-gate leg — employed runner, ₹72/rostered hr". Under the left arrow: "₹42.0 standard zone". Under the right fan: "₹17.6 volume-weighted". A vertical dashed line runs through the gate labelled "the labour class changes here". Flat vector, navy #0D1F5C, gold #FFC220 gate, green #1E7A46 for the right-hand fan, grey labels, transparent background, no gradients or shadows.
 
 **Kill list** — no vehicle photos, no "EV sustainability" line, no map.
 
@@ -276,19 +276,19 @@ Read-line: **a 4× demand spike needs 1.4× the runners, because the spike is ab
 
 | State | orders/hr | batch | batch wait | AVG SLA | LAST drop | runners | ₹/order |
 |---|---|---|---|---|---|---|---|
-| Trough | 6.5 | 1 | 9.3 | 25.7 | 31.3 | 1.2 | 64.8 |
-| Average | 25.9 | 2 | 4.6 | 21.6 | 27.8 | 2.7 | 33.0 |
+| Trough | 6.5 | 1 | 9.3 | 25.7 | 31.3 | 1.2 | 54.5 |
+| Average | 25.9 | 2 | 4.6 | 21.6 | 27.8 | 2.7 | 28.9 |
 | **Peak (4×)** | **103.7** | **10** | **5.8** | **27.1** | **37.7** | **3.7** | **7.7** |
 | Exam night (6×) | 155.6 | 12 | 4.6 | 27.1 | 38.8 | 5.1 | 6.6 |
 
-**Volume weighting — why ₹19.0 and not ₹33.0**
+**Volume weighting — why ₹17.6 and not ₹28.9**
 ```
 band        % of orders   ₹/order
 peak              62.7%       7.7
-normal            31.4%      33.0
-trough             5.9%      64.8
+normal            31.4%      28.9
+trough             5.9%      54.5
                           -------
-volume-weighted             19.0     an average-HOUR calculation gives 33.0 and is wrong
+volume-weighted             19.0     an average-HOUR calculation gives 28.9 and is wrong
 standard zone               42.0     saving 55%
 ```
 Below the **87/day** runner floor the roster is uneconomic and the gate leg reverts to gig. Two floors, stated: store floor (slide 5) and runner floor (here).
@@ -297,8 +297,8 @@ Below the **87/day** runner floor the roster is uneconomic and the gate leg reve
 
 | Tier | batch | AVG SLA | ₹/order | serves |
 |---|---|---|---|---|
-| Express | 1 | 18.7 | 64.8 | chilled/frozen, or paid tier |
-| Standard | 2 | 21.6 | 33.0 | ambient core, default |
+| Express | 1 | 18.7 | 54.5 | chilled/frozen, or paid tier |
+| Standard | 2 | 21.6 | 28.9 | ambient core, default |
 | Scheduled slot | 12 | 30-min window | 6.6 | predictable peaks, bulk, durables |
 
 **Limit strip**
@@ -306,12 +306,12 @@ Below the **87/day** runner floor the roster is uneconomic and the gate leg reve
 > `AND THE SENSITIVITY` The weighting depends on the demand profile. At a flatter 2× peak the weighted cost rises. Profile stated on-slide, measured by Round 1 metric 1 (PTDR) once live.
 
 **So-what band**
-> D2's cost stack is now fixed at ₹19.0/order. Apply it to the calendar. Slide 5.
+> D2's cost stack is now fixed at ₹17.6/order. Apply it to the calendar. Slide 5.
 
 **Footnote line** — `Sources 3,11,12,13,14 · SLA derivation A5 · access-regime matrix A4`
 
 **Napkin prompt**
-> One chart, two lines crossing, drawn as a simple hand-style plot. X axis "orders per hour" from 6 to 156. One descending curve labelled "cost per order ₹64.8 → ₹6.6" in navy. One flat-ish curve labelled "customer wait 25.7 → 27.1 min" in grey. A vertical gold band at the right labelled "exam-night peak" with a callout "cheapest and fastest here". Small annotation on the left: "batch = 1", on the right "batch = 12". Flat vector, no gradients or shadows, navy #0D1F5C, gold #FFC220, grey #5A6785, transparent background, wider than tall.
+> One chart, two lines crossing, drawn as a simple hand-style plot. X axis "orders per hour" from 6 to 156. One descending curve labelled "cost per order ₹54.5 → ₹7.6" in navy. One flat-ish curve labelled "customer wait 25.7 → 27.1 min" in grey. A vertical gold band at the right labelled "exam-night peak" with a callout "cheapest and fastest here". Small annotation on the left: "batch = 1", on the right "batch = 12". Flat vector, no gradients or shadows, navy #0D1F5C, gold #FFC220, grey #5A6785, transparent background, wider than tall.
 
 **Kill list** — no stopwatch icon, no "10 minutes" hero number, no rider photo.
 
@@ -355,7 +355,7 @@ subject to reactivation lead time >= 28 days
            revocation survival >= 513 orders/day
            contract lock-in (no calendar-indexed retail lease exists in India) [17]
            7-week rule (below a 7-week segment, no lever can fire)
-basis      residual demand r = 0%;  CM ₹30.3/order at campus AOV ₹580
+basis      residual demand r = 0%;  CM ₹30.3/order at campus AOV ₹573
 
 STRATEGY           DEAD-ZONE   RESID DEM   REACTIVN   DAYS->SVC   BEST
                   ₹, 3.5 mo      % term          ₹        lead
@@ -388,7 +388,7 @@ Read-line: **the ratio is linear in throughput, so we quote the range rather tha
 
 **Limit strip**
 > `ASSUMPTION EXPOSED` "Other fixed" of **₹2,59,660 (28.8% of the base)** is a residual we allocated out of JM's blended ₹100/sqft utilities-and-other line, not an itemised figure¹. It is the least defensible line in the stack and the one that persists through the break.
-> `OUTSIDE EVIDENCE` Physicswallah's pre-Ind-AS EBITDA margin swings ~850bps Q4FY26→Q1FY27E on the academic calendar (with NEET postponement delaying offline batches)¹¹. Kambli 2020: worker reallocation alone cuts campus-dining wait 29% at $200 capex and $0/yr — labour beats capital, in a campus context¹⁸. CRISIL: occupier contracts run 1–3 years, terminable by the occupier on short notice — the flexibility is on our side of the table¹⁷.
+> `OUTSIDE EVIDENCE` Physicswallah's pre-Ind-AS EBITDA margin swings ~850bps Q4FY26→Q1FY27E on the academic calendar (with NEET postponement delaying offline batches)¹¹. Kambli 2020: worker reallocation alone cuts campus-dining wait 29% at $200 capex and $0/yr — labour beats capital, in a campus context¹⁸. CRISIL: occupier contracts run 1–3 years, terminable by the client on short notice — the flexibility is on our side of the table¹⁷.
 
 **So-what band**
 > Cost cannot close the calendar. Density can. So the break becomes a site-selection criterion. Slide 6.
@@ -451,7 +451,7 @@ then screened for incumbent presence:   uncontested 9  |  contested 22  |  stack
 > `AND` The register carries no enrolment⁶, so district student counts are imputed off state ratios⁷ and labelled as such.
 
 **So-what band**
-> Site chosen, break survivable, revocation hedged. Can the basket clear ₹580? Slide 7.
+> Site chosen, break survivable, revocation hedged. Can the basket clear ₹573? Slide 7.
 
 **Footnote line** — `Sources 5,6,7 · full 111-district screen A7 · fragmentation A7b`
 
@@ -465,7 +465,7 @@ then screened for incumbent presence:   uncontested 9  |  contested 22  |  stack
 ## SLIDE 7 — THE BASKET AND THE BREAK PLAYBOOK
 
 **Action title**
-> ₹580 is modeled at 24.9% non-grocery, within Swiggy's disclosed reference range — and holding the node through the break costs 24% of relocating it.
+> ₹573 is reachable at 24.3% non-grocery, within Swiggy's disclosed external comparison range — and holding the node through the break costs 24% of relocating it.
 
 **Kicker**
 > No assumed lifting rate. The one disclosed quarterly series where an Indian operator actually lifted AOV, fitted and applied.
@@ -480,11 +480,10 @@ then screened for incumbent presence:   uncontested 9  |  contested 22  |  stack
    LADDER      ₹450  network basket today [4]
             +  ₹75   term-start durables: ₹1,000+ baskets over 14% of active weeks
             =  ₹525
-            +  ₹55   non-grocery mix 20% -> 24.9% of GOV
-            =  ₹580  required
-   mix lever alone would need 31.5%. Occasions do the rest.
-   Swiggy disclosed range 30-40% [10]  ->  headroom +15.1 pp
-   Cross-operator reference only; not a Flipkart commitment.
+            +  ₹55   non-grocery mix 20% -> 24.3% of GOV
+            =  ₹573  required
+   mix lever alone would need 30.9%. Occasions do the rest.
+   External comparator range 30-40% [10]    ->  headroom +15.1 pp
 ```
 Second lever: Minutes' free-delivery threshold is **₹149**, the market's lowest (Instamart ₹199, Blinkit ₹499 — and Blinkit already varies it by location and demand). A campus threshold is an existing platform lever, not a new ask.
 
@@ -519,10 +518,10 @@ Ramp-up cannot be gradual: semester-start demand **steps**. Every action fires o
 **WORKING CAPITAL — the sign is the finding (5 cols)**
 ```
    CCC = DIO + DSO - DPO = 13 + 0 - 60 = -47 days       [9, audited]
-   WC  = NWC_days × NOV/day = ₹90.0 lakh at 14 days      [8]  (₹77.1 L at the 12-day target)
+   WC  = NWC_days × NOV/day = ₹88.9 lakh at 14 days      [8]  (₹77.1 L at the 12-day target)
 
    STATE A  credit intact at restart      reactivation WC ≈ ₹0    stock rebuilds on payables
-   STATE B  credit resets after dormancy  ₹45 L at 30 days, ₹90 L for the full cycle
+   STATE B  credit resets after dormancy  ₹44.4 L at 30 days, ₹88.9 L for the full cycle
    MITIGATION IS CONTRACTUAL: dormancy clauses in supplier terms, signed alongside the
    campus licence, before the first break.
 ```
@@ -540,7 +539,7 @@ Urban demand is spatially mobile and temporally continuous — relocation is rig
 **Footnote line** — `Sources 4,8,9,10,20,21,22 · basket fit A6 · playbook A4 · WC derivation A5`
 
 **Napkin prompt**
-> A waterfall of three ascending bars left to right: ₹450 labelled "network basket today", a small connector bar "+₹75 term-start durables", reaching ₹525, then a second connector "+₹55 non-grocery mix to 24.9%", reaching a final gold bar ₹580 labelled "breakeven". Above the final bar draw a light horizontal band spanning 30–40% labelled "Swiggy disclosed range — headroom 15.1 pp". Flat vector, navy #0D1F5C bars, gold #FFC220 final bar, grey connectors, transparent background, no gradients or shadows, wider than tall.
+> A waterfall of three ascending bars left to right: ₹450 labelled "network basket today", a small connector bar "+₹75 term-start durables", reaching ₹525, then a second connector "+₹55 non-grocery mix to 24.3%", reaching a final gold bar ₹573 labelled "breakeven". Above the final bar draw a light horizontal band spanning 30–40% labelled "the range disclosed by Swiggy — headroom 15.1 pp". Flat vector, navy #0D1F5C bars, gold #FFC220 final bar, grey connectors, transparent background, no gradients or shadows, wider than tall.
 
 **Kill list** — no shopping-basket icon, no student persona, no "habit loop" diagram.
 
@@ -549,10 +548,10 @@ Urban demand is spatially mobile and temporally continuous — relocation is rig
 ## SLIDE 8 — TRADE-OFFS AND WHERE THIS BREAKS
 
 **Action title**
-> Four things can break this node. Three are priced; all four fall within the AOV band implied by Swiggy's disclosed range, and one binds alone.
+> Four things can break this node. Three are priced, all four remain within the disclosed external basket range, and one binds alone.
 
 **Kicker**
-> Shocks are quoted against the adopted ₹580 breakeven. The volume shock is the single binding dependency; the other three are absorbed.
+> Shocks are quoted against the adopted ₹573 breakeven. The volume shock is the single binding dependency; the other three are absorbed.
 
 **PRICED SHOCKS (7 cols) — tornado chart, widest bar at top**
 
@@ -566,7 +565,7 @@ Urban demand is spatially mobile and temporally continuous — relocation is rig
 ```
 CAN THE BASKET STILL COVER IT?
    AOV reachable at 30% non-grocery   ₹637      3 of 4 shocks covered inside the conservative floor
-   AOV reachable at 40% non-grocery   ₹750      4 of 4 covered within Swiggy's range
+   AOV at 40% non-grocery             ₹750      4 of 4 covered within the external comparison range
    The volume shock needs the basket to work harder than the 30% case. One binding dependency, not four.
 ```
 
@@ -611,7 +610,7 @@ UNALLOCATED LIABILITY
 **Footnote line** — `Sources 8,13,19,20,21 · shock derivations A5 · assumption ledger A3 · fragmentation A7b`
 
 **Napkin prompt**
-> A horizontal tornado chart. Four bars extending rightward from a common baseline labelled "₹580 breakeven", ordered longest to shortest: "volume −30% → ₹647", "shrinkage → ₹623", "gig levy → ₹595", "calendar fragmentation → ₹589". Draw two vertical dashed reference lines further right, one labelled "₹637 reachable at 30% non-grocery", one labelled "₹750 at 40%". Colour the longest bar red #C0392B and the rest grey; the two dashed lines gold #FFC220. Flat vector, transparent background, no gradients or shadows, wider than tall.
+> A horizontal tornado chart. Four bars extending rightward from a common baseline labelled "₹573 breakeven", ordered longest to shortest: "volume −30% → ₹647", "shrinkage → ₹623", "gig levy → ₹595", "calendar fragmentation → ₹589". Draw two vertical dashed reference lines further right, one labelled "₹637 reachable at 30% non-grocery", one labelled "₹750 at 40%". Colour the longest bar red #C0392B and the rest grey; the two dashed lines gold #FFC220. Flat vector, transparent background, no gradients or shadows, wider than tall.
 
 **Kill list** — no 2×2 risk matrix with vague labels, no "mitigation" column of platitudes, no traffic lights.
 
@@ -624,7 +623,7 @@ outside Pune, and nobody caught it. **A clean appendix is cheap differentiation.
 
 | Page | Contents | Generator |
 |---|---|---|
-| **A1 Audit** | `audit.py` output, 291/291 assertions, every on-slide number tied to the model. Plus `verify_deck.py` 61/61 — the built file re-parsed and checked against the model. | `audit.py`, `verify_deck.py` |
+| **A1 Audit** | `audit.py` output, 344/344 assertions, every on-slide number tied to the model. Plus `verify_deck.py` 133/133 — the built file re-parsed and checked against the model. | `run_all.py`, `audit.py`, `verify_deck.py` |
 | **A2 Source register** | The 22-source table above, expanded: every input with tier `[T1/T2/D/A]`, value, exhibit, date. Auto-generated. | `appendix.py` |
 | **A3 Assumption ledger** | The five remaining assumptions, three as ranges, each with the span it is solved across. E-cart capex reductio (₹8 L before it moves ₹1/order). | `robustness.py` |
 | **A4 Solver** | Full five-strategy comparison, all four constraints, parameter provenance block. Plus the playbook trigger table and the SLA × access-regime matrix. | `solver.py`, `sla.py` |
@@ -664,7 +663,7 @@ Ranked by what it adds per hour of work.
    number into a sign, and the sign changes the recommendation from financial to contractual.
 7. **DuPont framing on the asset turn**, if you want one more layer: T = NOV/K is the turnover leg of
    ROCE, and Eternal has publicly targeted ROCE "north of 40%"⁸. Saying *the campus node clears the
-   turnover leg at 94% of a city store* connects the asset-turn result to Eternal's public benchmark.
+   turnover leg at 94% of a city store* connects our headline to the external benchmark's stated hurdle.
 8. **Concepts to name explicitly** where they already apply, so the vocabulary is visible:
    *cost-to-serve decomposition* (slide 3), *risk pooling / consolidation* (slide 4), *capacity cushion*
    (slide 4 runners), *postponement* (scheduled-slot tier), *fixed-cost absorption and operating
@@ -680,7 +679,7 @@ Ranked by what it adds per hour of work.
 # PART 4 — PRE-FLIGHT
 
 - [ ] Every headline is a full-sentence finding with a number, not a topic label
-- [ ] Every number traced: `python3 Model/audit.py` (291/291), `python3 Model/verify_deck.py <deck.pptx>`
+- [ ] Every number traced: `python3 Model/run_all.py` (344/344, 31/31, 79/79, 133/133)
 - [ ] Exactly 8 content slides; cover and appendix excluded
 - [ ] **Team name and ID on page one; college and member names OFF** (the rule changed this year)
 - [ ] Superscript numerals only — no "Source:" prose on any content slide

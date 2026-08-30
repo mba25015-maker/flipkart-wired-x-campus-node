@@ -15,7 +15,7 @@ The third is the largest and it is the one a vehicle table would miss entirely.
 
 TIERS: T1 disclosure/analyst | T2 trade press | D derived | A assumed
 """
-import campus_model as M, cost_stack as C
+import campus_model as M, cost_stack as C, params as P
 
 # ---------------- LABOUR CLASSES ----------------
 GIG_HR    = C.RIDER_HR_ACTIVE          # D  Rs168/active hour, from JPM: Rs26.5K/mo, 21 ord/day, 4 ord/hr
@@ -57,6 +57,86 @@ def total_campus_cost(mode, drops, hourly, drop_min=DROP_MIN):
     gate_trip = C.trip(C.GEOM["Type A campus, gate-drop"])
     city_leg  = GIG_HR * (gate_trip/60.0) / drops
     return city_leg + in_cluster_cost(mode, drops, hourly, drop_min)
+
+# ============================================================================
+# THE MIX, OPTIMISED - not "what roster do we run" but "what roster is cheapest"
+# Decision variable: alpha, the share of in-gate orders served by ROSTERED runners.
+# The remainder rides the same leg on gig, which carries no idle cost.
+#   cost/order(alpha,V) = [ R(alpha)*RUNNER_DAY + (1-alpha)*V*gig_leg ] / V
+#   R(alpha) = ceil(alpha*V / capacity)          runners are integers, and that is the point
+# A runner costs RUNNER_DAY whether volume arrives or not, so the LAST runner is only
+# worth rostering if the volume left for it clears the breakeven. That makes the optimum
+# a closed form rather than a search.
+# ============================================================================
+def gig_leg_cost(mode="E-cart, stationed", drops=8, drop_min=SHELF_DROP):
+    """Gig on the SAME in-gate leg. The comparison has to hold the leg constant."""
+    return in_cluster_cost(mode, drops, GIG_HR, drop_min)
+
+def mix_cost_per_order(alpha, orders_day, mode="E-cart, stationed", drops=8, drop_min=SHELF_DROP):
+    import math
+    cap = runner_capacity(0, drops, mode, drop_min)
+    gig = gig_leg_cost(mode, drops, drop_min)
+    R   = math.ceil(alpha*orders_day/cap) if alpha > 0 else 0
+    return (R*RUNNER_DAY + (1-alpha)*orders_day*gig) / orders_day
+
+def optimal_roster(orders_day, mode="E-cart, stationed", drops=8, drop_min=SHELF_DROP):
+    """Closed form. Roster the whole runners the volume can keep busy; the residual gets a
+    runner only if it clears the breakeven, otherwise it rides gig.
+    Returns (runners, alpha, cost_per_order)."""
+    cap = runner_capacity(0, drops, mode, drop_min)
+    gig = gig_leg_cost(mode, drops, drop_min)
+    be  = RUNNER_DAY/gig
+    R   = int(orders_day // cap)
+    residual = orders_day - R*cap
+    if residual >= be:
+        R += 1
+        alpha = 1.0
+    else:
+        alpha = (R*cap)/orders_day if orders_day else 0.0
+    cost = (R*RUNNER_DAY + (1-alpha)*orders_day*gig)/orders_day
+    return R, alpha, cost
+
+def plan_roster(cluster=None, topology=None, mode="E-cart, stationed", drops=8,
+                drop_min=SHELF_DROP):
+    """THE PLAN'S in-gate cost, under the adopted topology in params.GATE_TOPOLOGY.
+
+    BASE CASE is per_gate: a node serves params.CAMPUSES_PER_NODE campus gates, runners
+    are stationed at one gate and do not move between them, so the roster is optimised
+    at each gate and aggregated. 1,400/day over three gates is 467/day each.
+
+    Returns (runners_total, alpha_blended, cost_per_order, gates).
+    """
+    cluster  = P.CLUSTER_VOLUME if cluster is None else cluster
+    topology = P.GATE_TOPOLOGY  if topology is None else topology
+    gates    = 1 if topology == "pooled" else P.CAMPUSES_PER_NODE
+    per_gate = cluster / gates
+    R, a, c  = optimal_roster(per_gate, mode, drops, drop_min)
+    return R*gates, a, c, gates
+
+def pooled_upside(cluster=None, mode="E-cart, stationed", drops=8, drop_min=SHELF_DROP):
+    """THE CONDITIONAL UPSIDE, not the plan.
+
+    Pooling all gates into one dispatch queue is cheaper because integer runners are
+    used more fully: one pool of 1,400 fills 7 runners at 99.0%, while three pools of
+    467 each strand capacity at the top of each gate's own roster.
+
+    It is NOT the base case, because it assumes runners reposition between gates with no
+    travel time, no access delay and no fragmented shift capacity - none of which we have
+    validated. The pilot's cross-gate movement test is the gate that would promote it.
+
+    Returns (runners, alpha, cost_per_order, saving_per_order_vs_plan).
+    """
+    cluster = P.CLUSTER_VOLUME if cluster is None else cluster
+    R, a, c = optimal_roster(cluster, mode, drops, drop_min)
+    _, _, plan_c, _ = plan_roster(cluster, "per_gate", mode, drops, drop_min)
+    return R, a, c, plan_c - c
+
+def shelf_handoff_value(drops=8, mode="E-cart, stationed"):
+    """What the block-level pickup shelf is worth per order, against a door drop.
+    The deck argues for the shelf in the licence; this prices it."""
+    door  = in_cluster_cost(mode, drops, RUNNER_HR, DROP_MIN)
+    shelf = in_cluster_cost(mode, drops, RUNNER_HR, SHELF_DROP)
+    return door - shelf, door, shelf
 
 if __name__ == "__main__":
     print("="*84); print("WHY THE LABOUR CLASS DOMINATES THE VEHICLE".center(84)); print("="*84)

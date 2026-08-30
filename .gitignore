@@ -8,6 +8,8 @@ __pycache__/
 .ruff_cache/
 .venv/
 venv/
+.nbdeps/
+node_modules/
 .env
 .env.*
 ~$*
@@ -19,8 +21,10 @@ Research Pulls/
 papers/
 *.pdf
 *.pptx
+!Flipkart_Minutes_WiRED_SemiFinal_FULL_light.pptx
 *.ppt
 *.xlsx
+!Campus_Store_Model.xlsx
 *.xls
 *.docx
 *.doc

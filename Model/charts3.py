@@ -126,12 +126,11 @@ def risk_tornado(T):
     # the basket lever's coverage band, behind the bars
     ax.axvspan(base, RS.AOV_CEILING_LO, color=c["pos"], alpha=.10, zorder=0)
     ax.axvspan(RS.AOV_CEILING_LO, RS.AOV_CEILING_HI, color=c["hi"], alpha=.12, zorder=0)
-    limits = ((RS.AOV_CEILING_LO, f"{BK.NONGROCERY_CEILING_LO:.0f}% floor [Swiggy]", "center"),
-              (RS.AOV_CEILING_HI, f"{BK.NONGROCERY_CEILING:.0f}% max [Swiggy]", "right"))
-    for x, lab, align in limits:
+    for x, lab in ((RS.AOV_CEILING_LO, f"{BK.NONGROCERY_CEILING_LO:.0f}% non-grocery"),
+                   (RS.AOV_CEILING_HI, f"{BK.NONGROCERY_CEILING:.0f}% ceiling")):
         ax.axvline(x, color=c["hi"], lw=1.1, ls=(0, (3, 2)), zorder=2)
-        ax.text(x, len(rows) - 0.32, f"Rs{x:.0f}\n{lab}", fontsize=5.6, color=c["fg"],
-                ha=align, va="bottom", fontweight="bold")
+        ax.text(x, len(rows) - 0.32, f"Rs{x:.0f}\n{lab}", fontsize=5.6, color=c["hi"],
+                ha="center", va="bottom", fontweight="bold")
 
     for i, (name, aov, _why) in enumerate(rows):
         y = len(rows) - 1 - i
@@ -152,8 +151,8 @@ def risk_tornado(T):
     for s in ["top", "right", "left"]:
         ax.spines[s].set_visible(False)
     ax.spines["bottom"].set_color(c["grid"])
-    ax.text(.5, -.30, "shaded = AOV implied by Swiggy's disclosed 30-40% non-grocery range "
-            "(cross-operator)", transform=ax.transAxes, fontsize=5.5,
+    ax.text(.5, -.30, "shaded = AOV the basket lever reaches inside the disclosed "
+            "30-40% non-grocery ceiling", transform=ax.transAxes, fontsize=5.5,
             color=c["mute"], ha="center", style="italic")
     save(fig, "risk_tornado", T)
 

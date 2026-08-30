@@ -1,8 +1,8 @@
 """
 D1 #4: CAN THE CAMPUS BASKET REACH THE BREAKEVEN AOV?
 
-THE PROBLEM, STATED HONESTLY. S19/S20 put the D2-consistent minimum viable campus AOV at Rs580.
-Round 1 already conceded that Rs528 sat "above every student-basket estimate". Rs580 sits further
+THE PROBLEM, STATED HONESTLY. S19/S20 put the D2-consistent minimum viable campus AOV at Rs573.
+Round 1 already conceded that Rs528 sat "above every student-basket estimate". Rs573 sits further
 above it. A well-audited impossibility is still an impossibility, so the deck has to show the path
 or drop the standalone-viability claim.
 
@@ -41,11 +41,16 @@ R2 = 1 - ((_y - (SLOPE*_x + INTERCEPT))**2).sum() / ((_y - _y.mean())**2).sum()
 MINUTES_NONGROCERY = 20.0     # T2  Netscribes, from Flipkart disclosure: mobiles/electronics
                               #     ~20% of Minutes sales. Third-party estimate, stated as such.
 MINUTES_AOV_NOW    = M.MINUTES_AOV            # Rs450, T1, journalist-confirmed
-TARGET_AOV         = 580.0                    # S19/S20 D2-consistent minimum viable campus AOV
+# TARGET_AOV IS NOT A LITERAL. It was 580.0 typed here, a third copy of the D2-consistent
+# breakeven that also lived in break_mode._D2_LM's downstream and in the audit literals. When
+# the last-mile basis moved from marginal to roster pricing, the deck's text updated and this
+# chart annotation did not - it kept drawing "breakeven Rs580" under a slide that said Rs573.
+# Sourced from the model, and audit.recon() now asserts the tie.
+import cost_stack as _CS, sla as _SL
+TARGET_AOV         = _CS.breakeven_d2_consistent(_CS.CAMPUS_FIXED, _SL.volume_weighted()[1])
 
-# Cross-operator reference range, not a Flipkart commitment:
-NONGROCERY_CEILING = 40.0     # T1  Swiggy management: non-grocery capped at 30-40% of GOV
-                              #     "to retain the benefits of being on a high frequency platform"
+# External comparator range; it is evidence, not a Flipkart target or commitment.
+NONGROCERY_CEILING = 40.0     # T1  Swiggy disclosed non-grocery range: 30-40% of GOV
 NONGROCERY_CEILING_LO = 30.0
 
 def aov_at_share(share):
@@ -103,7 +108,7 @@ THRESHOLD_GAP = FREE_DELIVERY_THRESHOLD["Blinkit"] - FREE_DELIVERY_THRESHOLD["Fl
 
 # ---------------------------------------------------------------------------
 # 5. THE THIRD LEVER: OCCASION CONCENTRATION
-#    Not every order has to reach Rs580. The ANNUAL AVERAGE has to.
+#    Not every order has to reach Rs573. The ANNUAL AVERAGE has to.
 # ---------------------------------------------------------------------------
 def blended_aov(base_aov, occasion_aov, occasion_share):
     return base_aov*(1-occasion_share) + occasion_aov*occasion_share
@@ -133,7 +138,7 @@ def ladder():
     # remaining gap closed by category mix
     need = share_needed(TARGET_AOV, aov2, MINUTES_NONGROCERY)
     rows.append((f"+ non-grocery mix to {need:.0f}% of GOV", TARGET_AOV,
-                 f"vs {MINUTES_NONGROCERY:.0f}% today; Swiggy disclosed range {NONGROCERY_CEILING_LO:.0f}-{NONGROCERY_CEILING:.0f}%"))
+                 f"vs {MINUTES_NONGROCERY:.0f}% today; disclosed range {NONGROCERY_CEILING_LO:.0f}-{NONGROCERY_CEILING:.0f}%"))
     return rows, need
 
 LADDER_ROWS, SHARE_NEEDED_AFTER_OCCASION = ladder()
@@ -160,10 +165,9 @@ def report():
     print(f"  Non-grocery share required, mix lever alone      {SHARE_NEEDED:.1f}% of GOV")
     print(f"  Non-grocery share required, after occasions      {SHARE_NEEDED_AFTER_OCCASION:.1f}% of GOV")
     print(f"  Minutes today                                    {MINUTES_NONGROCERY:.1f}% of GOV")
-    print(f"  Swiggy disclosed reference range                 {NONGROCERY_CEILING_LO:.0f}-{NONGROCERY_CEILING:.0f}% of GOV")
-    print(f"  VERDICT  {'WITHIN the Swiggy range' if FITS_AFTER_OCCASION else 'OUTSIDE the Swiggy range'}"
+    print(f"  External comparator range (Swiggy, disclosed)    {NONGROCERY_CEILING_LO:.0f}-{NONGROCERY_CEILING:.0f}% of GOV")
+    print(f"  VERDICT  {'WITHIN the external comparator range' if FITS_AFTER_OCCASION else 'ABOVE the external comparator range'}"
           f"  (headroom {NONGROCERY_CEILING-SHARE_NEEDED_AFTER_OCCASION:+.1f} pts)")
-    print("           Cross-operator comparator only; not a Flipkart target or commitment.")
     print()
     print("  SECOND LEVER -- free-delivery threshold, and Minutes is the market outlier")
     for k,v in FREE_DELIVERY_THRESHOLD.items(): print(f"    {k:<20} Rs{v:.0f}")

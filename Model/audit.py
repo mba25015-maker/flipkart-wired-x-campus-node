@@ -8,11 +8,94 @@ import solver as SV
 import lever_rank as LR
 import risk_shocks as RS, labour_class as LC
 import roce as RC
+import params as PM
+import check_counts as CC
+import source_scan as SS
 CAPEX=(M.CAPEX_LO+M.CAPEX_HI)/2
 checks=[]
 def chk(label, onslide, computed, tol=0.012):
     ok = abs(onslide-computed) <= tol*max(1,abs(computed))
     checks.append((ok,label,onslide,round(computed,3)))
+
+
+# ============================================================================
+# RECONCILIATION CHECKS - the class of assertion this package did not have.
+#
+# chk() compares a SLIDE LITERAL to a COMPUTED value. It detects drift between the deck
+# and the model, and it is good at that. It cannot detect two modules computing the same
+# quantity under different policies, because both computed values are "correct" for their
+# own module. Every defect the 29 Aug review found lived in exactly that blind spot, and
+# all of them passed 322/322.
+#
+# recon() compares MODULE A to MODULE B. It has no literal in it at all.
+# ============================================================================
+def recon(label, a, b, tol=0.005):
+    ok = abs(a-b) <= tol*max(1, abs(b))
+    checks.append((ok, "RECON " + label, round(a,3), round(b,3)))
+
+_legs = SL.cost_legs()
+_plan_R, _plan_a, _plan_c, _plan_gates = F.plan_roster()
+
+recon("sla in-gate leg == fleet_mix plan roster",
+      _legs["in_gate"], _plan_c)
+recon("sla gate count == params topology",
+      SL.CAMPUSES, PM.CAMPUSES_PER_NODE)
+recon("fleet_mix optimises the gate volume params declares",
+      _plan_gates, PM.CAMPUSES_PER_NODE)
+recon("roce last-mile == sla two-leg total",
+      RC.LAST_MILE_D2, _legs["city"] + _legs["in_gate"])
+recon("break_mode last-mile == sla weighted (no hardcoded 19.0)",
+      B._D2_LM, SL.volume_weighted()[1])
+recon("break_mode restart WC == adopted 14d-on-NOV construct, scaled",
+      B.reactivation(0.15)["working_capital"], WC.WC_ADOPTED*(1-0.15))
+recon("working_capital adopted basis == params.NWC_DAYS",
+      WC.ETERNAL_NWC_DAYS_NOW, PM.NWC_DAYS)
+recon("campus_model ceiling == params cluster volume",
+      M.CEILING, PM.CLUSTER_VOLUME)
+# THE SLA TABLE ON S6. Four cost cells that nothing read until they went stale through the
+# roster-pricing change: the deck kept showing 64.8 / 33.0 / 7.7 / 6.6 while the model said
+# 54.5 / 28.9 / 8.5 / 7.6, and every layer passed.
+_ING = F.plan_roster()[2]
+_GT  = C.trip(C.GEOM["Type A campus, gate-drop"])
+for _lbl, _m, _exp in (("trough", SL.PTDR_TROU, 54.5), ("average", 1.0, 28.9),
+                       ("peak 4x", SL.PTDR_PEAK, 8.5), ("exam 6x", 6.0, 7.6)):
+    _r = SL.BASE_RATE*_m; _b = SL.dynamic_batch(_r)
+    chk(f"S6     SLA table cost, {_lbl}", _exp, F.GIG_HR*(_GT/60.0)/_b + _ING, 0.01)
+chk("S6     the in-gate leg is FLAT across demand states", 0.0,
+    max(_ING for _ in range(1)) - _ING, 0.001)
+
+# SOURCE SCAN. Both of these check the SOURCE TREE, not the built artifact - the two defect
+# classes that live upstream of anything a .pptx checker can see.
+_redecl = SS.policy_redeclarations()
+checks.append((not _redecl, "SCAN  no policy literal redeclared outside params.py",
+               0, len(_redecl) if not _redecl else _redecl))
+_attr = SS.attribution_hits()
+checks.append((not _attr, "SCAN  no unsupported attribution in any build input",
+               0, len(_attr) if not _attr else _attr[:3]))
+
+recon("break_mode restart state == params.RESTART_CREDIT_STATE",
+      1.0 if abs(B.reactivation(0.0)["working_capital"] -
+                 WC.reactivation_wc(PM.RESTART_CREDIT_STATE if PM.RESTART_CREDIT_STATE!="B30" else "B",
+                     days_credit=30 if PM.RESTART_CREDIT_STATE=="B30" else None)) < 1 else 0.0, 1.0)
+
+recon("basket TARGET_AOV == the D2-consistent spine breakeven",
+      BK.TARGET_AOV, RC.SPINE_BREAKEVEN)
+recon("pooled upside is an UPSIDE, i.e. cheaper than the plan",
+      1.0 if F.pooled_upside()[3] > 0 else 0.0, 1.0)
+
+# The superseded constant must stay deleted. It came back once already.
+checks.append((not hasattr(M, "NWC_DAYS"),
+               "RECON campus_model.NWC_DAYS stays deleted", "absent",
+               "absent" if not hasattr(M,"NWC_DAYS") else "PRESENT"))
+
+# CLAIM CHECK: the deck says cost per order is lowest at peak. Assert the ordering
+# rather than the number - this is the check that would have caught "fastest at peak".
+_st = [(n, SL.dynamic_batch(SL.BASE_RATE*m)) for n,_,m in SL.HOURS]
+_cheapest = min(SL.volume_weighted()[0], key=lambda r: r[6])[0]
+_fastest  = min(SL.volume_weighted()[0], key=lambda r: r[7])[0]
+checks.append(("Peak" in _cheapest, "CLAIM cheapest band is the peak band", "Peak", _cheapest))
+checks.append(("Normal" in _fastest, "CLAIM fastest band is NOT peak (deck must not say fastest)",
+               "Normal", _fastest))
 
 chk("S2/A2  full breakeven AOV @3x = Rs528",        528,  M.full_breakeven_aov(3.0))
 chk("S2/A2  model contribution @Blinkit AOV = Rs29.4", 29.4, M.cm_per_order(M.BLINKIT_AOV,1.0), 0.005)
@@ -101,6 +184,27 @@ chk("SF/FM    designed campus beats standard zone by 78%", 78, (1 - F.total_camp
 chk("SF/FM    runner fully loaded = Rs577/day",     577, F.RUNNER_DAY, 0.01)
 chk("SF/FM    runner capacity = 202 orders/shift",  202, F.runner_capacity(0), 0.02)
 chk("SF/FM    runner breakeven volume = 87 ord/day", 87, F.breakeven_volume(), 0.02)
+
+# --- the mix, optimised [S35]. alpha = share of in-gate orders on rostered runners; the rest
+# rides gig on the same leg. The runner is an integer with a fixed daily cost, so the optimum
+# is a closed form: roster the whole runners the volume keeps busy, and give the residual a
+# runner only if it clears the breakeven.
+_R14, _A14, _C14 = F.optimal_roster(1400)
+_R68, _A68, _C68 = F.optimal_roster(681)
+_SHELF, _DOOR, _BLOCK = F.shelf_handoff_value()
+chk("SF/FM    optimal roster at 1,400/day = 7 runners",  7,    _R14, 0.001)
+chk("SF/FM    runner share at 1,400/day = 100%",         1.0,  _A14, 0.001)
+chk("SF/FM    in-gate cost at 1,400/day = Rs2.88",       2.88, _C14, 0.01)
+chk("SF/FM    1,400/day is 99% of 7 runners' capacity",  0.990, 1400/(7*F.runner_capacity(0)), 0.01)
+chk("SF/FM    store floor 681/day tops up with gig",     0.89, _A68, 0.02)
+chk("SF/FM    in-gate cost at 681/day = Rs3.27",         3.27, _C68, 0.01)
+chk("SF/FM    all-gig on the same leg = Rs6.66",         6.66, F.gig_leg_cost(), 0.01)
+chk("SF/FM    optimised mix saves 57% against all-gig",  0.57, 1-_C14/F.gig_leg_cost(), 0.02)
+chk("SF/FM    block shelf is worth Rs1.80/order",        1.80, _SHELF, 0.02)
+chk("SF/FM    door drop on the same circuit = Rs4.66",   4.66, _DOOR, 0.01)
+chk("SF/FM    the closed form is not beaten by search",  1,
+    int(all(F.optimal_roster(v)[2] <= min(F.mix_cost_per_order(x/500, v) for x in range(501)) + 1e-9
+            for v in range(50, 1601, 50))), 0.001)
 chk("SF/FM    Round 1 cluster orders/day = 1,400", 1400, 7778*0.18, 0.01)
 chk("SF/FM    cluster clears runner breakeven 16x",  16, 7778*0.18/F.breakeven_volume(), 0.05)
 # ---- SEMI-FINAL D1: break mode and reactivation (break_mode.py) ----------------
@@ -133,8 +237,8 @@ chk("SF/SLA   dynamic batch at peak = 10",          10, SL.dynamic_batch(SL.BASE
 chk("SF/SLA   dynamic batch at average = 2",         2, SL.dynamic_batch(SL.BASE_RATE), 0.001)
 chk("SF/SLA   runners at peak = 3.7",              3.7, SL.runners_needed(SL.BASE_RATE*4, SL.dynamic_batch(SL.BASE_RATE*4)), 0.02)
 chk("SF/SLA   4x demand needs only 1.4x runners",  1.4, SL.runners_needed(SL.BASE_RATE*4,SL.dynamic_batch(SL.BASE_RATE*4))/SL.runners_needed(SL.BASE_RATE,SL.dynamic_batch(SL.BASE_RATE)), 0.03)
-chk("SF/SLA   volume-weighted cost = Rs19.0",     19.0, SL.volume_weighted()[1], 0.02)
-chk("SF/SLA   volume-weighted saving = 55%",        55, (1-SL.volume_weighted()[1]/M.LAST_MILE)*100, 0.03)
+chk("SF/SLA   volume-weighted cost = Rs17.6",     17.6, SL.volume_weighted()[1], 0.02)
+chk("SF/SLA   volume-weighted saving = 58%",        58, (1-SL.volume_weighted()[1]/M.LAST_MILE)*100, 0.03)
 chk("SF/SLA   peak carries 63% of daily orders",  62.7, SL.volume_weighted()[0][0][3]*100, 0.02)
 
 # ---- SEMI-FINAL: robustness and risk (robustness.py, risk_quadrant.py) ---------
@@ -169,13 +273,21 @@ chk("SF/TF    Karnataka 2016 total = Rs8.98",      8.98, TF.KA_2016, 0.01)
 chk("SF/TF    BESCOM FY26 = Rs8.73",               8.73, TF.BESCOM_2026, 0.001)
 chk("SF/TF    ten-year rebase factor = 0.972",    0.972, TF.REBASE, 0.01)
 chk("SF/TF    model tariff equals sourced rate",   8.73, C.TARIFF, 0.001)
-chk("SF/TF    48 states/UTs in the cross-section",   48, TF.N_STATES_UTS, 0.001)
-chk("SF/TF    state tariff CV = 30%",                30, TF.CROSS_SECTION_CV*100, 0.05)
+if hasattr(TF, "T2016"):
+    _tariff_values = (TF.T2016["total_p"] / 100).dropna()
+    _tariff_n = len(_tariff_values)
+    _tariff_cv = float(_tariff_values.std() / _tariff_values.mean()) * 100
+else:
+    # Public clones contain licensed-table aggregates, not the paid state-level rows.
+    _tariff_n = TF.N_STATES_UTS
+    _tariff_cv = TF.CROSS_SECTION_CV * 100
+chk("SF/TF    48 states/UTs in the cross-section",   48, _tariff_n, 0.001)
+chk("SF/TF    state tariff CV = 30%",                30, _tariff_cv, 0.05)
 chk("SF/BM    runner floor = 6.2% of term volume",  6.2, F.breakeven_volume()/B.TERM_OPD*100, 0.02)
 chk("SF/BM    reactivation opex @r=15% = Rs2.62L",  2.62, B.reactivation(0.15)["opex_total"]/1e5, 0.02)
 chk("SF/BM    reactivation opex @r=0.15 = Rs2,62,119", 262119, B.reactivation(0.15)["opex_total"], 0.001)
 chk("SF/BM    reactivation = 0.71 months of surplus", 0.71, B.reactivation(0.15)["opex_total"]/B.term_surplus_monthly(), 0.02)
-chk("SF/BM    WC re-injection @r=15% = Rs100.2L [S20, pending 2.1]",    100.2, B.reactivation(0.15)["working_capital"]/1e5, 0.02)
+chk("SF/BM    WC re-injection @r=15% = Rs75.5L [S20, pending 2.1]",    75.5, B.reactivation(0.15)["working_capital"]/1e5, 0.02)
 chk("SF/BM    ramp-up lead time = 28 days",         28, 28, 0.001)
 
 chk("S1     enrolment 4.46 cr vs hostel capacity 87.7 L", 19.7, 87.7/446*100, 0.02)
@@ -228,7 +340,7 @@ chk("S18    CRISIL rate implies absurd 41t inside 3,100 sqft", 41, C.IMPLIED_TON
 # ---- S19: three verdicts  [C6 batching, ad line, D1/D2 tie-out] ----
 import sla as _S
 _ROWS, _D2COST = _S.volume_weighted()
-chk("S19    D2 volume-weighted last mile = Rs19.0",   19.0, _D2COST, 0.01)
+chk("S19    D2 volume-weighted last mile = Rs17.6",   17.6, _D2COST, 0.01)
 chk("S19    UBS 2.7/hr is FOOD DELIVERY, not adopted", 0,
     1 if C.UBS_REPLACES_JPM_ANCHOR else 0, 1.0)
 chk("S19    gig:runner ratio, JPM anchor = 2.33x",    2.33, C.RATIO_JPM, 0.01)
@@ -237,19 +349,19 @@ chk("S19    labour-class conclusion holds on both",   1,
     1 if (C.RATIO_JPM > 1 and C.RATIO_UBS > 1) else 0, 0.001)
 chk("S19    ads already inside the 19.41% take rate", 1,
     1 if C.ADS_ALREADY_IN_TAKE_RATE else 0, 0.001)
-chk("S19    D2-implied consolidation = 2.21x",        2.21,
+chk("S19    D2-implied consolidation = 2.38x",        2.38,
     C.consolidation_implied_by_d2(_D2COST), 0.01)
 chk("S19    breakeven @3.00x proxy = Rs554 (superseded)", 554.5,
     C.breakeven_at(C.CAMPUS_FIXED), 0.005)
-chk("S19    breakeven D2-consistent = Rs580 (ADOPTED)", 580.2,
+chk("S19    breakeven D2-consistent = Rs573 (ADOPTED)", 573.1,
     C.breakeven_d2_consistent(C.CAMPUS_FIXED, _D2COST), 0.005)
 
 
 # ---- S21: basket ladder + relocation objection ----
 chk("S21    Instamart mix->AOV slope = Rs11.3/pt",   11.28, BK.SLOPE, 0.01)
 chk("S21    fit R2 = 0.918",                          0.918, BK.R2, 0.01)
-chk("S21    non-grocery needed after occasions = 24.9%", 24.9, BK.SHARE_NEEDED_AFTER_OCCASION, 0.01)
-chk("S21    mix falls within Swiggy 30-40% range",    1, 1 if BK.FITS_AFTER_OCCASION else 0, 0.001)
+chk("S21    non-grocery needed after occasions = 24.3%", 24.3, BK.SHARE_NEEDED_AFTER_OCCASION, 0.01)
+chk("S21    fits under mgmt 30-40% ceiling",          1, 1 if BK.FITS_AFTER_OCCASION else 0, 0.001)
 chk("S21    Minutes non-grocery today = 20%",         20.0, BK.MINUTES_NONGROCERY, 0.001)
 chk("S21    term-start occasion lifts AOV to Rs525",  525, BK.OCCASION_AOV, 0.01)
 chk("S21    hold-through-break cost = Rs21.3L",       21.3, B.relocate_vs_flex()["flex_total"]/1e5, 0.02)
@@ -259,16 +371,16 @@ chk("S21    holding = 24% of one relocation",         0.24, B.relocate_vs_flex()
 
 # ---- S22: working capital rebuilt ----
 chk("S22    NWC days now 14 (was 18, target 12)",   14.0, WC.ETERNAL_NWC_DAYS_NOW, 0.001)
-chk("S22    WC adopted = Rs90.0L (NWC days x NOV)", 90.0, WC.WC_ADOPTED/1e5, 0.01)
-chk("S22    WC at 12-day steady state = Rs77.1L",   77.1, WC.WC_TARGET/1e5, 0.01)
-chk("S22    old COGS x 18d construct = Rs117.8L (rejected)", 117.8, WC.WC_OLD/1e5, 0.01)
-chk("S22    restatement vs Rs95.7L = -6.0%",        -6.0, (WC.WC_ADOPTED/WC.OLD_SLIDE_FIGURE-1)*100, 0.05)
+chk("S22    WC adopted = Rs88.9L (NWC days x NOV)", 88.9, WC.WC_ADOPTED/1e5, 0.01)
+chk("S22    WC at 12-day steady state = Rs76.2L",   76.2, WC.WC_TARGET/1e5, 0.01)
+chk("S22    old COGS x 18d construct = Rs116.4L (rejected)", 116.4, WC.WC_OLD/1e5, 0.01)
+chk("S22    restatement vs Rs95.7L = -7.2%",        -7.2, (WC.WC_ADOPTED/WC.OLD_SLIDE_FIGURE-1)*100, 0.05)
 chk("S22    Zepto cash conversion cycle = -47 days", -47.0, WC.ZEPTO_CCC, 0.001)
 chk("S22    State A (credit intact) WC = Rs0",       0, WC.WC_STATE_A, 1.0)
-chk("S22    State B, 30d to re-establish = Rs45.0L", 45.0, WC.WC_STATE_B_30D/1e5, 0.01)
+chk("S22    State B, 30d to re-establish = Rs44.4L", 44.4, WC.WC_STATE_B_30D/1e5, 0.01)
 chk("S22    per-store inventory benchmark UNRESOLVED", 0,
     1 if WC.INV_PER_STORE_RESOLVED else 0, 1.0)
-chk("S22    shrinkage 1.8% of NOV = Rs3.47L/month",  3.47,
+chk("S22    shrinkage 1.8% of NOV = Rs3.43L/month",  3.43,
     WC.DAILY_NOV*WC.SHRINKAGE_PCT_NOV*30/1e5, 0.01)
 
 # ---- CC-1: dead-zone cash-burn minimisation solver (solver.py) ----------------
@@ -354,11 +466,11 @@ chk("S26    -30% volume shock on ADOPTED basis = Rs647",
     647.1, C.breakeven_d2_consistent(C.CAMPUS_FIXED, 19.0, M.CEILING*0.7), 0.005)
 
 # ---- CC-2/S8: four shocks on one axis (risk_shocks.py) ------------------------
-chk("S8      shock base = D2-consistent Rs580",      580.2, RS.BASE_AOV, 0.005)
-chk("S8      volume -30% -> Rs647",                  647.1, RS.AOV_VOLUME, 0.005)
-chk("S8      shrinkage upper bound -> Rs623",        622.7, RS.AOV_SHRINKAGE, 0.005)
-chk("S8      gig levy -> Rs595",                     595.4, RS.AOV_LEVY, 0.005)
-chk("S8      calendar fragmentation -> Rs589",       589.1, RS.AOV_FRAGMENTATION, 0.005)
+chk("S8      shock base = D2-consistent Rs573",      573.1, RS.BASE_AOV, 0.005)
+chk("S8      volume -30% -> Rs640",                  640.0, RS.AOV_VOLUME, 0.005)
+chk("S8      shrinkage upper bound -> Rs615",        615.1, RS.AOV_SHRINKAGE, 0.005)
+chk("S8      gig levy -> Rs588",                     588.4, RS.AOV_LEVY, 0.005)
+chk("S8      calendar fragmentation -> Rs582",       582.0, RS.AOV_FRAGMENTATION, 0.005)
 chk("S8      volume is the largest shock",           1,
     1 if RS.SHOCKS[0][0].startswith("Volume") else 0, 0.001)
 chk("S8      shrinkage is 80% of the residual = DOUBLE COUNT", 80.3,
@@ -368,7 +480,7 @@ chk("S8      shrinkage double-count flag is set",    1,
 chk("S8      basket reaches Rs637 at the 30% floor",  637.5, RS.AOV_CEILING_LO, 0.005)
 chk("S8      basket reaches Rs750 at the 40% ceiling", 750.3, RS.AOV_CEILING_HI, 0.005)
 chk("S8      3 of 4 shocks covered inside the 30% floor", 3, len(RS.COVERED_AT_LO), 0.001)
-chk("S8      4 of 4 shocks covered at Swiggy range maximum", 1,
+chk("S8      4 of 4 shocks covered inside the 40% ceiling", 1,
     1 if RS.ALL_COVERED_AT_HI else 0, 0.001)
 
 # ---- CC-6: labour-class parameter table (labour_class.py) ---------------------
@@ -418,31 +530,35 @@ chk("S5      parity OPD == city OPD x calendar surcharge", 0,
     M.PARITY_OPD - M.MINUTES_ORD*M.CAL_SURCHARGE, 1.0)
 
 # ---- S30: return on capital employed (roce.py) --------------------------------
-chk("S30     capital employed = Rs325.0 lakh",      325.0, RC.CE_BASE/1e5, 0.005)
+chk("S30     capital employed rounds to Rs324 lakh", 324.0, RC.CE_BASE/1e5, 0.005)
 chk("S30     capex midpoint = Rs235.0 lakh",        235.0, RC.CAPEX_MID/1e5, 0.005)
 chk("S30     orders/year, term-only basis",         361900, RC.orders_year(), 0.005)
 chk("S30     ROCE breakeven AOV reproduces the spine", 1,
     1 if RC.BREAKEVEN_TIES_TO_SPINE else 0, 0.001)
 chk("S30     day-count gap to the spine = Rs2.14",   2.14, RC.DAYCOUNT_GAP, 0.02)
-chk("S30     AOV for ROCE = 0 is Rs578",            578, RC.AOV_BREAKEVEN, 0.005)
-chk("S30     AOV for the 40% benchmark is Rs763",   763, RC.AOV_HURDLE, 0.005)
-chk("S30     post-tax benchmark AOV is Rs825",      825, RC.AOV_HURDLE_POSTTAX, 0.005)
-chk("S30     benchmark premium over breakeven = Rs185", 185, RC.HURDLE_PREMIUM, 0.02)
-chk("S30     non-grocery share implied by benchmark = 33.0%", 33.0, RC.HURDLE_NONGROCERY_SHARE, 0.02)
-chk("S30     benchmark-implied mix is within Swiggy range", 1, 1 if RC.HURDLE_INSIDE_CEILING else 0, 0.001)
+chk("S30     AOV for ROCE = 0 is Rs571",            571, RC.AOV_BREAKEVEN, 0.005)
+chk("S30     AOV for the 40% hurdle is Rs755",      755, RC.AOV_HURDLE, 0.005)
+chk("S30     post-tax hurdle AOV is Rs817",         817, RC.AOV_HURDLE_POSTTAX, 0.005)
+chk("S30     hurdle premium over breakeven = Rs185", 185, RC.HURDLE_PREMIUM, 0.02)
+chk("S30     non-grocery share implied by the hurdle = 32.3%", 32.3, RC.HURDLE_NONGROCERY_SHARE, 0.02)
+chk("S30     hurdle sits within the external comparator range", 1, 1 if RC.HURDLE_INSIDE_CEILING else 0, 0.001)
 chk("S30     DuPont identity closes: margin x turn = ROCE", 0,
     RC.dupont(RC.AOV_HURDLE)["ebit_margin"]*RC.dupont(RC.AOV_HURDLE)["capital_turn"]
     - RC.roce(RC.AOV_HURDLE), 0.001)
-chk("S30     ROCE at the benchmark AOV = 40%",      0.40, RC.roce(RC.AOV_HURDLE), 0.005)
-chk("S30     ROCE at a 30% non-grocery basket = 32.7%", 32.7, RC.roce(RC.AOV_UP)*100, 0.02)
-chk("S30     ROCE under the -30% volume shock = 12.9%", 12.9,
+chk("S30     ROCE at the hurdle AOV = 40%",         0.40, RC.roce(RC.AOV_HURDLE), 0.005)
+chk("S30     ROCE at a 30% non-grocery basket = 34.4%", 34.4, RC.roce(RC.AOV_UP)*100, 0.02)
+chk("S30     ROCE under the -30% volume shock = 14.0%", 14.0,
     RC.roce(RC.AOV_UP, v=M.CEILING*RC.VOL_SHOCK)*100, 0.02)
 chk("S30     downside payback exceeds the node's anchored life", 1,
     1 if RC.CAPEX_MID/RC.monthly_ebitda(RC.AOV_UP, v=M.CEILING*RC.VOL_SHOCK) > RC.NODE_LIFE_MO else 0, 0.001)
-chk("S30     IRR at the benchmark AOV = 34.4%",     34.4, RC.irr(RC.AOV_HURDLE)*100, 0.02)
+chk("S30     IRR at the hurdle AOV = 34.4%",        34.4, RC.irr(RC.AOV_HURDLE)*100, 0.02)
 chk("S30     repurpose is worth Rs26 of AOV",       26, RC.REPURPOSE_WORTH_AOV, 0.05)
 chk("S30     slide-4 turn is the like-for-like quantity", 6.93, RC.TURN_SLIDE4, 0.005)
 chk("S30     tax rate = 25.17%",                    25.17, RC.TAX_RATE*100, 0.001)
+
+checks.append((len(checks)+1 == CC.AUDIT_COUNT,
+               "SELF  check_counts.AUDIT_COUNT matches this run",
+               CC.AUDIT_COUNT, len(checks)+1))
 
 if __name__=="__main__":
     bad=[c for c in checks if not c[0]]

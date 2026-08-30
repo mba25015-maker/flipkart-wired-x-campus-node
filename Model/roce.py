@@ -2,9 +2,10 @@
 S30  RETURN ON CAPITAL EMPLOYED — breakeven and an external return benchmark.
 
 WHY THIS MODULE EXISTS. Everything upstream solves for BREAKEVEN: the AOV at which the node
-stops losing money (Rs580). Eternal has publicly stated a ROCE benchmark "north of 40%"
+stops losing money (Rs573 on the 30-day spine; Rs571 on the 365-day convention). Eternal has
+publicly stated a ROCE benchmark "north of 40%"
 [T1, earnings call Jan 2026]. This is an external comparator, not a disclosed Flipkart target.
-A node that clears Rs580 earns exactly zero, so this module separately reports the basket needed
+A node that clears the breakeven earns exactly zero, so this module separately reports the basket needed
 for breakeven and the basket implied by the external return benchmark.
 
 THE DECOMPOSITION THAT CONNECTS THIS TO THE MONEYSHOT (DuPont):
@@ -18,7 +19,7 @@ margin leg is where AOV enters. The DuPont identity therefore connects throughpu
 capital employed without treating another operator's benchmark as a Flipkart commitment.
 
 WHAT IS SOLVED AND WHAT IS ASSUMED, stated up front:
-  SOLVED     AOV at which ROCE = 40%; AOV at which ROCE = 0 (reproduces Rs580 as a check);
+  SOLVED     AOV at which ROCE = 40%; AOV at which ROCE = 0 (reconciled to the Rs573 spine);
              payback months; the margin the turnover leg implies.
   SOURCED    take rate, cost lines, fixed base, capex band, NWC days, tax rate, node life anchor.
   ASSUMED    ramp shape inside the 3-month implementation cap (linear, flagged, and the IRR is
@@ -36,11 +37,11 @@ NODE_LIFE_MO  = 60                     # D   5 years, anchored on JPM's 56-month
                                        #     payback: a node must outlive its own payback [T1]
 RAMP_MONTHS   = 3                      # A   the case's own implementation cap; linear ramp
 CAPEX_MID     = (M.CAPEX_LO + M.CAPEX_HI) / 2          # T2  Rs2.35 cr
-LAST_MILE_D2  = SL.volume_weighted()[1]                # D   Rs19.0/order, D2 circuit model
+LAST_MILE_D2  = SL.volume_weighted()[1]                # D   live D2 circuit model
 RESIDUAL_SHARE = B.threshold(B.CONFIGS[-1][1])         # D   48.6%, the REPURPOSE fill rate
 
 # BASIS, AND THIS MATTERS ENOUGH TO BE A CONSTANT RATHER THAN A DEFAULT ARGUMENT.
-# The Rs580 spine is quoted TERM-ONLY: fixed base carried across twelve months, contribution
+# The Rs573 spine is quoted TERM-ONLY: fixed base carried across twelve months, contribution
 # earned across 8.5. Running the same arithmetic on the REPURPOSE configuration (break-period
 # orders at r = 48.6%) gives a LOWER breakeven, because the node is earning through the break.
 # Both are true; they are different configurations. The deck's headline is the term-only one,
@@ -103,7 +104,7 @@ def aov_for_roce(target, ce=None, v=M.CEILING, r=BASIS_R, fixed=CS.CAMPUS_FIXED)
     c = LAST_MILE_D2 + M.STORE_OPS + M.PACKAGING + M.RESIDUAL
     return (target*ce + fixed*12) / (M.TAKE_RATE*n) + c/M.TAKE_RATE
 
-AOV_BREAKEVEN = aov_for_roce(0.0)                      # reproduces the Rs580 spine as a check
+AOV_BREAKEVEN = aov_for_roce(0.0)                      # reconciles to the Rs573 spine
 # Ties to the spine within Rs2.5, and the residual gap is a DAY-COUNT convention rather than a
 # disagreement: this module runs a 365-day year (365 x 8.5/12 = 258.5 active days), the spine runs
 # 12 x 30-day months (255.0 days). 3.5 more active days = Rs2.14 lower breakeven. Stated, not

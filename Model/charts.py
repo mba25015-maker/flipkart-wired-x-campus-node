@@ -4,9 +4,9 @@ from matplotlib.patches import Polygon, FancyBboxPatch, Wedge, Circle
 import campus_model as M, cost_stack as C, sla as SL
 
 # ---- restated economics, read from the model (S18/S19/S21) -------------------
-D2_LAST_MILE = SL.volume_weighted()[1]                       # Rs19.0/order, D2 circuit model
-D2_CONS      = M.LAST_MILE / D2_LAST_MILE                    # 2.21x implied consolidation
-BREAKEVEN_AOV = C.breakeven_d2_consistent(C.CAMPUS_FIXED, D2_LAST_MILE)   # Rs580, D2-consistent
+D2_LAST_MILE = SL.volume_weighted()[1]                       # live D2 circuit model
+D2_CONS      = M.LAST_MILE / D2_LAST_MILE                    # implied consolidation
+BREAKEVEN_AOV = C.breakeven_d2_consistent(C.CAMPUS_FIXED, D2_LAST_MILE)   # Rs573, D2-consistent
 
 def _cm_d2(aov):
     """Contribution per order on the D2-consistent last-mile basis."""
@@ -36,7 +36,7 @@ def save(fig, name, theme):
 def waterfalls(T):
     c=THEMES[T]
     # restated at S18/S19: network AOV has converged to Rs450; the D2 circuit model
-    # replaces the 3x proxy; the minimum viable campus AOV is Rs580.
+    # replaces the 3x proxy; the minimum viable campus AOV is Rs573.
     scen=[("MINUTES NETWORK TODAY",
            f"AOV Rs{M.MINUTES_AOV:.0f} - baseline batch {C.BATCH_BASE:.1f}x",
            M.MINUTES_AOV, C.BATCH_BASE),

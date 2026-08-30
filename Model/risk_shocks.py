@@ -8,7 +8,7 @@ units - Rs/month, +% of dead-zone cost, Rs lakh/month, Rs of AOV - which cannot 
 against each other and therefore cannot be prioritised on a slide.
 
 THE FIX: restate every shock on the deck's own headline axis, the D2-consistent breakeven
-campus AOV (Rs580). Each shock becomes "how many rupees of basket does this cost us", which
+campus AOV (Rs573). Each shock becomes "how many rupees of basket does this cost us", which
 is directly comparable to the basket ladder's headroom. That makes the risk slide answer the
 only question that matters: DOES THE BASKET STILL COVER IT?
 
@@ -27,8 +27,8 @@ import basket as BK
 import calendar_fragmentation as CF
 import working_capital as WC
 
-D2_LAST_MILE = SL.volume_weighted()[1]                                   # Rs19.0/order
-BASE_AOV = C.breakeven_d2_consistent(C.CAMPUS_FIXED, D2_LAST_MILE)       # Rs580, ADOPTED
+D2_LAST_MILE = SL.volume_weighted()[1]                                   # live D2 circuit model
+BASE_AOV = C.breakeven_d2_consistent(C.CAMPUS_FIXED, D2_LAST_MILE)       # Rs573, ADOPTED
 
 VOLUME_SHOCK = 0.30          # D  the -30% case the risk register has always carried (item 3)
 TERM_ORDERS  = B.TERM_OPD * 30 * B.TERM_MONTHS   # orders over the active year, break_mode basis

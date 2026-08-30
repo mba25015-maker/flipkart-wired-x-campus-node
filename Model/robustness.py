@@ -12,6 +12,7 @@ The fourth is the strongest and Round 1 used it: an assumption that cannot chang
 not a vulnerability, and saying so is more honest than sourcing it badly.
 """
 import campus_model as M, cost_stack as C, fleet_mix as F, break_mode as B, rent_lever as R
+import sla as SL
 
 # ============================================================================
 # 1. RIDER WORKING DAYS  ->  SOLVED (was assumed at 30)
@@ -119,7 +120,7 @@ if __name__=="__main__":
         print(f"   {cx:>12,}{ecart_per_order(cx):>12.2f}")
     print(f"   Capex at which it would add Rs1/order:  Rs{ecart_material_at(1.0):,.0f}")
     print(f"   >>> An e-cart would have to cost Rs{ecart_material_at(1.0)/1e5:.0f} lakh before it registered against a")
-    print(f"       Rs19.0/order total. The no-vehicle-capex argument survives, now quantified")
+    print(f"       Rs{SL.volume_weighted()[1]:.2f}/order total. The no-vehicle-capex argument survives, now quantified")
     print(f"       rather than asserted, and the contradiction is closed.")
 
     print("\n"+"="*84); print("WHAT REMAINS ASSUMED, STATED PLAINLY".center(84)); print("="*84)

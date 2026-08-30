@@ -1,6 +1,6 @@
 # PPT BUILD PROMPT — Flipkart WiRED X Semi-Final  ·  v2, template-native
 *Built against the actual `Presentation_template.pptx`, measured. v1 assumed a 13.33×7.5 canvas and is
-wrong — it is in `_superseded/`. Every figure below is asserted in `Model/audit.py` (311/311).*
+wrong — it is in `_superseded/`. Every figure below is asserted by `python3 Model/run_all.py` (344/344 model checks plus three artifact layers).*
 
 ---
 
@@ -164,7 +164,7 @@ LAYOUT MAP (CUSTOM_3)
 
 **Action title (15.5pt, 2 lines):**
 One dark store per 3–6 college cluster, sited on the academic calendar rather than the campus —
-₹325 lakh of capital returning 33%, with a 90-day gate before the second node
+₹324 lakh of capital returning 33%, with a 90-day gate before the second node
 
 **Kicker:** Two demand pools underwrite the node, not one: the colleges inside the gate, and ≥569 orders a day of adjacent non-student demand that is still there when the students leave.
 
@@ -183,8 +183,8 @@ BREAK — repurpose the catchment; the node never closes ·
 GATE — go/no-go at day 90 on four instrumented metrics
 
 **EXHIBIT 2 — four stat tiles (accent bars: blue, green, green, green):**
-| CAPITAL EMPLOYED **₹325 L** capex ₹235 L + working capital ₹90 L | ROCE, 30% BASKET **32.7%** and 40% at AOV ₹763 against Eternal's public benchmark |
-| PAYBACK **27 months** against a 56-month franchised-store benchmark¹¹ | IRR, 5-YEAR **34.4%** 31–35% across a 2–6 month ramp |
+| CAPITAL EMPLOYED **₹324 L** capex ₹235 L + working capital ₹88.9 L | ROCE, 30% BASKET **34.4%**; an external 40% benchmark corresponds to AOV ₹755 |
+| PAYBACK **25 months** against a 56-month franchised-store benchmark¹¹ | IRR, 5-YEAR **34.4%** 31–35% across a 2–6 month ramp |
 
 **EXHIBIT 3 — comparison table.** Header row two cells: left **"TREATED AS A COST PROBLEM"** on
 #C0392B, right **"TREATED AS A SITE-SELECTION PROBLEM"** on #1E7A46, white 6pt caps. Four body rows:
@@ -192,12 +192,12 @@ GATE — go/no-go at day 90 on four instrumented metrics
 |---|---|
 | Lever ladder moves the requirement 70.8% → 48.6% of term volume, then stops | 111 of 760 districts clear a four-part operational screen |
 | 48.6 points still unfunded through a break that delivers nothing | Density buys the calendar back: 6.93× against a city store's 7.34× |
-| Holding costs ₹31.6 L; relocating costs ₹89 L and forfeits a catchment that returns on a published date | The same node returns 32.7% at the modeled 30% basket mix |
-| Network basket ₹450 against a required ₹580 | Repurposing the break is worth ₹26 of AOV — cheaper than lifting the basket |
+| Holding costs ₹31.6 L; relocating costs ₹89 L and forfeits a catchment that returns on a published date | The same node returns 34.4% on a basket mix already called reachable |
+| Network basket ₹450 against a required ₹573 | Repurposing the break is worth ₹26 of AOV — cheaper than lifting the basket |
 
-**Limit strip (red callout, one line):** LIMIT, COMPUTED — at a 30% basket with volume 30% below plan, ROCE falls to 12.9% and payback runs to 67 months, longer than the node's 60-month life. Volume is what day 90 measures first.
+**Limit strip (red callout, one line):** LIMIT, COMPUTED — at a 30% basket with volume 30% below plan, ROCE falls to 14.0% and payback runs to 62 months, longer than the node's 60-month life. Volume is what day 90 measures first.
 
-**Band:** Approve one pilot node, ₹325 lakh, and a day-90 gate on four metrics. **If volume clears, node two is a siting decision we have already made 111 times.**
+**Band:** Approve one pilot node, ₹324 lakh, and a day-90 gate on four metrics. **If volume clears, node two is a siting decision we have already made 111 times.**
 
 **Footnote:** Sources 1, 2, 4, 5, 6, 10, 11 · every figure asserted in A1 · return model A6b · district screen A7
 
@@ -268,7 +268,7 @@ Read-line (7pt): **The do-nothing threshold is the calendar surcharge inverted.*
 minimise   dead-zone cash burn = break deficit + reactivation
 s.t.       reactivation lead ≥ 28 days · SLA ≤ 27.1 min at peak
            revocation ≥ 513 orders/day · no calendar-indexed lease
-           7-week rule · basis: residual r = 0%, CM ₹30.3 at AOV ₹580
+           7-week rule · basis: residual r = 0%, CM ₹30.3 at AOV ₹573
 
 STRATEGY          DEAD ZONE   RESID DEM   REACTIVN   DAYS→SVC
 DO_NOTHING          ₹31.6 L      70.8%          ₹0          0
@@ -286,7 +286,7 @@ blended ₹100/sqft line, not an itemised figure — the least defensible number
 
 **Band:** Cost is exhausted at 48.6% and a break delivers zero. **The gap has to be filled by demand, which makes it a question about where the store is, not how it is run.**
 
-**Footnote:** Sources 1, 11, 17, 18 · last mile ₹19.0/order derived on slide 6 · solver A4 · fixed-base derivation A5
+**Footnote:** Sources 1, 11, 17, 18 · last mile ₹17.6/order derived on slide 6 · solver A4 · fixed-base derivation A5
 
 ---
 
@@ -298,11 +298,11 @@ blended ₹100/sqft line, not an itemised figure — the least defensible number
  ┌ 0.45→5.35 @2.06 · EXH 11 four sensitivity cells, 1.20 wide each ───────┐
  ┌ 0.45→5.35 @3.06 · EXH 12 DuPont mono card, height 0.92 ────────────────┐
  ┌ 5.45→9.55 @1.44 · EXH 13 roce_ladder.png 4.10 × 1.42 ─────────────────┐
- ┌ 5.45→9.55 @3.00 · five-row fact list (breakeven → benchmark → premium)  ──┐
+ ┌ 5.45→9.55 @3.00 · five-row fact list (breakeven → hurdle → premium)  ──┐
  red callout 0.45→5.35 @4.06 (two asset turns) · band @4.76 · footnote
 ```
 
-**Action title:** Campus density buys back the academic calendar almost exactly — and reaches Eternal's public 40% ROCE benchmark at ₹763
+**Action title:** Campus density buys back the academic calendar almost exactly — and on Eternal's disclosed hurdle metric the node clears 40% ROCE at ₹755
 
 **Kicker:** Asset turn is the turnover leg of ROCE. The node clears that leg at 94% of a city store. The margin leg is what the basket has to buy.
 
@@ -318,17 +318,17 @@ Caption: Blinkit's own observed nine-quarter range is 1,334–1,487 orders/day²
 ```
 ROCE = EBIT/CE = (EBIT/NOV) × (NOV/CE)     DuPont
                   margin leg   turnover leg
-     = 4.71%    ×   8.50×     =  40.0%     at AOV ₹763
+     = 4.74%    ×   8.44×     =  40.0%     at AOV ₹755
 AOV* = (ROCE·CE + F·12)/(τ·N) + c/τ        closed form, no search
 ```
 
 **EXHIBIT 13** — `roce_ladder.png`, then a five-row fact list beneath it:
-AOV for ROCE = 0 **₹578** · AOV for the 40% benchmark **₹763** · premium over breakeven **₹185** ·
-non-grocery mix it implies **33.0% of GOV** · Swiggy disclosed reference range **30–40%**
+AOV for ROCE = 0 **₹571** · AOV for the 40% hurdle **₹755** · premium over breakeven **₹185** ·
+non-grocery mix it implies **32.3% of GOV** · the 30–40% range disclosed by Swiggy
 
-**Red callout:** TWO ASSET TURNS, BOTH CORRECT — QUOTE THE BASIS. The 6.93× is a like-for-like comparison at a common AOV of ₹450, which is what isolates density × calendar. The DuPont leg (8.50×) is the node's own turnover at its achieved AOV on capital employed including working capital.
+**Red callout:** TWO ASSET TURNS, BOTH CORRECT — QUOTE THE BASIS. The 6.93× is a like-for-like comparison at a common AOV of ₹450, which is what isolates density × calendar. The DuPont leg (8.44×) is the node's own turnover at its achieved AOV on capital employed including working capital.
 
-**Band:** Breakeven is not the return benchmark. **₹578 earns zero on ₹325 lakh; ₹763 earns 40%** — and the site is what supplies the throughput either one needs.
+**Band:** Breakeven was never the hurdle. **₹571 earns zero on ₹324 lakh; ₹755 earns 40%** — and the site is what supplies the throughput either one needs.
 
 **Footnote:** Sources 1, 2, 4, 8, 10, 11 · ROCE model, DuPont reconciliation and the day-count note A6b
 
@@ -391,7 +391,7 @@ Karnataka, 190, 11.2, 26 · Visakhapatnam, Andhra Pradesh, 133, 15.0, 18 · Dhar
  red concession strip @4.64 · band @4.76 · footnote
 ```
 
-**Action title:** Split the trip at the gate and pay for the batch with time — last mile falls from ₹42.0 to ₹19.0 an order, and the product is fastest at exam-night peak
+**Action title:** Split the trip at the gate and pay for the batch with time — last mile falls from ₹42.0 to ₹17.6 an order, while cost per order is lowest at exam-night peak
 
 **Kicker:** Two decisions on one page. The fleet is a labour class, not a vehicle. The SLA is a batching rule, not a promise.
 
@@ -399,9 +399,9 @@ Karnataka, 190, 11.2, 26 · Visakhapatnam, Andhra Pradesh, 133, 15.0, 18 · Dhar
 ACTIVE hour"* → gate → four thin arrows to hostel blocks *"in-gate leg · employed runner · ₹72 per
 ROSTERED hour"*. Dashed vertical line through the gate: **the labour class changes here — 2.33×, and 1.60× on the least favourable anchor.**
 
-**EXHIBIT 19 — SLA table:** Trough 6.5/hr, batch 1, 25.7 min, ₹64.8 · Average 25.9, 2, 21.6, ₹33.0 ·
-**Peak 4× 103.7, 10, 27.1, ₹7.7** · Exam night 6× 155.6, 12, 27.1, ₹6.6.
-Annotation in gold: a 4× spike needs 1.4× the runners — absorbed by batch size, not headcount. 62.7% of orders fall in the peak band, which is why the volume-weighted cost is ₹19.0 and an average-hour calculation would say ₹33.0.
+**EXHIBIT 19 — SLA table:** Trough 6.5/hr, batch 1, 25.7 min, ₹54.5 · Average 25.9, 2, 21.6, ₹28.9 ·
+**Peak 4× 103.7, 10, 27.1, ₹8.5** · Exam night 6× 155.6, 12, 27.1, ₹7.6.
+Annotation in gold: a 4× spike needs 1.4× the runners — absorbed by batch size, not headcount. 62.7% of orders fall in the peak band, which is why the volume-weighted cost is ₹17.6 and an average-hour calculation would say ₹28.9.
 
 **EXHIBIT 20 — labour class table:** Gig quick-commerce 0 / ₹42.06 / ₹2.36 / ₹168 / 40% / any ·
 Gig JM non-metro 0 / ₹43.96 / ₹2.36 / ₹176 / 36% / any · **Employed runner ₹577 / ₹4.66 / ₹0 / ₹72 /
@@ -425,7 +425,7 @@ orders, up from 42%¹²
 
 **Red strip:** CONCESSION — 11 minutes is a marketing number. Walmart's own CEO says under 13¹³, Euromonitor 15–20¹⁴, our 35-store field survey median 15 with 9% at ten or under³. The two ten-minute operators in J.P. Morgan's table did not batch¹¹.
 
-**Band:** Both decisions are cheap and reversible. **Together they are the ₹19.0 an order the whole D1 case rests on.**
+**Band:** Both decisions are cheap and reversible. **Together they are the ₹17.6 an order the whole D1 case rests on.**
 
 **Footnote:** Sources 1, 3, 11, 12, 13, 14, 16 · trip identity and volume weighting A5 · labour-class provenance A2
 
@@ -443,33 +443,33 @@ orders, up from 42%¹²
  red callout 0.45→9.55 @4.30 (the limit) · band @4.76 · footnote
 ```
 
-**Action title:** One node earns ₹130 lakh of EBIT and 32.7% on capital at a 30% non-grocery basket, and reaches Eternal's public 40% benchmark at ₹763
+**Action title:** One node earns ₹111 lakh of EBIT and 34.4% on capital at a 30% non-grocery basket; a disclosed external 40% benchmark corresponds to ₹755
 
 **Kicker:** The basket is fitted, not assumed — the one disclosed quarterly series where an Indian operator actually lifted AOV. Every point of non-grocery mix is worth ₹11.28.
 
-**EXHIBIT 23** — `pnl_bridge.png`. Header line above it: 361,958 orders a year at AOV ₹763, NOV ₹27.6 cr.
+**EXHIBIT 23** — `pnl_bridge.png`. Header line above it: 361,958 orders a year at AOV ₹755, NOV ₹27.6 cr.
 
-**Capital rows:** capex, midpoint of the band **₹235 L** · working capital at 14 NWC days **₹90 L** ·
-**capital employed ₹325 L** · cash conversion cycle **−47 days — the node is supplier-funded**⁹
+**Capital rows:** capex, midpoint of the band **₹235 L** · working capital at 14 NWC days **₹88.9 L** ·
+**capital employed ₹323.9 L** · cash conversion cycle **−47 days — the node is supplier-funded**⁹
 
-**EXHIBIT 24** — `basket_ladder.png`. Caption: ₹450 → ₹525 on term-start durables → ₹580 at 24.9%
-non-grocery, from 20% today. The 40% benchmark needs 33.0% — within Swiggy's disclosed 30–40% range,
-with 7.0 points of headroom. This is a cross-operator reference, not a Flipkart commitment.
+**EXHIBIT 24** — `basket_ladder.png`. Caption: ₹450 → ₹525 on term-start durables → ₹573 at 24.3%
+non-grocery, from 20% today. The 40% hurdle needs 32.3% — still inside the disclosed 30–40% range,
+with 7.0 points of headroom.
 
-**EXHIBIT 25 — returns:** breakeven AOV ₹578 · benchmark AOV, pre-tax **₹763** · post-tax at 25.17% ₹825 ·
+**EXHIBIT 25 — returns:** breakeven AOV ₹571 · hurdle AOV, pre-tax **₹755** · post-tax at 25.17% ₹817 ·
 IRR, 5-year, 3-month ramp **34.4%** · ramp 2–6 months 35%–31% · node life anchor 56-month payback¹¹
 
 **EXHIBIT 26 — scenarios (data table):**
 | Scenario | AOV | Margin | Turn | ROCE | Payback |
 |---|---|---|---|---|---|
-| Underwritten, at breakeven | ₹578 | 0.00% | 6.44× | 0.0% | — |
-| Basket at 30% non-grocery | ₹729 | 4.03% | 8.12× | **32.7%** | 27 mo |
-| Basket at 40% non-grocery | ₹842 | 6.09% | 9.38× | **57.1%** | 15 mo |
-| **30% basket, volume −30%** | ₹729 | 2.27% | 5.69× | **12.9%** | **67 mo** |
+| Underwritten, at breakeven | ₹571 | 0.00% | 6.44× | 0.0% | — |
+| Basket at 30% non-grocery | ₹729 | 4.22% | 8.15× | **34.4%** | 25 mo |
+| Basket at 40% non-grocery | ₹842 | 6.09% | 9.38× | **58.8%** | 15 mo |
+| **30% basket, volume −30%** | ₹729 | 2.27% | 5.69× | **14.0%** | **67 mo** |
 
-**Red callout:** THE LIMIT, COMPUTED NOT ASSERTED — at a 30% basket with volume 30% below plan the node returns 12.9% and pays back in 67 months, longer than the 60 months its life is anchored on. Under that combination it does not pay back within its life. That is why day 90 measures volume before anything else, and why node two is not funded until it clears.
+**Red callout:** THE LIMIT, COMPUTED NOT ASSERTED — at a 30% basket with volume 30% below plan the node returns 14.0% and pays back in 62 months, longer than the 60 months its life is anchored on. Under that combination it does not pay back within its life. That is why day 90 measures volume before anything else, and why node two is not funded until it clears.
 
-**Band:** The modeled basket mix falls within Swiggy's disclosed range; this does not establish Flipkart feasibility. **One dependency binds: term volume.**
+**Band:** The node clears the hurdle on a basket mix inside a disclosed industry range. **One dependency binds: term volume.**
 
 **Footnote:** Sources 2, 4, 8, 9, 10, 11 · P&L, capital and ROCE derivation A6b · basket fit R²=0.918 on four disclosed quarters A6 · NPV at 12%/15% assumes a discount rate; no WACC is disclosed
 
@@ -511,7 +511,7 @@ figure already net of it, so charging it again double-counts.
 
 **Gold callout:** WHAT WE CONCEDE, BEFORE YOU ASK — 11 minutes is marketing (slide 6). The industry relocates rather than mothballs, and we never proposed mothballing: holding costs 24% of one move. We are not first — Swiggy, Blinkit and Zepto are all in this segment. None underwrites the node on the cluster rather than the campus.
 
-**Band:** Approve one node, ₹325 lakh, and a day-90 gate on four metrics. **If volume clears, node two is a siting decision we have already made 111 times.**
+**Band:** Approve one node, ₹324 lakh, and a day-90 gate on four metrics. **If volume clears, node two is a siting decision we have already made 111 times.**
 
 **Footnote:** Sources 8, 13, 19, 20, 21 · shock derivations A5 · assumption ledger A3 · fragmentation A7b
 

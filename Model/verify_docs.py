@@ -6,9 +6,7 @@ import re, sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import campus_model as M, cost_stack as C, break_mode as B, basket as BK, working_capital as W, sla as S
 _rows, D2 = S.volume_weighted()
-HERE = os.path.dirname(os.path.abspath(__file__))
-DOC = (sys.argv[1] if len(sys.argv) > 1 else
-       os.path.join(HERE, "verification", "HANDOFF_snapshot.md"))
+DOC = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "HANDOFF.md")
 
 def num(tok):
     t = re.sub(r"[^0-9.\-]", "", tok).rstrip(".")
@@ -46,7 +44,7 @@ CHECKS = {
  "basket slope":          (r"AOV = ([\d.]+) x \(non-grocery", BK.SLOPE),
  "basket r2":             (r"R2 = (0\.\d+)", BK.R2),
  "basket occasion":       (r"Rs450 -> Rs(\d+) \(term-start", BK.OCCASION_AOV),
- "basket share needed":   (r"Rs580 at ([\d.]+)%\nnon-grocery", BK.SHARE_NEEDED_AFTER_OCCASION),
+ "basket share needed":   (r"Rs\d+ at ([\d.]+)%\nnon-grocery", BK.SHARE_NEEDED_AFTER_OCCASION),
 }
 
 def run():

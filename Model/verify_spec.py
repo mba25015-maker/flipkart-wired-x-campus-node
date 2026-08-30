@@ -13,12 +13,11 @@ import aishe_district as AD, calendar_fragmentation as CF, risk_quadrant as Q
 import basket as BK, working_capital as WC, risk_shocks as RS, fleet_mix as F
 import labour_class as LC
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
 # Checks every figure-bearing build document, not just the spec: a number that drifts in the PPT
 # build prompt reaches a slide just as surely as one that drifts in the spec.
 DOCS = ([sys.argv[1]] if len(sys.argv) > 1 else
-        [os.path.join(HERE, "verification", d) for d in
-         ("DECK_SPEC_snapshot.md", "PPT_BUILD_PROMPT_snapshot.md")])
+        [os.path.join(ROOT, d) for d in ("DECK_SPEC_SemiFinal.md", "PPT_BUILD_PROMPT_SemiFinal.md")])
 TEXT = "\n".join(open(d, encoding="utf-8").read() for d in DOCS)
 DOC  = " + ".join(os.path.basename(d) for d in DOCS)
 
@@ -127,15 +126,15 @@ must("working capital at 14 days",       f"{WC.WC_ADOPTED/1e5:.1f} lakh" if hasa
 # ---- figures that live only in the PPT build prompt -----------------------------
 import roce as RC
 must_num("capital employed",             RC.CE_BASE/1e5)
-must("external-benchmark AOV",            f"{RC.AOV_HURDLE:,.0f}")
+must("hurdle AOV",                       f"{RC.AOV_HURDLE:,.0f}")
 must("ROCE breakeven AOV",               f"{RC.AOV_BREAKEVEN:,.0f}")
 must("ROCE at a 30% basket",             f"{RC.roce(RC.AOV_UP):.1%}")
 must("ROCE at a 40% basket",             f"{RC.roce(RC.AOV_MAX):.1%}")
 must("downside ROCE",                    f"{RC.roce(RC.AOV_UP, v=M.CEILING*RC.VOL_SHOCK):.1%}")
-must("IRR at the external benchmark",     f"{RC.irr(RC.AOV_HURDLE):.1%}")
+must("IRR at the hurdle",                f"{RC.irr(RC.AOV_HURDLE):.1%}")
 must("DuPont margin leg",                f"{RC.dupont(RC.AOV_HURDLE)['ebit_margin']:.2%}")
 must("DuPont turnover leg",              f"{RC.dupont(RC.AOV_HURDLE)['capital_turn']:.2f}")
-must("non-grocery share at the benchmark", f"{RC.HURDLE_NONGROCERY_SHARE:.1f}%")
+must("non-grocery share at the hurdle",  f"{RC.HURDLE_NONGROCERY_SHARE:.1f}%")
 must("capex midpoint",                   f"{RC.CAPEX_MID/1e5:,.0f}")
 must("orders per year",                  f"{RC.orders_year():,.0f}")
 must("node life anchor",                 f"{M.FRANCHISE_PAYBACK}-month")

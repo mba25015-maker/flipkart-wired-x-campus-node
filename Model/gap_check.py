@@ -37,11 +37,11 @@ print("A 10-15 minute promise is not reachable on ANY of these. The honest produ
 
 print("\n"+"="*84); print("PROBE 3: cost per order at ACHIEVABLE batch sizes".center(84)); print("="*84)
 # S26 REFRESH: the headline is no longer a single batch size. sla.volume_weighted() gives
-# Rs19.0/order across the daypart (batch 10 at peak / 2 at average / 1 at trough, 62.7% of
+# The live volume-weighted cost across the daypart (batch 10 at peak / 2 at average / 1 at trough, 62.7% of
 # orders in the peak band). This probe now tests the DESIGN against fixed-batch alternatives.
 import sla as _S
 _rows, HEADLINE = _S.volume_weighted()
-print(f"{'batch':>7}{'Rs/order':>11}{'vs volume-weighted Rs19.0':>27}{'vs standard zone':>19}")
+print(f"{'batch':>7}{'Rs/order':>11}{f'vs volume-weighted Rs{HEADLINE:.2f}':>27}{'vs standard zone':>19}")
 head = HEADLINE
 for b in (3,4,6,8):
     c=F.total_campus_cost("E-cart, stationed",b,F.RUNNER_HR,F.SHELF_DROP)
