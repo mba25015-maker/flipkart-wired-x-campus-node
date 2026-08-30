@@ -22,6 +22,19 @@ ALL FOUR LAYERS PASS
 
 `run_all.py` exits nonzero if any layer fails and verifies the exact presentation named by `Model/params.py`.
 
+## Run the models in Google Colab
+
+No local installation is required. Each link opens a runnable copy directly from this GitHub repository.
+
+| Notebook | What it proves | Open |
+|---|---|---|
+| L1 — Audit and verification | Runs all four verification layers on the model, documents, specification, and final deck | [![Open L1 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L1_Audit_Verification.ipynb) |
+| L2 — Dead-zone solver | Compares five strategies under the operating constraints | [![Open L2 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L2_Dead_Zone_Solver.ipynb) |
+| L3 — Return model | Reproduces ROCE, payback, IRR, DuPont, and benchmark-implied AOV | [![Open L3 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L3_Return_Model.ipynb) |
+| L4 — District screen | Runs the public-safe AISHE district screening model | [![Open L4 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L4_District_Screen.ipynb) |
+| L5 — Fulfilment model | Reproduces SLA, batching, fleet topology, and ₹17.61 cost per order | [![Open L5 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L5_Fulfilment_Model.ipynb) |
+| L6 — Basket regression | Reproduces the four-quarter basket fit and mix ladder | [![Open L6 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mba25015-maker/flipkart-wired-x-campus-node/blob/main/notebooks/L6_Basket_Regression.ipynb) |
+
 ## Setup
 
 ```bash
