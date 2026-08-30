@@ -14,7 +14,7 @@ regenerated. This layer reads them.
 
 Scope: Campus_Store_Model.xlsx, the six notebooks, deck_asset_manifest.csv, and Model/data.
 """
-import csv, json, os, re, sys
+import csv, json, os, re, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
@@ -59,7 +59,31 @@ NBD = next((d for d in (os.path.join(ROOT, "notebooks"),
                         os.path.join(ROOT, "_release_repo", "notebooks")) if os.path.isdir(d)), None)
 if NBD:
     nbs = sorted(f for f in os.listdir(NBD) if f.endswith(".ipynb"))
-    chk(len(nbs) == 6, "NOTEBOOKS  all six present", f"{len(nbs)} found")
+    # Structure alone is not enough. L5 once passed every package verifier while its public
+    # cell failed because sla.py's display loop still unpacked the old eight-column row after
+    # volume_weighted() had grown to ten columns. Execute every non-recursive notebook
+    # entrypoint here; L1 is this verifier's parent (run_all.py), so assert that it is wired to
+    # the supported command rather than recursively launching it.
+    _entrypoints = {
+        "L2_Dead_Zone_Solver.ipynb": ["solver.py"],
+        "L3_Return_Model.ipynb": ["roce.py"],
+        "L4_District_Screen.ipynb": ["aishe_district.py"],
+        "L5_Fulfilment_Model.ipynb": ["sla.py", "fleet_mix.py"],
+        "L6_Basket_Regression.ipynb": ["basket.py"],
+    }
+    _entry_fail = []
+    for _nb, _scripts in _entrypoints.items():
+        for _script in _scripts:
+            _run = subprocess.run([sys.executable, os.path.join(HERE, _script)],
+                                  cwd=ROOT, stdout=subprocess.DEVNULL,
+                                  stderr=subprocess.PIPE, text=True)
+            if _run.returncode:
+                _entry_fail.append(f"{_nb}:{_script}:exit {_run.returncode}")
+    _l1 = os.path.join(NBD, "L1_Audit_Verification.ipynb")
+    _l1_wired = os.path.exists(_l1) and "Model/run_all.py" in open(_l1, encoding="utf-8").read()
+    chk(len(nbs) == 6 and _l1_wired and not _entry_fail,
+        "NOTEBOOKS  all six present and entrypoints execute",
+        (_entry_fail[:2] if _entry_fail else f"{len(nbs)} found; all commands exit 0"))
     saved_out, homepaths, stale = [], [], []
     for f in nbs:
         nb = json.load(open(os.path.join(NBD, f), encoding="utf-8"))
