@@ -51,14 +51,18 @@ def runners_needed(rate_hr, batch, drop=F.SHELF_DROP):
     per_runner_hr = 60.0/F.circuit_min("E-cart, stationed", batch, drop)*batch
     return rate_hr/per_runner_hr
 
+def demand_states():
+    """Canonical within-term demand states shared by SLA and assortment policy."""
+    return [("Trough", BASE_RATE*PTDR_TROU), ("Average", BASE_RATE),
+            ("Peak (4x)", BASE_RATE*PTDR_PEAK), ("Exam night (6x)", BASE_RATE*6)]
+
 if __name__=="__main__":
     print("="*88); print("THE PROMISE WE CAN ACTUALLY KEEP".center(88)); print("="*88)
     print(f"Cluster {M.CEILING:,} orders/day across {CAMPUSES} campuses -> {BASE_RATE:.1f} orders/hour at one gate\n")
     print(f"{'state':<14}{'orders/hr':>11}{'batch (dyn)':>13}{'batch wait':>12}"
           f"{'AVG SLA':>10}{'LAST':>8}{'runners':>9}{'Rs/order':>10}")
     print("-"*88)
-    STATES = [("Trough", BASE_RATE*PTDR_TROU), ("Average", BASE_RATE),
-              ("Peak (4x)", BASE_RATE*PTDR_PEAK), ("Exam night (6x)", BASE_RATE*6)]
+    STATES = demand_states()
     for name, rate in STATES:
         b = dynamic_batch(rate)
         cost = F.total_campus_cost("E-cart, stationed", b, F.RUNNER_HR, F.SHELF_DROP)

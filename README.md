@@ -27,6 +27,17 @@ All five layers passed on the last recorded run.
 separate commands, one of which needed an explicit filename, and it defaulted to a superseded
 build when run without one.
 
+The demand-state assortment policy has its own transparent guardrail report:
+
+```bash
+python3 Model/assortment.py
+```
+
+It preserves a 16,500-SKU network range through SDFC backfill while varying the modelled local
+range by demand state. The 7,000 / 8,000 / 4,200 local caps are policy inputs, not observed demand
+forecasts, and the financial evidence gate remains closed: no incremental saving enters the
+published solver.
+
 To rebuild the deck and re-verify the exact stamped file:
 
 ```bash
@@ -90,10 +101,12 @@ pip install -r requirements.txt
 | path | what |
 |---|---|
 | `Model/params.py` | every contested policy constant, defined once |
+| `Model/assortment.py` | demand-state local allocation, temperature constraints and financial evidence gate |
 | `Model/run_all.py` | the only supported verification entrypoint |
 | `Model/release.py` | build → verify → capture → stamp → re-verify |
 | `Model/source_scan.py` | scans the source tree, not just the artifact |
 | `notebooks/` | six runnable notebooks, L1–L6 |
+| `ASSORTMENT_MODEL_HANDOFF.md` | evidence classes, current state allocations and pilot inputs required for recalibration |
 | `Flipkart_Minutes_WiRED_SemiFinal_FULL_light.pptx` | the submission |
 
 ## Reproducibility note

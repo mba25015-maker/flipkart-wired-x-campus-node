@@ -140,6 +140,15 @@ PG_HOSTEL_TERM_OPD = CLUSTER_VOLUME
 PG_NORMALISED_BEDS = 1000
 PG_PENETRATION_SENSITIVITY = (0.10, 0.25, 0.40)
 
+# ---------------------------------------------------------------- ASSORTMENT FLEX
+# Operational recommendations may always be produced, but incremental financial savings stay
+# at zero until pilot evidence opens this gate. Cold-power savings already live in break_mode.py
+# and must not be counted here again.
+ASSORTMENT_FINANCIAL_ENABLED = False
+ASSORTMENT_WASTE_MARKDOWN_SAVING_MONTH = 0.0
+ASSORTMENT_HANDLING_SAVING_MONTH = 0.0
+ASSORTMENT_NWC_RELEASE = 0.0
+
 # ---------------------------------------------------------------- BUILD TARGETS
 FINAL_DECK = "Flipkart_Minutes_WiRED_SemiFinal_FULL_light.pptx"
 # verify_deck.py defaulted to Flipkart_Minutes_WiRED_SemiFinal_light.pptx - the

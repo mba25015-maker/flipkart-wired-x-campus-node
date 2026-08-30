@@ -21,8 +21,9 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
 import params as P, campus_model as M, cost_stack as CS, sla as SL, fleet_mix as FM
-import roce as RC, working_capital as WC, break_mode as B, risk_shocks as RS
+import roce as RC, working_capital as WC, break_mode as B, risk_shocks as RS, rent_lever as R
 import basket as BK, aishe_district as AD, check_counts as CC, pg_demand as PG
+import assortment as AS
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
 OUT  = os.path.join(ROOT, "Campus_Store_Model.xlsx")
@@ -125,6 +126,10 @@ def build():
         ("Term days", RC.DAYS_TERM, "days/year","D","365 x active academic months / 12"),
         ("Break days", RC.DAYS_BREAK, "days/year","D","365 - term days"),
         ("Hostel comparison AOV", RC.AOV_UP, "Rs/order","D","basket at the 30% non-grocery floor"),
+        ("Assortment financial evidence gate", P.ASSORTMENT_FINANCIAL_ENABLED, "TRUE/FALSE","P","opens only after pilot category evidence is approved"),
+        ("Assortment waste + markdown saving", P.ASSORTMENT_WASTE_MARKDOWN_SAVING_MONTH, "Rs/break month","P","pilot-observed; zero means not evidenced"),
+        ("Assortment handling saving", P.ASSORTMENT_HANDLING_SAVING_MONTH, "Rs/break month","P","pilot-observed; excludes labour already flexed elsewhere"),
+        ("Assortment NWC release", P.ASSORTMENT_NWC_RELEASE, "Rs one-time","P","pilot-observed cash release; not EBIT"),
     ]
     for row in _inputs:
         _input_rows[row[0]] = r
@@ -333,6 +338,52 @@ def build():
             ws.cell(row=rr,column=2).number_format="0.00"
             ws.cell(row=rr,column=4).number_format="0.00"
             ws.cell(row=rr,column=5).number_format="0.00"
+
+    # ---------------------------------------------------------------- 10 Assortment
+    ws=sheet(wb,"10 Assortment","Assortment — demand-state local range, wide network promise",
+        "The optimiser changes what is held locally, not what the Minutes network can offer. "
+        "All 16,500 network SKUs remain available through SDFC backfill. Financial savings remain "
+        "zero until the gold pilot inputs on 1 Inputs are evidenced and explicitly promoted.")
+    ps=AS.plans(); states=[p.key for p in AS.POLICIES]
+    r=4; ws.cell(row=r,column=1,value="FINANCIAL PROMOTION GATE").font=BOLD; r+=1
+    header(ws,r,[("Metric",38),("Value",18),("Decision reading",72)]); r+=1
+    r=put(ws,r,["Evidence status",f'=IF(AND({_iref("Assortment financial evidence gate")}=TRUE,OR({_iref("Assortment waste + markdown saving")}>0,{_iref("Assortment handling saving")}>0,{_iref("Assortment NWC release")}>0)),"OPEN","CLOSED")',
+                  "CLOSED means no assortment saving enters the published solver"],fill=PILOT,bold=True)
+    r=put(ws,r,["Incremental monthly opex saving",f'=IF(B{r-1}="OPEN",{_iref("Assortment waste + markdown saving")}+{_iref("Assortment handling saving")},0)',
+                  "excludes the cold-power saving already in break_mode.cfg_cold"],fill=CALC,fmt="#,##0")
+    r=put(ws,r,["One-time NWC release",f'=IF(B{r-2}="OPEN",{_iref("Assortment NWC release")},0)',
+                  "cash timing only; not EBIT"],fill=CALC,fmt="#,##0")
+    r=put(ws,r,["Promoted to solver","NO","requires a separate reviewed promotion decision"],fill=CHIP,bold=True)
+
+    r+=2; ws.cell(row=r,column=1,value="OPTIMISED LOCAL SKU ALLOCATION").font=BOLD; r+=1
+    widths=[("Category",29),("Temperature",14)]+[(s.replace(" (4x)","").replace(" night (6x)",""),15) for s in states]+[("Evidence",18)]
+    header(ws,r,widths); r+=1; first_cat=r
+    for cat in AS.CATEGORIES:
+        r=put(ws,r,[cat.label,cat.temperature]+[ps[s]["allocation"][cat.key] for s in states]+["A — policy"],fill=CALC)
+        for cc in range(3,3+len(states)): ws.cell(r-1,cc).number_format="#,##0"
+    last_cat=r-1
+    r=put(ws,r,["LOCAL SKUs","—"]+[f'=SUM({get_column_letter(c)}{first_cat}:{get_column_letter(c)}{last_cat})' for c in range(3,3+len(states))]+["computed"],bold=True)
+    local_row=r-1
+    r=put(ws,r,["SDFC tail","—"]+[f'={int(R.SKU_BASE)}-{get_column_letter(c)}{local_row}' for c in range(3,3+len(states))]+["computed"],fill=CHIP)
+    tail_row=r-1
+    r=put(ws,r,["NETWORK assortment","—"]+[f'={get_column_letter(c)}{local_row}+{get_column_letter(c)}{tail_row}' for c in range(3,3+len(states))]+["must remain wide"],fill=CHIP,bold=True)
+    network_row=r-1
+    r=put(ws,r,["Cold SKUs","—"]+[f'=SUM({get_column_letter(c)}{first_cat+1}:{get_column_letter(c)}{first_cat+3})' for c in range(3,3+len(states))]+["chilled + frozen"],fill=CHIP)
+    cold_row=r-1
+    r=put(ws,r,["Local cap","—"]+[p.local_cap for p in AS.POLICIES]+["hard constraint"],fill=SRC)
+    cap_row=r-1
+    r=put(ws,r,["Cold cap","—"]+[p.cold_cap for p in AS.POLICIES]+["hard constraint"],fill=SRC)
+    coldcap_row=r-1
+    r=put(ws,r,["Guardrail","—"]+[f'=IF(AND({get_column_letter(c)}{local_row}<={get_column_letter(c)}{cap_row},{get_column_letter(c)}{cold_row}<={get_column_letter(c)}{coldcap_row},{get_column_letter(c)}{network_row}={int(R.SKU_BASE)}),"PASS","FAIL")' for c in range(3,3+len(states))]+["all three must hold"],fill=PILOT,bold=True)
+
+    r+=2; ws.cell(row=r,column=1,value="PILOT DATA REQUIRED BEFORE FINANCIAL PROMOTION").font=BOLD; r+=1
+    header(ws,r,[("Input",38),("Why it matters",72)]); r+=1
+    for a,b in (("Category velocity by demand state","replaces A-tier priorities with observed demand"),
+                ("Waste and markdown by category","prices only genuinely avoided loss"),
+                ("Shelf life, case pack and replenishment lead","sets safe inventory floors"),
+                ("Cold-zone kWh by operating mode","reconciles with, rather than duplicates, cfg_cold"),
+                ("Stockout and fill-rate guardrails","prevents cost savings from weakening the promise")):
+        r=put(ws,r,[a,b])
     wb.save(OUT); return OUT
 
 if __name__=="__main__":
