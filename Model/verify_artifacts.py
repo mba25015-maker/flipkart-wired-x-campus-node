@@ -72,6 +72,11 @@ if NBD:
         "L6_Basket_Regression.ipynb": ["basket.py"],
     }
     _entry_fail = []
+    _display_missing = []
+    for _nb in nbs:
+        _raw = open(os.path.join(NBD, _nb), encoding="utf-8").read()
+        if "capture_output=True" not in _raw or "result.check_returncode()" not in _raw:
+            _display_missing.append(_nb)
     for _nb, _scripts in _entrypoints.items():
         for _script in _scripts:
             _run = subprocess.run([sys.executable, os.path.join(HERE, _script)],
@@ -81,9 +86,10 @@ if NBD:
                 _entry_fail.append(f"{_nb}:{_script}:exit {_run.returncode}")
     _l1 = os.path.join(NBD, "L1_Audit_Verification.ipynb")
     _l1_wired = os.path.exists(_l1) and "Model/run_all.py" in open(_l1, encoding="utf-8").read()
-    chk(len(nbs) == 6 and _l1_wired and not _entry_fail,
-        "NOTEBOOKS  all six present and entrypoints execute",
-        (_entry_fail[:2] if _entry_fail else f"{len(nbs)} found; all commands exit 0"))
+    chk(len(nbs) == 6 and _l1_wired and not _entry_fail and not _display_missing,
+        "NOTEBOOKS  entrypoints execute and surface their output",
+        ((_entry_fail + [f"{n}:output hidden" for n in _display_missing])[:2]
+         if (_entry_fail or _display_missing) else f"{len(nbs)} found; all commands visible, exit 0"))
     saved_out, homepaths, stale = [], [], []
     for f in nbs:
         nb = json.load(open(os.path.join(NBD, f), encoding="utf-8"))
