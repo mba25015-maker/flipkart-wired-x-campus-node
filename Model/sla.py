@@ -227,7 +227,7 @@ if __name__=="__main__":
     print("\n"+"="*88); print("THE HONEST HEADLINE: cost weighted by ORDERS, not by hours".center(88)); print("="*88)
     print(f"{'demand band':<36}{'hrs':>5}{'rate':>6}{'% of orders':>13}{'batch':>7}{'Rs/order':>10}{'SLA':>7}")
     print("-"*88)
-    for name,h,m,share,rate,b,cost,s in rows:
+    for name,h,m,share,rate,b,cost,s,_,_ in rows:
         print(f"{name:<36}{h:>5}{m:>5.2f}x{share:>12.1%}{b:>7}{cost:>10.1f}{s:>7.1f}")
     print("-"*88)
     print(f"{'VOLUME-WEIGHTED COST PER ORDER':<36}{'':<31}{w:>10.1f}")

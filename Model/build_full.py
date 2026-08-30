@@ -1004,7 +1004,7 @@ LINKS = {
  "L2": ("L2_Dead_Zone_Solver",    "Five strategies, four constraints, one basis. BEST = REPURPOSE is the solver's output, not our preference."),
  "L3": ("L3_Return_Model",        "ROCE, DuPont, payback, IRR and the AOV that clears a 40% hurdle — solved in closed form, not searched."),
  "L4": ("L4_District_Screen",     f"72,352 institutions, {AD.N_DISTRICTS} districts, four screen criteria, and the contestedness band that cut 72% of our own shortlist."),
- "L5": ("L5_Fulfilment_Model",    f"The trip identity, the batching rule and the volume weighting that produce ₹{LM:.1f} an order."),
+ "L5": ("L5_Fulfilment_Model",    f"The trip identity and volume weighting that produce ₹{LM:.1f}/order, plus the demand-state local assortment policy."),
  "L6": ("L6_Basket_Regression",   "Four-quarter fit, R² = 0.918, with the four-point limitation shown explicitly."),
 }
 SHEET = "docs.google.com/spreadsheets/d/1CEo9XOH5WeR8ZwHS0qF-ulBTGm0GlhUfNL8YzRGmyfM"
@@ -1915,7 +1915,7 @@ def _write_manifest():
     import csv
     rows=[["Link","Notebook","Runs","Appendix page","What it proves","Colab URL","QR asset","Screenshot asset"]]
     runs={"L1":"audit.py","L2":"solver.py","L3":"roce.py","L4":"aishe_district.py",
-          "L5":"sla.py","L6":"basket.py"}
+          "L5":"sla.py; fleet_mix.py; assortment.py","L6":"basket.py"}
     page={"L1":"A1","L2":"A4","L3":"A6b","L4":"A7","L5":"A5","L6":"A6"}
     shots={"L1":"assets/screenshots/S1_audit.png; assets/screenshots/S2_deck.png",
            "L2":"assets/screenshots/S3_solver_repurpose.png","L3":"assets/screenshots/S4_roce_hurdle.png",
